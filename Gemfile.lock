@@ -2,6 +2,7 @@ PATH
   remote: .
   specs:
     comicbook (0.1.0)
+      rubyzip (>= 3.2.1)
 
 GEM
   remote: https://rubygems.org/
@@ -77,6 +78,7 @@ GEM
       lint_roller (~> 1.1)
       rubocop (~> 1.72, >= 1.72.1)
     ruby-progressbar (1.13.0)
+    rubyzip (3.2.1)
     stringio (3.1.7)
     tsort (0.2.0)
     unicode-display_width (3.2.0)
