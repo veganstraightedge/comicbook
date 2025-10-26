@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 require 'comicbook'
 
 RSpec.configure do |config|
