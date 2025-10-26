@@ -12,19 +12,19 @@ RSpec.describe ComicBook do
   end
 
   after do
-    FileUtils.rm_rf(temp_dir)
+    FileUtils.rm_rf temp_dir
   end
 
   it 'has a version number' do
     expect(ComicBook::VERSION).not_to be_nil
   end
 
-  describe '.new' do
+  describe '#new' do
     it 'creates a ComicBook instance with a file path' do
       cb = described_class.new test_file
 
       expect(cb).to be_a described_class
-      expect(cb.path).to eq File.expand_path(test_file)
+      expect(cb.path).to eq File.expand_path test_file
       expect(cb.type).to eq :cbz
     end
 
@@ -37,7 +37,7 @@ RSpec.describe ComicBook do
     end
 
     it 'raises error for non-existent path' do
-      expect { described_class.new('/non/existent/path') }.to raise_error(ComicBook::Error, /Path does not exist/)
+      expect { described_class.new('/non/existent/path') }.to raise_error ComicBook::Error, /Path does not exist/
     end
 
     it 'raises error for unsupported file type' do
@@ -68,13 +68,13 @@ RSpec.describe ComicBook do
   describe 'file type detection' do
     %w[.cbz .cb7 .cbt .cbr .cba].each do |ext|
       it "detects #{ext} files" do
-        file = File.join(temp_dir, "test#{ext}")
-        File.write(file, 'content')
+        file = File.join temp_dir, "test#{ext}"
+        File.write file, 'content'
 
         cb = described_class.new(file)
 
         expected_type = ext == '.cb7' ? :cb_seven : ext[1..].to_sym
-        expect(cb.type).to eq(expected_type)
+        expect(cb.type).to eq expected_type
       end
     end
 

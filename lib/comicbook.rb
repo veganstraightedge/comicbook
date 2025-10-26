@@ -6,7 +6,7 @@ class ComicBook
   attr_reader :path, :type
 
   def initialize path
-    @path = File.expand_path path
+    @path = File.expand_path path.strip
     @type = determine_type @path
     validate_path!
   end
