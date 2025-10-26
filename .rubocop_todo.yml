@@ -10,5 +10,4 @@
 # This cop supports safe autocorrection (--autocorrect).
 RSpec/ExpectActual:
   Exclude:
-    - "**/spec/routing/**/*"
     - "spec/comicbook_spec.rb"
