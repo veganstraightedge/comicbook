@@ -23,7 +23,7 @@ RSpec.describe ComicBook do
     context 'with a file path' do
       subject(:cb) { described_class.new test_file }
 
-      let(:test_file_path) { File.expand_path(test_file) }
+      let(:test_file_path) { File.expand_path test_file }
 
       it 'creates a ComicBook instance with a file path' do
         expect(cb).to be_a described_class
@@ -35,7 +35,7 @@ RSpec.describe ComicBook do
     context 'with a folder path' do
       subject(:cb) { described_class.new test_folder }
 
-      let(:test_folder_path) { File.expand_path(test_folder) }
+      let(:test_folder_path) { File.expand_path test_folder }
 
       it 'creates a ComicBook instance with a folder path' do
         expect(cb).to be_a described_class
@@ -78,8 +78,9 @@ RSpec.describe ComicBook do
   end
 
   describe 'file type detection' do
-    subject(:cb) { described_class.new file }
+    subject(:type) { cb.type }
 
+    let(:cb) { described_class.new file }
     let(:file) do
       temp_file = File.join temp_dir, "test#{file_ext}"
       File.write temp_file, 'content'
@@ -90,7 +91,7 @@ RSpec.describe ComicBook do
       let(:file_ext) { '.cbz' }
 
       it 'detects .cbz files' do
-        expect(cb.type).to eq :cbz
+        expect(type).to eq :cbz
       end
     end
 
@@ -98,7 +99,7 @@ RSpec.describe ComicBook do
       let(:file_ext) { '.cb7' }
 
       it 'detects .cb7 files' do
-        expect(cb.type).to eq :cb7
+        expect(type).to eq :cb7
       end
     end
 
@@ -106,7 +107,7 @@ RSpec.describe ComicBook do
       let(:file_ext) { '.cbt' }
 
       it 'detects .cbt files' do
-        expect(cb.type).to eq :cbt
+        expect(type).to eq :cbt
       end
     end
 
@@ -114,7 +115,7 @@ RSpec.describe ComicBook do
       let(:file_ext) { '.cbr' }
 
       it 'detects .cbr files' do
-        expect(cb.type).to eq :cbr
+        expect(type).to eq :cbr
       end
     end
 
@@ -122,17 +123,56 @@ RSpec.describe ComicBook do
       let(:file_ext) { '.cba' }
 
       it 'detects .cba files' do
-        expect(cb.type).to eq :cba
+        expect(type).to eq :cba
       end
     end
   end
 
   describe 'folder detection' do
-    subject(:cb) { described_class.new test_folder }
+    subject(:type) { cb.type }
+
+    let(:cb) { described_class.new test_folder }
 
     context 'when loading a .cb folder' do
       it 'detects folders' do
-        expect(cb.type).to eq :folder
+        expect(type).to eq :folder
+      end
+    end
+  end
+
+  describe '#pages' do
+    context 'with a folder' do
+      subject(:pages) { cb.pages }
+
+      let(:cb) { described_class.new test_folder }
+
+      let(:image_files) do
+        %w[page1.jpg page2.png page3.gif].map do |filename|
+          file_path = File.join(test_folder, filename)
+          File.write(file_path, 'image content')
+          file_path
+        end
+      end
+
+      before { image_files }
+
+      it 'returns an array of Page objects' do
+        expect(pages).to all be_a(ComicBook::Page)
+        expect(pages.length).to eq 3
+      end
+
+      it 'sorts pages alphabetically' do
+        expect(pages.map(&:name)).to eq %w[page1.jpg page2.png page3.gif]
+      end
+    end
+
+    context 'with an archive file' do
+      subject(:pages) { cb.pages }
+
+      let(:cb) { described_class.new test_file }
+
+      it 'returns empty array for now' do
+        expect(pages).to eq []
       end
     end
   end
