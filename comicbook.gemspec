@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
 
   spec.summary     = 'Ruby interface for working with comic book archive files'
   spec.description = <<~DESCRIPTION
-    Library for reading and writing comic book archive files,
+    Library for reading and writing comic book archive files:
     .cbz, .cbr, .cbt, .cb7, .cba
   DESCRIPTION
 
