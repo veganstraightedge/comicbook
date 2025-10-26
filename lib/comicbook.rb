@@ -23,7 +23,7 @@ class ComicBook
     elsif File.file? path
       case File.extname(path).downcase
       when '.cbz' then :cbz
-      when '.cb7' then :cb_seven
+      when '.cb7' then :cb7
       when '.cbt' then :cbt
       when '.cbr' then :cbr
       when '.cba' then :cba

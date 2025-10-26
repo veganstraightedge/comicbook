@@ -1,5 +1,3 @@
-inherit_from: .rubocop_todo.yml
-
 plugins:
   - rubocop-performance
   - rubocop-rake
@@ -18,6 +16,8 @@ Layout/LineLength:
 
 Naming/VariableNumber:
   EnforcedStyle: snake_case
+  AllowedIdentifiers:
+    - cb7
 
 Style/AsciiComments:
   Enabled: false
@@ -33,7 +33,7 @@ Style/MethodDefParentheses:
 
 Style/MixinUsage:
   Exclude:
-    - "script/*"
+    - script/*
 
 Metrics/AbcSize:
   Max: 65
@@ -55,6 +55,9 @@ RSpec/ExampleLength:
 
 RSpec/MultipleExpectations:
   Enabled: false
+
+RSpec/MultipleMemoizedHelpers:
+  Max: 6
 
 RSpec/RepeatedExample:
   Exclude:

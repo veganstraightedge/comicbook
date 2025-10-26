@@ -22,17 +22,19 @@ RSpec.describe ComicBook do
   describe '#new' do
     it 'creates a ComicBook instance with a file path' do
       cb = described_class.new test_file
+      test_file_path = File.expand_path(test_file)
 
       expect(cb).to be_a described_class
-      expect(cb.path).to eq File.expand_path test_file
+      expect(cb.path).to eq test_file_path
       expect(cb.type).to eq :cbz
     end
 
     it 'creates a ComicBook instance with a folder path' do
       cb = described_class.new test_folder
+      test_folder_path = File.expand_path(test_folder)
 
       expect(cb).to be_a described_class
-      expect(cb.path).to eq File.expand_path test_folder
+      expect(cb.path).to eq test_folder_path
       expect(cb.type).to eq :folder
     end
 
@@ -66,22 +68,62 @@ RSpec.describe ComicBook do
   end
 
   describe 'file type detection' do
-    %w[.cbz .cb7 .cbt .cbr .cba].each do |ext|
-      it "detects #{ext} files" do
-        file = File.join temp_dir, "test#{ext}"
-        File.write file, 'content'
+    subject(:cb) { described_class.new file }
 
-        cb = described_class.new(file)
+    let(:file) do
+      temp_file = File.join temp_dir, "test#{file_ext}"
+      File.write temp_file, 'content'
+      temp_file
+    end
 
-        expected_type = ext == '.cb7' ? :cb_seven : ext[1..].to_sym
-        expect(cb.type).to eq expected_type
+    context 'when loading a .cbz' do
+      let(:file_ext) { '.cbz' }
+
+      it 'detects .cbz files' do
+        expect(cb.type).to eq :cbz
       end
     end
 
-    it 'detects folders' do
-      cb = described_class.new test_folder
+    context 'when loading a .cb7' do
+      let(:file_ext) { '.cb7' }
 
-      expect(cb.type).to eq :folder
+      it 'detects .cb7 files' do
+        expect(cb.type).to eq :cb7
+      end
+    end
+
+    context 'when loading a .cbt' do
+      let(:file_ext) { '.cbt' }
+
+      it 'detects .cbt files' do
+        expect(cb.type).to eq :cbt
+      end
+    end
+
+    context 'when loading a .cbr' do
+      let(:file_ext) { '.cbr' }
+
+      it 'detects .cbr files' do
+        expect(cb.type).to eq :cbr
+      end
+    end
+
+    context 'when loading a .cba' do
+      let(:file_ext) { '.cba' }
+
+      it 'detects .cba files' do
+        expect(cb.type).to eq :cba
+      end
+    end
+  end
+
+  describe 'folder detection' do
+    subject(:cb) { described_class.new test_folder }
+
+    context 'when loading a .cb folder' do
+      it 'detects folders' do
+        expect(cb.type).to eq :folder
+      end
     end
   end
 end
