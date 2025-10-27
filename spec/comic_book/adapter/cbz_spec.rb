@@ -1,0 +1,169 @@
+require 'spec_helper'
+require 'tmpdir'
+
+RSpec.describe ComicBook::Adapter::CBZ do
+  subject(:adapter) { described_class.new(test_cbz) }
+
+  let(:temp_dir) { Dir.mktmpdir }
+  let(:source_folder) { File.join(temp_dir, 'source') }
+  let(:test_cbz) { File.join(temp_dir, 'test.cbz') }
+
+  before do
+    Dir.mkdir(source_folder)
+    File.write(File.join(source_folder, 'page1.jpg'), 'image1 content')
+    File.write(File.join(source_folder, 'page2.png'), 'image2 content')
+  end
+
+  after do
+    FileUtils.rm_rf(temp_dir)
+  end
+
+  describe '#initialize' do
+    it 'stores absolute path' do
+      expect(adapter.send(:path)).to eq File.expand_path(test_cbz)
+    end
+  end
+
+  describe '#archive' do
+    it 'creates a CBZ file from source folder' do
+      output_path = adapter.archive(source_folder)
+
+      expect(File.exist?(output_path)).to be true
+      expect(File.extname(output_path)).to eq '.cbz'
+    end
+
+    it 'includes image files in the archive' do
+      output_path = adapter.archive(source_folder)
+
+      Zip::File.open(output_path) do |zipfile|
+        entries = zipfile.map(&:name)
+        expect(entries).to include('page1.jpg', 'page2.png')
+      end
+    end
+
+    it 'deletes original folder when delete_original is true' do
+      adapter.archive(source_folder, delete_original: true)
+      expect(File.exist?(source_folder)).to be false
+    end
+
+    it 'preserves original folder when delete_original is false' do
+      adapter.archive(source_folder, delete_original: false)
+      expect(File.exist?(source_folder)).to be true
+    end
+
+    it 'uses custom extension when specified' do
+      output_path = adapter.archive(source_folder, extension: :zip)
+      expect(File.extname(output_path)).to eq '.zip'
+    end
+  end
+
+  describe '#extract' do
+    subject(:adapter) { described_class.new(cbz_file) }
+
+    let(:cbz_file) { File.join(temp_dir, 'extract_test.cbz') }
+
+    before do
+      # Create a real CBZ file first using the source folder
+      source_adapter = described_class.new(source_folder)
+      output_path = source_adapter.archive(source_folder)
+      # Move the created archive to the expected location
+      File.rename(output_path, cbz_file) if output_path != cbz_file
+    end
+
+    it 'extracts CBZ file to folder' do
+      extract_path = adapter.extract
+
+      expect(File.exist?(extract_path)).to be true
+      expect(File.directory?(extract_path)).to be true
+      expect(File.exist?(File.join(extract_path, 'page1.jpg'))).to be true
+      expect(File.exist?(File.join(extract_path, 'page2.png'))).to be true
+    end
+
+    it 'uses .cb extension by default' do
+      extract_path = adapter.extract
+      expect(File.extname(extract_path)).to eq '.cb'
+    end
+
+    it 'uses custom extension when specified' do
+      extract_path = adapter.extract(nil, extension: :folder)
+      expect(File.extname(extract_path)).to eq '.folder'
+    end
+
+    it 'uses no extension when extension is nil' do
+      extract_path = adapter.extract(nil, extension: nil)
+      expect(File.extname(extract_path)).to eq ''
+    end
+
+    it 'extracts to custom destination when specified' do
+      custom_dest = File.join(temp_dir, 'custom_extract')
+      extract_path = adapter.extract(custom_dest)
+
+      expect(extract_path).to eq custom_dest
+      expect(File.exist?(custom_dest)).to be true
+    end
+
+    it 'deletes original file when delete_original is true' do
+      adapter.extract(nil, delete_original: true)
+      expect(File.exist?(cbz_file)).to be false
+    end
+
+    it 'preserves original file when delete_original is false' do
+      adapter.extract(nil, delete_original: false)
+      expect(File.exist?(cbz_file)).to be true
+    end
+  end
+
+  describe '#pages' do
+    subject(:adapter) { described_class.new(cbz_file) }
+
+    let(:cbz_file) { File.join(temp_dir, 'pages_test.cbz') }
+
+    before do
+      # Create a real CBZ file first using the source folder
+      source_adapter = described_class.new(source_folder)
+      output_path = source_adapter.archive(source_folder)
+      # Move the created archive to the expected location
+      File.rename(output_path, cbz_file) if output_path != cbz_file
+    end
+
+    it 'returns array of Page objects' do
+      pages = adapter.pages
+      expect(pages).to all(be_a(ComicBook::Page))
+      expect(pages.length).to eq 2
+    end
+
+    it 'sorts pages alphabetically by name' do
+      pages = adapter.pages
+      expect(pages.map(&:name)).to eq %w[page1.jpg page2.png]
+    end
+
+    it 'sets correct path and name for each page' do
+      pages = adapter.pages
+      page_one = pages.find { |p| p.name == 'page1.jpg' }
+      page_two = pages.find { |p| p.name == 'page2.png' }
+
+      expect(page_one.path).to eq 'page1.jpg'
+      expect(page_one.name).to eq 'page1.jpg'
+      expect(page_two.path).to eq 'page2.png'
+      expect(page_two.name).to eq 'page2.png'
+    end
+
+    it 'only includes image files' do
+      # Add a non-image file to the source
+      File.write(File.join(source_folder, 'readme.txt'), 'text content')
+
+      # Recreate the CBZ with the text file
+      source_adapter = described_class.new(source_folder)
+      FileUtils.rm_f(cbz_file)
+      output_path = source_adapter.archive(source_folder)
+      # Move the created archive to the expected location
+      File.rename(output_path, cbz_file) if output_path != cbz_file
+
+      pages = adapter.pages
+      page_names = pages.map(&:name)
+
+      expect(page_names).to include('page1.jpg', 'page2.png')
+      expect(page_names).not_to include('readme.txt')
+    end
+  end
+end
