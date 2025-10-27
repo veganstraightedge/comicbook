@@ -1,4 +1,4 @@
-require_relative 'lib/comicbook/version'
+require_relative 'lib/comic_book/version'
 
 Gem::Specification.new do |spec|
   spec.name    = 'comicbook'

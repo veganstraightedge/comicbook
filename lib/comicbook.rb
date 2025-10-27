@@ -1,7 +1,8 @@
-require_relative 'comicbook/version'
-require_relative 'comicbook/page'
-require_relative 'comicbook/adapter/base'
-require_relative 'comicbook/adapter/cbz'
+require_relative 'comic_book/version'
+require_relative 'comic_book/page'
+require_relative 'comic_book/adapter/base'
+require_relative 'comic_book/adapter/cbz'
+
 require 'pathname'
 require 'fileutils'
 
