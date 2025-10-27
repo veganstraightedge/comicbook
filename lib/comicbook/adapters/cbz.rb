@@ -32,11 +32,15 @@ class ComicBook
       end
 
       def create_page_from_entry entry
-        ComicBook::Page.new entry.name, File.basename(entry.name)
+        basename = File.basename(entry.name)
+
+        ComicBook::Page.new entry.name, basename
       end
 
       def image_file? filename
-        %w[.jpg .jpeg .png .gif .bmp .webp].include? File.extname(filename.downcase)
+        extension = File.extname(filename.downcase)
+
+        ComicBook::IMAGE_EXTENSIONS.include? extension
       end
     end
   end

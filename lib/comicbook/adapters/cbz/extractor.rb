@@ -68,7 +68,7 @@ class ComicBook
       end
 
       def image_file? filename
-        %w[.jpg .jpeg .png .gif .bmp .webp].include? File.extname(filename.downcase)
+        ComicBook::IMAGE_EXTENSIONS.include? File.extname(filename.downcase)
       end
     end
   end

@@ -8,6 +8,9 @@ require 'fileutils'
 class ComicBook
   class Error < StandardError; end
 
+  IMAGE_EXTENSIONS   = %w[.jpg .jpeg .png .gif .bmp .webp].freeze
+  IMAGE_GLOB_PATTERN = '*.{jpg,jpeg,png,gif,bmp,webp}'.freeze
+
   attr_reader :path, :type
 
   def initialize path
@@ -72,8 +75,8 @@ class ComicBook
   end
 
   def folder_pages
-    pattern     = '*.{jpg,jpeg,png,gif,bmp,webp}'
-    search_path = File.join path, '**', pattern
+    pattern     = IMAGE_GLOB_PATTERN
+    search_path = File.join @path, '**', pattern
     image_files = Dir.glob search_path, File::FNM_CASEFOLD
 
     image_files.sort.map do |file|

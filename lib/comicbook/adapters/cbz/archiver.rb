@@ -39,8 +39,7 @@ class ComicBook
       end
 
       def find_image_files
-        pattern = File.join source_folder, '**', '*.{jpg,jpeg,png,gif,bmp,webp}'
-
+        pattern = File.join(source_folder, '**', ComicBook::IMAGE_GLOB_PATTERN)
         Dir.glob(pattern, File::FNM_CASEFOLD).sort
       end
 
