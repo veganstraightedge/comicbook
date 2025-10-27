@@ -2,7 +2,7 @@ require 'zip'
 
 class ComicBook
   module Adapters
-    class Cbz < Base
+    class CBZ < Base
       def archive source_folder, options = {}
         source_folder = File.expand_path(source_folder)
         extension = options.fetch(:extension, :cbz)
