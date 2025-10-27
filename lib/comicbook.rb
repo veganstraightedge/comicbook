@@ -21,7 +21,7 @@ class ComicBook
   end
 
   def self.extract path, options = {}
-    new(path).extract(options)
+    new(path).extract options
   end
 
   def pages
@@ -34,13 +34,13 @@ class ComicBook
   def archive source_folder, options = {}
     raise Error, 'Cannot archive a file' unless @type == :folder
 
-    Adapters::CBZ.new(source_folder).archive(source_folder, options)
+    Adapters::CBZ.new(source_folder).archive source_folder, options
   end
 
   def extract options = {}
     raise Error, 'Cannot extract a folder' if @type == :folder
 
-    adapter.extract(nil, options)
+    adapter.extract nil, options
   end
 
   private
@@ -86,7 +86,7 @@ class ComicBook
   def adapter
     case @type
     when :cbz, :cb7, :cbt, :cbr, :cba
-      Adapters::CBZ.new(@path) # Start with CBZ for all archives
+      Adapters::CBZ.new @path # Start with CBZ for all archives
     else
       raise Error, "No adapter available for type: #{@type}"
     end

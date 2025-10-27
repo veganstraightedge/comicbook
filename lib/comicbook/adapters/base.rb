@@ -2,7 +2,7 @@ class ComicBook
   module Adapters
     class Base
       def initialize path
-        @path = File.expand_path(path)
+        @path = File.expand_path path
       end
 
       def archive source_folder, options = {}
