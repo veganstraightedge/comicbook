@@ -116,54 +116,56 @@ RSpec.describe ComicBook::Adapter::CBZ do
   describe '#pages' do
     subject(:adapter) { described_class.new(cbz_file) }
 
-    let(:cbz_file) { File.join(temp_dir, 'pages_test.cbz') }
+    let(:cbz_file) { File.join temp_dir, 'pages_test.cbz' }
+    let(:pages) { adapter.pages }
+    let(:page_names) { pages.map &:name }
+    let(:page_one) { pages.find { |p| p.name == 'page1.jpg' } }
+    let(:page_two) { pages.find { |p| p.name == 'page2.png' } }
+
+    # Create a real CBZ file first using the source folder
+    let(:source_adapter) { described_class.new(source_folder) }
+    let(:output_path)    { source_adapter.archive(source_folder) }
 
     before do
-      # Create a real CBZ file first using the source folder
-      source_adapter = described_class.new(source_folder)
-      output_path = source_adapter.archive(source_folder)
       # Move the created archive to the expected location
       File.rename(output_path, cbz_file) if output_path != cbz_file
     end
 
     it 'returns array of Page objects' do
-      pages = adapter.pages
-      expect(pages).to all(be_a(ComicBook::Page))
+      expect(pages).to be_all ComicBook::Page
       expect(pages.length).to eq 2
     end
 
     it 'sorts pages alphabetically by name' do
-      pages = adapter.pages
-      expect(pages.map(&:name)).to eq %w[page1.jpg page2.png]
+      expect(page_names).to eq %w[page1.jpg page2.png]
     end
 
     it 'sets correct path and name for each page' do
-      pages = adapter.pages
-      page_one = pages.find { |p| p.name == 'page1.jpg' }
-      page_two = pages.find { |p| p.name == 'page2.png' }
-
       expect(page_one.path).to eq 'page1.jpg'
       expect(page_one.name).to eq 'page1.jpg'
       expect(page_two.path).to eq 'page2.png'
       expect(page_two.name).to eq 'page2.png'
     end
 
-    it 'only includes image files' do
-      # Add a non-image file to the source
-      File.write(File.join(source_folder, 'readme.txt'), 'text content')
+    context 'with non-image files in the archive' do
+      before do
+        # Add a non-image file to the source
+        non_image_file = File.join source_folder, 'readme.txt'
+        File.write non_image_file, 'text content'
 
-      # Recreate the CBZ with the text file
-      source_adapter = described_class.new(source_folder)
-      FileUtils.rm_f(cbz_file)
-      output_path = source_adapter.archive(source_folder)
-      # Move the created archive to the expected location
-      File.rename(output_path, cbz_file) if output_path != cbz_file
+        # Recreate the CBZ with the text file
+        source_adapter = described_class.new source_folder
+        FileUtils.rm_f cbz_file
+        output_path = source_adapter.archive source_folder
 
-      pages = adapter.pages
-      page_names = pages.map(&:name)
+        # Move the created archive to the expected location
+        File.rename(output_path, cbz_file) if output_path != cbz_file
+      end
 
-      expect(page_names).to include('page1.jpg', 'page2.png')
-      expect(page_names).not_to include('readme.txt')
+      it 'only includes image files' do
+        expect(page_names).to include 'page1.jpg', 'page2.png'
+        expect(page_names).not_to include 'readme.txt'
+      end
     end
   end
 end

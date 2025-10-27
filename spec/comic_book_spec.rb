@@ -145,8 +145,9 @@ RSpec.describe ComicBook do
       subject(:pages) { cb.pages }
 
       let(:cb) { described_class.new test_folder }
+      let(:page_names) { pages.map &:name }
 
-      let(:image_files) do
+      before do
         %w[page1.jpg page2.png page3.gif].map do |filename|
           file_path = File.join(test_folder, filename)
           File.write(file_path, 'image content')
@@ -154,15 +155,13 @@ RSpec.describe ComicBook do
         end
       end
 
-      before { image_files }
-
       it 'returns an array of Page objects' do
-        expect(pages).to all be_a(ComicBook::Page)
+        expect(pages).to be_all ComicBook::Page
         expect(pages.length).to eq 3
       end
 
       it 'sorts pages alphabetically' do
-        expect(pages.map(&:name)).to eq %w[page1.jpg page2.png page3.gif]
+        expect(page_names).to eq %w[page1.jpg page2.png page3.gif]
       end
     end
 
@@ -181,15 +180,13 @@ RSpec.describe ComicBook do
     context 'with a folder' do
       subject(:cb) { described_class.new test_folder }
 
-      let(:image_files) do
+      before do
         %w[page1.jpg page2.png].map do |filename|
           file_path = File.join(test_folder, filename)
           File.write(file_path, 'image content')
           file_path
         end
       end
-
-      before { image_files }
 
       it 'creates a .cbz archive from folder' do
         archive_path = cb.archive(test_folder)
