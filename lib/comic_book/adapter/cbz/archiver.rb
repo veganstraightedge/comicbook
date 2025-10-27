@@ -1,6 +1,3 @@
-require 'zip'
-require 'pathname'
-
 class ComicBook
   module Adapter
     class CBZArchiver

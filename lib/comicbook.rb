@@ -3,9 +3,6 @@ require_relative 'comic_book/page'
 require_relative 'comic_book/adapter/base'
 require_relative 'comic_book/adapter/cbz'
 
-require 'pathname'
-require 'fileutils'
-
 class ComicBook
   class Error < StandardError; end
 

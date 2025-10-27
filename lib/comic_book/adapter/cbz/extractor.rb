@@ -1,5 +1,3 @@
-require 'zip'
-
 class ComicBook
   module Adapter
     class CBZExtractor

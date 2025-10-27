@@ -1,5 +1,4 @@
 require 'spec_helper'
-require 'tmpdir'
 
 RSpec.describe ComicBook::Adapter::CBZArchiver do
   subject(:archiver) { described_class.new(source_folder) }

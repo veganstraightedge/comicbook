@@ -1,5 +1,4 @@
 require 'spec_helper'
-require 'tmpdir'
 
 RSpec.describe ComicBook::Adapter::CBZExtractor do
   subject(:extractor) { described_class.new(test_cbz) }
