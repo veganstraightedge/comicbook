@@ -31,10 +31,6 @@ Style/FrozenStringLiteralComment:
 Style/MethodDefParentheses:
   EnforcedStyle: require_no_parentheses
 
-Style/MixinUsage:
-  Exclude:
-    - script/*
-
 Metrics/AbcSize:
   Max: 65
 
@@ -59,6 +55,5 @@ RSpec/MultipleExpectations:
 RSpec/MultipleMemoizedHelpers:
   Enabled: false
 
-RSpec/RepeatedExample:
-  Exclude:
-    - spec/comic_info/issue_spec.rb
+RSpec/NestedGroups:
+  Enabled: false

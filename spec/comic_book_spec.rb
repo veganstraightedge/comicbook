@@ -184,7 +184,6 @@ RSpec.describe ComicBook do
         %w[page1.jpg page2.png].map do |filename|
           file_path = File.join(test_folder, filename)
           File.write(file_path, 'image content')
-          file_path
         end
       end
 
@@ -221,6 +220,7 @@ RSpec.describe ComicBook do
     context 'with an archive file' do
       subject(:cb) { described_class.new test_cbz }
 
+      let(:extracted_folder_path) { cb.extract }
       let(:source_folder) { File.join(temp_dir, 'source') }
       let(:test_cbz) do
         Dir.mkdir source_folder
@@ -228,21 +228,23 @@ RSpec.describe ComicBook do
         File.write File.join(source_folder, 'page2.png'), 'image2'
 
         # Create a real CBZ file using our archive method
-        folder_cb = described_class.new(source_folder)
-        folder_cb.archive(source_folder)
+        folder_cb = described_class.new source_folder
+        folder_cb.archive source_folder
       end
 
       it 'extracts archive to folder' do
-        extract_path = cb.extract
-
-        expect(File.exist?(extract_path)).to be true
-        expect(File.directory?(extract_path)).to be true
+        expect(File.exist?(extracted_folder_path)).to be true
+        expect(File.directory?(extracted_folder_path)).to be true
       end
 
-      it 'deletes original file when delete_original is true' do
-        cb.extract delete_original: true
+      context 'when delete_original is true' do
+        before do
+          cb.extract delete_original: true
+        end
 
-        expect(File.exist?(test_cbz)).to be false
+        it 'deletes original file' do
+          expect(File.exist?(test_cbz)).to be false
+        end
       end
     end
   end
@@ -250,19 +252,20 @@ RSpec.describe ComicBook do
   describe '.extract' do
     let(:source_folder) { File.join temp_dir, 'source' }
     let(:test_cbz) do
-      Dir.mkdir(source_folder)
-      File.write(File.join(source_folder, 'page1.jpg'), 'image1')
+      Dir.mkdir source_folder
+      test_image = File.join source_folder, 'page1.jpg'
+      File.write test_image, 'image1'
 
       # Create a real CBZ file
-      folder_cb = described_class.new(source_folder)
-      folder_cb.archive(source_folder)
+      folder_cb = described_class.new source_folder
+      folder_cb.archive source_folder
     end
 
     it 'is a shorthand for load().extract()' do
-      extract_path = described_class.extract test_cbz
+      extracted_folder_path = described_class.extract test_cbz
 
-      expect(File.exist?(extract_path)).to be true
-      expect(File.directory?(extract_path)).to be true
+      expect(File.exist?(extracted_folder_path)).to be true
+      expect(File.directory?(extracted_folder_path)).to be true
     end
   end
 end
