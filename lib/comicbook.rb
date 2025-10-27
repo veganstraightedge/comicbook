@@ -12,7 +12,7 @@ class ComicBook
 
   def initialize path
     @path = File.expand_path path.strip
-    @type = determine_type @path
+    @type = determine_type path
     validate_path!
   end
 
@@ -25,20 +25,20 @@ class ComicBook
   end
 
   def pages
-    case @type
+    case type
     when :folder then folder_pages
     else adapter.pages
     end
   end
 
   def archive source_folder, options = {}
-    raise Error, 'Cannot archive a file' unless @type == :folder
+    raise Error, 'Cannot archive a file' unless type == :folder
 
     Adapters::CBZ.new(source_folder).archive source_folder, options
   end
 
   def extract options = {}
-    raise Error, 'Cannot extract a folder' if @type == :folder
+    raise Error, 'Cannot extract a folder' if type == :folder
 
     adapter.extract nil, options
   end
@@ -66,14 +66,14 @@ class ComicBook
   end
 
   def validate_path!
-    return if File.exist? @path
+    return if File.exist? path
 
-    raise Error, "Path does not exist: #{@path}"
+    raise Error, "Path does not exist: #{path}"
   end
 
   def folder_pages
     pattern     = '*.{jpg,jpeg,png,gif,bmp,webp}'
-    search_path = File.join @path, '**', pattern
+    search_path = File.join path, '**', pattern
     image_files = Dir.glob search_path, File::FNM_CASEFOLD
 
     image_files.sort.map do |file|
@@ -84,11 +84,11 @@ class ComicBook
   end
 
   def adapter
-    case @type
+    case type
     when :cbz, :cb7, :cbt, :cbr, :cba
-      Adapters::CBZ.new @path # Start with CBZ for all archives
+      Adapters::CBZ.new path # Start with CBZ for all archives
     else
-      raise Error, "No adapter available for type: #{@type}"
+      raise Error, "No adapter available for type: #{type}"
     end
   end
 end
