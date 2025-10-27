@@ -7,7 +7,7 @@ RSpec.describe ComicBook::Adapters::CBZExtractor do
   let(:temp_dir)      { Dir.mktmpdir }
   let(:source_folder) { File.join temp_dir, 'source' }
   let(:test_cbz)      { File.join temp_dir, 'test.cbz' }
-  let(:archiver) { ComicBook::Adapters::CBZArchiver.new source_folder }
+  let(:archiver)      { ComicBook::Adapters::CBZArchiver.new source_folder }
 
   before do
     Dir.mkdir source_folder
@@ -70,24 +70,23 @@ RSpec.describe ComicBook::Adapters::CBZExtractor do
       end
     end
 
-    it 'extracts all image files from the archive' do
-      extracted_folder_path = extractor.extract
+    context 'with images in archive' do
+      let(:image_a) { File.join extracted_folder_path, 'page1.jpg' }
+      let(:image_b) { File.join extracted_folder_path, 'page2.png' }
+      let(:image_c) { File.join extracted_folder_path, 'page3.gif' }
+      let(:extracted_folder_path) { extractor.extract }
 
-      expect(File.exist?(File.join(extracted_folder_path, 'page1.jpg'))).to be true
-      expect(File.exist?(File.join(extracted_folder_path, 'page2.png'))).to be true
-      expect(File.exist?(File.join(extracted_folder_path, 'page3.gif'))).to be true
-    end
+      it 'extracts all image files from the archive' do
+        expect(File.exist?(image_a)).to be true
+        expect(File.exist?(image_b)).to be true
+        expect(File.exist?(image_c)).to be true
+      end
 
-    it 'preserves file contents during extraction' do
-      extracted_folder_path = extractor.extract
-
-      content_one   = File.read File.join(extracted_folder_path, 'page1.jpg')
-      content_two   = File.read File.join(extracted_folder_path, 'page2.png')
-      content_three = File.read File.join(extracted_folder_path, 'page3.gif')
-
-      expect(content_one).to eq   'image1 content'
-      expect(content_two).to eq   'image2 content'
-      expect(content_three).to eq 'image3 content'
+      it 'preserves file contents during extraction' do
+        expect(File.read(image_a)).to eq 'image1 content'
+        expect(File.read(image_b)).to eq 'image2 content'
+        expect(File.read(image_c)).to eq 'image3 content'
+      end
     end
 
     context 'with nested directories' do
@@ -117,12 +116,12 @@ RSpec.describe ComicBook::Adapters::CBZExtractor do
     end
 
     context 'with non-images in the archive' do
-      let(:mixed_cbz) { File.join temp_dir, 'mixed.cbz' }
-      let(:mixed_extractor) { described_class.new mixed_cbz }
+      let(:mixed_cbz)             { File.join temp_dir, 'mixed.cbz' }
+      let(:mixed_extractor)       { described_class.new mixed_cbz }
       let(:extracted_folder_path) { mixed_extractor.extract }
-      let(:image_in_archive) { File.join(extracted_folder_path, 'page1.jpg') }
-      let(:text_file_in_archive) { File.join(extracted_folder_path, 'readme.txt') }
-      let(:json_file_inarchive) { File.join(extracted_folder_path, 'data.json') }
+      let(:image_in_archive)      { File.join(extracted_folder_path, 'page1.jpg') }
+      let(:text_file_in_archive)  { File.join(extracted_folder_path, 'readme.txt') }
+      let(:json_file_inarchive)   { File.join(extracted_folder_path, 'data.json') }
 
       before do
         Zip::File.open(mixed_cbz, create: true) do |zipfile|
@@ -188,7 +187,7 @@ RSpec.describe ComicBook::Adapters::CBZExtractor do
       subject(:extractor_path) { extractor.extract }
 
       let(:extractor) { described_class.new text_cbz }
-      let(:text_cbz) { File.join temp_dir, 'text_only.cbz' }
+      let(:text_cbz)  { File.join temp_dir, 'text_only.cbz' }
 
       before do
         Zip::File.open(text_cbz, create: true) do |zipfile|
