@@ -171,9 +171,101 @@ RSpec.describe ComicBook do
 
       let(:cb) { described_class.new test_file }
 
-      it 'returns empty array for now' do
-        expect(pages).to eq []
+      it 'raises error for invalid zip file' do
+        expect { pages }.to raise_error(Zip::Error)
       end
+    end
+  end
+
+  describe '#archive' do
+    context 'with a folder' do
+      subject(:cb) { described_class.new test_folder }
+
+      let(:image_files) do
+        %w[page1.jpg page2.png].map do |filename|
+          file_path = File.join(test_folder, filename)
+          File.write(file_path, 'image content')
+          file_path
+        end
+      end
+
+      before { image_files }
+
+      it 'creates a .cbz archive from folder' do
+        archive_path = cb.archive(test_folder)
+        expect(File.exist?(archive_path)).to be true
+        expect(File.extname(archive_path)).to eq '.cbz'
+      end
+
+      it 'deletes original folder when delete_original is true' do
+        cb.archive(test_folder, delete_original: true)
+        expect(File.exist?(test_folder)).to be false
+      end
+    end
+
+    context 'with an archive file' do
+      subject(:cb) { described_class.new test_file }
+
+      it 'raises error when trying to archive a file' do
+        expect { cb.archive(test_folder) }.to raise_error(ComicBook::Error, 'Cannot archive a file')
+      end
+    end
+  end
+
+  describe '#extract' do
+    context 'with a folder' do
+      subject(:cb) { described_class.new test_folder }
+
+      it 'raises error when trying to extract a folder' do
+        expect { cb.extract }.to raise_error(ComicBook::Error, 'Cannot extract a folder')
+      end
+    end
+
+    context 'with an archive file' do
+      subject(:cb) { described_class.new test_cbz }
+
+      let(:source_folder) { File.join(temp_dir, 'source') }
+      let(:test_cbz) do
+        Dir.mkdir source_folder
+        File.write File.join(source_folder, 'page1.jpg'), 'image1'
+        File.write File.join(source_folder, 'page2.png'), 'image2'
+
+        # Create a real CBZ file using our archive method
+        folder_cb = described_class.new(source_folder)
+        folder_cb.archive(source_folder)
+      end
+
+      it 'extracts archive to folder' do
+        extract_path = cb.extract
+
+        expect(File.exist?(extract_path)).to be true
+        expect(File.directory?(extract_path)).to be true
+      end
+
+      it 'deletes original file when delete_original is true' do
+        cb.extract delete_original: true
+
+        expect(File.exist?(test_cbz)).to be false
+      end
+    end
+  end
+
+  describe '.extract' do
+    let(:source_folder) { File.join temp_dir, 'source' }
+    let(:test_cbz) do
+      Dir.mkdir(source_folder)
+      File.write(File.join(source_folder, 'page1.jpg'), 'image1')
+
+      # Create a real CBZ file
+      folder_cb = described_class.new(source_folder)
+      folder_cb.archive(source_folder)
+    end
+
+    it 'is a shorthand for load().extract()' do
+      extract_path = described_class.extract test_cbz
+
+      expect(File.exist?(extract_path)).to be true
+      expect(File.directory?(extract_path)).to be true
     end
   end
 end

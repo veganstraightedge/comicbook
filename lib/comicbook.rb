@@ -1,5 +1,9 @@
 require_relative 'comicbook/version'
 require_relative 'comicbook/page'
+require_relative 'comicbook/adapters/base'
+require_relative 'comicbook/adapters/cbz'
+require 'pathname'
+require 'fileutils'
 
 class ComicBook
   class Error < StandardError; end
@@ -16,11 +20,27 @@ class ComicBook
     new path
   end
 
+  def self.extract path, options = {}
+    new(path).extract(options)
+  end
+
   def pages
     case @type
     when :folder then folder_pages
-    else archive_pages
+    else adapter.pages
     end
+  end
+
+  def archive source_folder, options = {}
+    raise Error, 'Cannot archive a file' unless @type == :folder
+
+    Adapters::Cbz.new(source_folder).archive(source_folder, options)
+  end
+
+  def extract options = {}
+    raise Error, 'Cannot extract a folder' if @type == :folder
+
+    adapter.extract(nil, options)
   end
 
   private
@@ -59,12 +79,16 @@ class ComicBook
     image_files.sort.map do |file|
       basename = File.basename file
 
-      Page.new path: file, name: basename
+      Page.new file, basename
     end
   end
 
-  def archive_pages
-    # TODO: Implement archive reading for different formats
-    []
+  def adapter
+    case @type
+    when :cbz, :cb7, :cbt, :cbr, :cba
+      Adapters::Cbz.new(@path) # Start with CBZ for all archives
+    else
+      raise Error, "No adapter available for type: #{@type}"
+    end
   end
 end
