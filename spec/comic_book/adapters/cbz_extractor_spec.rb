@@ -7,18 +7,16 @@ RSpec.describe ComicBook::Adapters::CBZExtractor do
   let(:temp_dir)      { Dir.mktmpdir }
   let(:source_folder) { File.join temp_dir, 'source' }
   let(:test_cbz)      { File.join temp_dir, 'test.cbz' }
+  let(:archiver) { ComicBook::Adapters::CBZArchiver.new source_folder }
 
   before do
     Dir.mkdir source_folder
-
     File.write File.join(source_folder, 'page1.jpg'), 'image1 content'
     File.write File.join(source_folder, 'page2.png'), 'image2 content'
     File.write File.join(source_folder, 'page3.gif'), 'image3 content'
 
     # Create a real CBZ file using CBZArchiver
-    archiver    = ComicBook::Adapters::CBZArchiver.new source_folder
     output_path = archiver.archive
-
     File.rename(output_path, test_cbz) if output_path != test_cbz
   end
 
