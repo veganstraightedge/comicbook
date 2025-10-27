@@ -1,6 +1,7 @@
-require 'zip'
+require_relative 'base'
 require_relative 'cbz/archiver'
 require_relative 'cbz/extractor'
+require 'zip'
 
 class ComicBook
   module Adapter

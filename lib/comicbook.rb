@@ -1,6 +1,5 @@
 require_relative 'comic_book/version'
 require_relative 'comic_book/page'
-require_relative 'comic_book/adapter/base'
 require_relative 'comic_book/adapter/cbz'
 
 class ComicBook
