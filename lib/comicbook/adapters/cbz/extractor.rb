@@ -23,15 +23,11 @@ class ComicBook
       attr_reader :archive_path
 
       def determine_extract_path extension
-        base_name = File.basename archive_path, '.*'
-        dir_name  = File.dirname archive_path
+        base_name    = File.basename archive_path, '.*'
+        dir_name     = File.dirname archive_path
+        archive_name = base_name
 
-        if extension
-          file_name = "#{base_name}.#{extension}"
-          archive_name = file_name
-        else
-          archive_name = base_name
-        end
+        archive_name << ".#{extension}" if extension
 
         full_path = File.join dir_name, archive_name
         File.expand_path full_path
