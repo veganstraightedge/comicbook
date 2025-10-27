@@ -33,125 +33,144 @@ RSpec.describe ComicBook::Adapters::CBZExtractor do
   end
 
   describe '#extract' do
-    it 'extracts CBZ file to folder with default .cb extension' do
-      extract_path = extractor.extract
+    context 'with default .cb extension' do
+      it 'extracts CBZ file to folder' do
+        extracted_folder_path = extractor.extract
 
-      expect(File.exist?(extract_path)).to be true
-      expect(File.directory?(extract_path)).to be true
-      expect(File.extname(extract_path)).to eq '.cb'
-      expect(File.basename(extract_path, '.cb')).to eq 'test'
+        expect(File.exist?(extracted_folder_path)).to be true
+        expect(File.directory?(extracted_folder_path)).to be true
+        expect(File.extname(extracted_folder_path)).to eq '.cb'
+        expect(File.basename(extracted_folder_path, '.cb')).to eq 'test'
+      end
     end
 
-    it 'extracts to custom destination folder' do
-      custom_destination = File.join temp_dir, 'custom_extract'
-      extract_path = extractor.extract custom_destination
+    context 'with non-default destination folder' do
+      it 'extracts to custom destination folder' do
+        custom_destination_path = File.join temp_dir, 'custom_destination_path_folder'
+        extracted_folder_path   = extractor.extract custom_destination_path
 
-      expect(extract_path).to eq custom_destination
-      expect(File.exist?(custom_destination)).to be true
-      expect(File.directory?(custom_destination)).to be true
+        expect(extracted_folder_path).to eq custom_destination_path
+        expect(File.exist?(custom_destination_path)).to be true
+        expect(File.directory?(custom_destination_path)).to be true
+      end
     end
 
-    it 'uses custom extension when specified' do
-      extract_path = extractor.extract nil, extension: :folder
+    context 'with non-default folder extension' do
+      it 'extracts to a folder with custom extension' do
+        extracted_folder_path = extractor.extract nil, extension: :comicbook
 
-      expect(File.extname(extract_path)).to eq '.folder'
+        expect(File.extname(extracted_folder_path)).to eq '.comicbook'
+      end
     end
 
-    it 'uses no extension when extension is nil' do
-      extract_path = extractor.extract nil, extension: nil
+    context 'with no folder extension' do
+      it 'uses no extension when extension is nil' do
+        extracted_folder_path = extractor.extract nil, extension: nil
 
-      expect(File.extname(extract_path)).to eq ''
-      expect(File.basename(extract_path)).to eq 'test'
+        expect(File.extname(extracted_folder_path)).to eq ''
+        expect(File.basename(extracted_folder_path)).to eq 'test'
+      end
     end
 
     it 'extracts all image files from the archive' do
-      extract_path = extractor.extract
+      extracted_folder_path = extractor.extract
 
-      expect(File.exist?(File.join(extract_path, 'page1.jpg'))).to be true
-      expect(File.exist?(File.join(extract_path, 'page2.png'))).to be true
-      expect(File.exist?(File.join(extract_path, 'page3.gif'))).to be true
+      expect(File.exist?(File.join(extracted_folder_path, 'page1.jpg'))).to be true
+      expect(File.exist?(File.join(extracted_folder_path, 'page2.png'))).to be true
+      expect(File.exist?(File.join(extracted_folder_path, 'page3.gif'))).to be true
     end
 
     it 'preserves file contents during extraction' do
-      extract_path = extractor.extract
+      extracted_folder_path = extractor.extract
 
-      content_one   = File.read File.join(extract_path, 'page1.jpg')
-      content_two   = File.read File.join(extract_path, 'page2.png')
-      content_three = File.read File.join(extract_path, 'page3.gif')
+      content_one   = File.read File.join(extracted_folder_path, 'page1.jpg')
+      content_two   = File.read File.join(extracted_folder_path, 'page2.png')
+      content_three = File.read File.join(extracted_folder_path, 'page3.gif')
 
       expect(content_one).to eq   'image1 content'
       expect(content_two).to eq   'image2 content'
       expect(content_three).to eq 'image3 content'
     end
 
-    it 'handles nested directory structures' do
-      # Create CBZ with nested structure
-      nested_folder = File.join temp_dir, 'nested_source'
-      subfolder     = File.join nested_folder, 'subfolder'
+    context 'with nested directories' do
+      subject(:nested_image) { File.join subfolder, 'nested.jpg' }
 
-      Dir.mkdir nested_folder
-      Dir.mkdir subfolder
-      File.write File.join(subfolder, 'nested.jpg'), 'nested content'
+      let(:nested_folder)         { File.join temp_dir,      'nested_source' }
+      let(:subfolder)             { File.join nested_folder, 'subfolder' }
 
-      nested_cbz  = File.join temp_dir, 'nested.cbz'
-      archiver    = ComicBook::Adapters::CBZArchiver.new nested_folder
-      output_path = archiver.archive
+      let(:nested_cbz)            { File.join temp_dir,      'nested.cbz' }
+      let(:nested_extractor)      { described_class.new nested_cbz }
+      let(:extracted_folder_path) { nested_extractor.extract }
 
-      File.rename output_path, nested_cbz
+      let(:archiver)              { ComicBook::Adapters::CBZArchiver.new nested_folder }
+      let(:output_path)           { archiver.archive }
 
-      nested_extractor = described_class.new nested_cbz
-      extract_path     = nested_extractor.extract
-      nested_image     = File.join extract_path, 'subfolder', 'nested.jpg'
-
-      expect(File.exist?(nested_image)).to be true
-      expect(File.read(nested_image)).to eq 'nested content'
-    end
-
-    it 'ignores non-image files in the archive' do
-      # Create CBZ with mixed file types (manually add non-image files)
-      mixed_cbz = File.join(temp_dir, 'mixed.cbz')
-
-      Zip::File.open(mixed_cbz, create: true) do |zipfile|
-        zipfile.add 'page1.jpg', File.join(source_folder, 'page1.jpg')
-        zipfile.get_output_stream('readme.txt') { |f| f.write 'text content' }
-        zipfile.get_output_stream('data.json')  { |f| f.write '{}' }
+      before do
+        Dir.mkdir nested_folder
+        Dir.mkdir subfolder
+        File.write nested_image, 'nested content'
+        File.rename output_path, nested_cbz
       end
 
-      mixed_extractor = described_class.new mixed_cbz
-      extract_path    = mixed_extractor.extract
-
-      image_in_archive = File.join(extract_path, 'page1.jpg')
-      text_file_in_archive = File.join(extract_path, 'readme.txt')
-      json_file_inarchive = File.join(extract_path, 'data.json')
-
-      expect(File.exist?(image_in_archive)).to be true
-      expect(File.exist?(text_file_in_archive)).to be false
-      expect(File.exist?(json_file_inarchive)).to be false
+      it 'handles nested directory structures' do
+        expect(File.exist?(nested_image)).to be true
+        expect(File.read(nested_image)).to eq 'nested content'
+      end
     end
 
-    it 'deletes original archive when delete_original is true' do
-      extractor.extract nil, delete_original: true
+    context 'with non-images in the archive' do
+      let(:mixed_cbz) { File.join temp_dir, 'mixed.cbz' }
+      let(:mixed_extractor) { described_class.new mixed_cbz }
+      let(:extracted_folder_path) { mixed_extractor.extract }
+      let(:image_in_archive) { File.join(extracted_folder_path, 'page1.jpg') }
+      let(:text_file_in_archive) { File.join(extracted_folder_path, 'readme.txt') }
+      let(:json_file_inarchive) { File.join(extracted_folder_path, 'data.json') }
 
-      expect(File.exist?(test_cbz)).to be false
+      before do
+        Zip::File.open(mixed_cbz, create: true) do |zipfile|
+          zipfile.add 'page1.jpg', File.join(source_folder, 'page1.jpg')
+          zipfile.get_output_stream('readme.txt') { |f| f.write 'text content' }
+          zipfile.get_output_stream('data.json')  { |f| f.write '{}' }
+        end
+      end
+
+      it 'ignores non-image files' do
+        expect(File.exist?(image_in_archive)).to be true
+        expect(File.exist?(text_file_in_archive)).to be false
+        expect(File.exist?(json_file_inarchive)).to be false
+      end
     end
 
-    it 'preserves original archive when delete_original is false' do
-      extractor.extract(nil, delete_original: false)
+    context 'when delete_original is true' do
+      it 'deletes original archive' do
+        extractor.extract nil, delete_original: true
 
-      expect(File.exist?(test_cbz)).to be true
+        expect(File.exist?(test_cbz)).to be false
+      end
     end
 
-    it 'returns the path to the extracted folder' do
-      extract_path = extractor.extract
+    context 'when delete_original is false' do
+      it 'preserves original archive' do
+        extractor.extract(nil, delete_original: false)
 
-      expect(extract_path).to be_a String
-      expect(File.exist?(extract_path)).to be true
-      expect(File.directory?(extract_path)).to be true
+        expect(File.exist?(test_cbz)).to be true
+      end
+    end
+
+    context 'when no args are set' do
+      subject(:extracted_folder_path) { extractor.extract }
+
+      it 'returns the path to the extracted folder' do
+        expect(extracted_folder_path).to be_a String
+        expect(File.exist?(extracted_folder_path)).to be true
+        expect(File.directory?(extracted_folder_path)).to be true
+      end
     end
 
     context 'when archive is empty' do
-      subject(:extractor) { described_class.new empty_cbz }
+      subject(:extracted_folder_path) { extractor.extract }
 
+      let(:extractor) { described_class.new empty_cbz }
       let(:empty_cbz) { File.join temp_dir, 'empty.cbz' }
 
       before do
@@ -161,23 +180,21 @@ RSpec.describe ComicBook::Adapters::CBZExtractor do
       end
 
       it 'creates empty extraction folder' do
-        extract_path = extractor.extract
-
-        expect(File.exist?(extract_path)).to be true
-        expect(File.directory?(extract_path)).to be true
-        expect(Dir.empty?(extract_path)).to be true
+        expect(File.exist?(extracted_folder_path)).to be true
+        expect(File.directory?(extracted_folder_path)).to be true
+        expect(Dir.empty?(extracted_folder_path)).to be true
       end
     end
 
     context 'when archive contains only non-image files' do
-      let(:extractor) { described_class.new text_cbz }
       subject(:extractor_path) { extractor.extract }
 
+      let(:extractor) { described_class.new text_cbz }
       let(:text_cbz) { File.join temp_dir, 'text_only.cbz' }
 
       before do
         Zip::File.open(text_cbz, create: true) do |zipfile|
-          zipfile.get_output_stream('readme.txt') { |f| f.write('text content') }
+          zipfile.get_output_stream('readme.txt')  { |f| f.write('text content') }
           zipfile.get_output_stream('config.json') { |f| f.write('{}') }
         end
       end
@@ -200,9 +217,9 @@ RSpec.describe ComicBook::Adapters::CBZExtractor do
       end
 
       it 'extracts into existing folder' do
-        extract_path = extractor.extract(existing_destination)
+        extracted_folder_path = extractor.extract(existing_destination)
 
-        expect(extract_path).to eq existing_destination
+        expect(extracted_folder_path).to eq existing_destination
         expect(File.exist?(image_in_archive)).to be true
         expect(File.exist?(old_file)).to be true
       end
