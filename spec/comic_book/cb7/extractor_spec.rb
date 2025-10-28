@@ -22,14 +22,17 @@ RSpec.describe ComicBook::CB7::Extractor do
   end
 
   describe '#extract' do
-    subject(:extractor) { described_class.new(simple_cb7) }
+    subject(:extractor) { described_class.new temp_cb7_file }
 
-    let(:simple_cb7) { load_fixture 'cb7/simple.cb7' }
+    before { cb7_file.copy_to temp_cb7_file }
+
+    let(:cb7_file) { load_fixture 'cb7/simple.cb7' }
+    let(:temp_cb7_file) { File.join temp_dir, 'simple.cb7' }
+    let(:extracted_folder_path) { extractor.extract }
+    # let(:destination_path)      { File.expand_path temp_cb7_file }
 
     context 'with default .cb extension' do
       it 'extracts CB7 file to folder' do
-        extracted_folder_path = extractor.extract
-
         expect(File.exist?(extracted_folder_path)).to be true
         expect(File.directory?(extracted_folder_path)).to be true
         expect(File.extname(extracted_folder_path)).to eq '.cb'
@@ -38,10 +41,10 @@ RSpec.describe ComicBook::CB7::Extractor do
     end
 
     context 'with non-default destination folder' do
-      it 'extracts to custom destination folder' do
-        custom_destination_path = File.join temp_dir, 'custom_destination_path_folder'
-        extracted_folder_path   = extractor.extract custom_destination_path
+      let(:custom_destination_path) { File.join temp_dir, 'custom_destination_path_folder' }
+      let(:extracted_folder_path) { extractor.extract custom_destination_path }
 
+      it 'extracts to custom destination folder' do
         expect(extracted_folder_path).to eq custom_destination_path
         expect(File.exist?(custom_destination_path)).to be true
         expect(File.directory?(custom_destination_path)).to be true
