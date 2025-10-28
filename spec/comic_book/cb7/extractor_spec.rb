@@ -68,14 +68,12 @@ RSpec.describe ComicBook::CB7::Extractor do
     context 'with images in archive' do
       subject(:extractor) { described_class.new temp_cb7 }
 
-      before do
-        simple_cb7.copy_to temp_cb7
-      end
+      before { simple_cb7.copy_to temp_cb7 }
 
       let(:simple_cb7) { load_fixture('cb7/simple.cb7') }
       let(:temp_cb7) { File.join temp_dir, 'simple.cb7' }
-
       let(:extracted_folder_path) { extractor.extract }
+
       let(:image_a) { File.join extracted_folder_path, 'page1.jpg' }
       let(:image_b) { File.join extracted_folder_path, 'page2.png' }
       let(:image_c) { File.join extracted_folder_path, 'page3.gif' }
