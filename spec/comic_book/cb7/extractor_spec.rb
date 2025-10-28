@@ -28,7 +28,7 @@ RSpec.describe ComicBook::CB7::Extractor do
     let(:test_cb7) { File.join(temp_dir, 'simple.cb7') }
 
     before do
-      FileUtils.cp(File.join(fixtures_dir, 'simple.cb7'), test_cb7)
+      load_fixture('cb7/simple.cb7').copy_to test_cb7
     end
 
     context 'with default .cb extension' do
@@ -97,7 +97,8 @@ RSpec.describe ComicBook::CB7::Extractor do
       let(:nested_image) { File.join(extracted_folder_path, 'subfolder', 'nested.jpg') }
 
       before do
-        FileUtils.cp(File.join(fixtures_dir, 'nested.cb7'), nested_cb7)
+        # FileUtils.cp(File.join(fixtures_dir, 'nested.cb7'), nested_cb7)
+        load_fixture('cb7/nested.cb7').copy_to nested_cb7 # test_cb7
       end
 
       it 'handles nested directory structures' do
