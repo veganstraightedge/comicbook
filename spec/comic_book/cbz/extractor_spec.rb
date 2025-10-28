@@ -20,7 +20,7 @@ RSpec.describe ComicBook::CBZ::Extractor do
   end
 
   after do
-    FileUtils.rm_rf(temp_dir)
+    FileUtils.rm_rf temp_dir
   end
 
   describe '#initialize' do

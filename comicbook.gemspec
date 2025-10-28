@@ -51,4 +51,5 @@ Gem::Specification.new do |spec|
 
   # Runtime dependencies
   spec.add_dependency 'rubyzip', '>= 3.2.1'
+  spec.add_dependency 'seven-zip', '~> 1.4'
 end

@@ -1,4 +1,5 @@
 require 'comicbook'
+require 'rspec/file_fixtures'
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure

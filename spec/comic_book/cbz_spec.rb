@@ -14,7 +14,7 @@ RSpec.describe ComicBook::CBZ do
   end
 
   after do
-    FileUtils.rm_rf(temp_dir)
+    FileUtils.rm_rf temp_dir
   end
 
   describe '#initialize' do

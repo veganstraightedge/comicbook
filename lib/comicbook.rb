@@ -1,5 +1,6 @@
 require_relative 'comic_book/version'
 require_relative 'comic_book/page'
+require_relative 'comic_book/cb7'
 require_relative 'comic_book/cbz'
 require_relative 'comic_book/cli_helpers'
 
@@ -86,7 +87,7 @@ class ComicBook
 
   def adapter
     case type
-    # when :cb7 then CB7.new path
+    when :cb7 then CB7.new path
     # when :cba then CBA.new path
     # when :cbr then CBR.new path
     # when :cbt then CBT.new path
