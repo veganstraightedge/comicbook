@@ -139,8 +139,6 @@ RSpec.describe ComicBook::CB7::Extractor do
     end
 
     context 'when no args are set' do
-      subject(:extracted_folder_path) { extractor.extract }
-
       it 'returns the path to the extracted folder' do
         expect(extracted_folder_path).to be_a String
         expect(File.exist?(extracted_folder_path)).to be true
