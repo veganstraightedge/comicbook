@@ -7,11 +7,11 @@ class ComicBook
   module Adapter
     class CBZ < Base
       def archive source_folder, options = {}
-        CBZArchiver.new(source_folder).archive options
+        Archiver.new(source_folder).archive options
       end
 
       def extract destination_folder = nil, options = {}
-        CBZExtractor.new(path).extract destination_folder, options
+        Extractor.new(path).extract destination_folder, options
       end
 
       def pages = collect_pages_from_zip

@@ -1,12 +1,12 @@
 require 'spec_helper'
 
-RSpec.describe ComicBook::Adapter::CBZExtractor do
+RSpec.describe ComicBook::Adapter::CBZ::Extractor do
   subject(:extractor) { described_class.new(test_cbz) }
 
   let(:temp_dir)      { Dir.mktmpdir }
   let(:source_folder) { File.join temp_dir, 'source' }
   let(:test_cbz)      { File.join temp_dir, 'test.cbz' }
-  let(:archiver)      { ComicBook::Adapter::CBZArchiver.new source_folder }
+  let(:archiver)      { ComicBook::Adapter::CBZ::Archiver.new source_folder }
 
   before do
     Dir.mkdir source_folder
@@ -14,7 +14,7 @@ RSpec.describe ComicBook::Adapter::CBZExtractor do
     File.write File.join(source_folder, 'page2.png'), 'image2 content'
     File.write File.join(source_folder, 'page3.gif'), 'image3 content'
 
-    # Create a real CBZ file using CBZArchiver
+    # Create a real CBZ file using CBZ::Archiver
     output_path = archiver.archive
     File.rename(output_path, test_cbz) if output_path != test_cbz
   end
@@ -98,7 +98,7 @@ RSpec.describe ComicBook::Adapter::CBZExtractor do
       let(:nested_extractor)      { described_class.new nested_cbz }
       let(:extracted_folder_path) { nested_extractor.extract }
 
-      let(:archiver)              { ComicBook::Adapter::CBZArchiver.new nested_folder }
+      let(:archiver)              { ComicBook::Adapter::CBZ::Archiver.new nested_folder }
       let(:output_path)           { archiver.archive }
 
       before do

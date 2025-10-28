@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe ComicBook::Adapter::CBZArchiver do
+RSpec.describe ComicBook::Adapter::CBZ::Archiver do
   subject(:archiver) { described_class.new(source_folder) }
 
   let(:temp_dir) { Dir.mktmpdir }
