@@ -1,16 +1,15 @@
 require 'spec_helper'
 
 RSpec.describe ComicBook::CB7::Extractor do
-  let(:fixtures_dir) { File.join(File.dirname(__FILE__), '..', '..', 'fixtures', 'cb7') }
+  subject(:extractor) { described_class.new(test_cb7) }
+
   let(:temp_dir) { Dir.mktmpdir }
 
   after do
-    FileUtils.rm_rf(temp_dir)
+    FileUtils.rm_rf temp_dir
   end
 
   describe '#initialize' do
-    subject(:extractor) { described_class.new(test_cb7) }
-
     let(:test_cb7) { File.join(temp_dir, 'simple.cb7') }
 
     before do
@@ -23,8 +22,6 @@ RSpec.describe ComicBook::CB7::Extractor do
   end
 
   describe '#extract' do
-    subject(:extractor) { described_class.new(test_cb7) }
-
     let(:test_cb7) { File.join(temp_dir, 'simple.cb7') }
 
     before do
@@ -32,9 +29,9 @@ RSpec.describe ComicBook::CB7::Extractor do
     end
 
     context 'with default .cb extension' do
-      it 'extracts CB7 file to folder' do
-        extracted_folder_path = extractor.extract
+      let(:extracted_folder_path) { extractor.extract }
 
+      it 'extracts CB7 file to folder' do
         expect(File.exist?(extracted_folder_path)).to be true
         expect(File.directory?(extracted_folder_path)).to be true
         expect(File.extname(extracted_folder_path)).to eq '.cb'
@@ -43,10 +40,10 @@ RSpec.describe ComicBook::CB7::Extractor do
     end
 
     context 'with non-default destination folder' do
-      it 'extracts to custom destination folder' do
-        custom_destination_path = File.join(temp_dir, 'custom_destination')
-        extracted_folder_path = extractor.extract(custom_destination_path)
+      let(:extracted_folder_path) { extractor.extract custom_destination_path }
+      let(:custom_destination_path) { File.join(temp_dir, 'custom_destination') }
 
+      it 'extracts to custom destination folder' do
         expect(extracted_folder_path).to eq custom_destination_path
         expect(File.exist?(custom_destination_path)).to be true
         expect(File.directory?(custom_destination_path)).to be true
@@ -54,17 +51,17 @@ RSpec.describe ComicBook::CB7::Extractor do
     end
 
     context 'with non-default folder extension' do
-      it 'extracts to a folder with custom extension' do
-        extracted_folder_path = extractor.extract(nil, extension: :comicbook)
+      let(:extracted_folder_path) { extractor.extract(nil, extension: :comicbook) }
 
+      it 'extracts to a folder with custom extension' do
         expect(File.extname(extracted_folder_path)).to eq '.comicbook'
       end
     end
 
     context 'with no folder extension' do
-      it 'uses no extension when extension is nil' do
-        extracted_folder_path = extractor.extract(nil, extension: nil)
+      let(:extracted_folder_path) { extractor.extract(nil, extension: nil) }
 
+      it 'uses no extension when extension is nil' do
         expect(File.extname(extracted_folder_path)).to eq ''
         expect(File.basename(extracted_folder_path)).to eq 'simple'
       end
@@ -90,8 +87,6 @@ RSpec.describe ComicBook::CB7::Extractor do
     end
 
     context 'with nested directories' do
-      subject(:extractor) { described_class.new(test_cb7) }
-
       let(:test_cb7) { File.join(temp_dir, 'nested.cb7') }
       let(:extracted_folder_path) { extractor.extract }
       let(:nested_image) { File.join(extracted_folder_path, 'subfolder', 'nested.jpg') }
@@ -106,8 +101,6 @@ RSpec.describe ComicBook::CB7::Extractor do
     end
 
     context 'with non-images in the archive' do
-      subject(:extractor) { described_class.new(test_cb7) }
-
       let(:test_cb7) { File.join(temp_dir, 'mixed.cb7') }
       let(:extracted_folder_path) { extractor.extract }
       let(:image_in_archive) { File.join(extracted_folder_path, 'page1.jpg') }
@@ -152,9 +145,9 @@ RSpec.describe ComicBook::CB7::Extractor do
     end
 
     context 'when archive is empty' do
-      subject(:extractor) { described_class.new(test_cb7) }
       subject(:extracted_folder_path) { extractor.extract }
 
+      let(:extractor) { described_class.new(test_cb7) }
       let(:test_cb7) { File.join(temp_dir, 'empty.cb7') }
 
       before do
@@ -169,9 +162,9 @@ RSpec.describe ComicBook::CB7::Extractor do
     end
 
     context 'when archive contains only non-image files' do
-      subject(:extractor) { described_class.new(test_cb7) }
       subject(:extracted_folder_path) { extractor.extract }
 
+      let(:extractor) { described_class.new(test_cb7) }
       let(:test_cb7) { File.join(temp_dir, 'text_only.cb7') }
 
       before do
