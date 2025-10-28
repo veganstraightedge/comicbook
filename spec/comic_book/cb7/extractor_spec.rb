@@ -108,25 +108,18 @@ RSpec.describe ComicBook::CB7::Extractor do
     end
 
     context 'when delete_original is true' do
-      let(:test_cb7) { File.join(temp_dir, 'test.cb7') }
-      let(:extractor) { described_class.new(test_cb7) }
-
-      before do
-        FileUtils.cp(simple_cb7, test_cb7)
-      end
+      subject(:extractor) { described_class.new temp_cb7_file, delete_original: true }
 
       it 'deletes original archive' do
-        extractor.extract nil, delete_original: true
-
-        expect(File.exist?(test_cb7)).to be false
+        expect(File.exist?(temp_cb7_file)).to be false
       end
     end
 
     context 'when delete_original is false' do
       it 'preserves original archive' do
-        extractor.extract(nil, delete_original: false)
+        subject(:extractor) { described_class.new temp_cb7_file, delete_original: true }
 
-        expect(File.exist?(simple_cb7)).to be true
+        expect(File.exist?(cb7_file)).to be true
       end
     end
 
