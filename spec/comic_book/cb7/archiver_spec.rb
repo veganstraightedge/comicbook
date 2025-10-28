@@ -14,7 +14,7 @@ RSpec.describe ComicBook::CB7::Archiver do
   end
 
   after do
-    FileUtils.rm_rf temp_dir
+    FileUtils.rm_rf(temp_dir)
   end
 
   describe '#initialize' do
