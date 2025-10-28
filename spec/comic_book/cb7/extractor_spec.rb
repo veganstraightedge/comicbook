@@ -75,9 +75,15 @@ RSpec.describe ComicBook::CB7::Extractor do
     end
 
     context 'with nested directories' do
-      subject(:extractor) { described_class.new(nested_cb7) }
+      subject(:extractor) { described_class.new temp_cb7 }
 
-      let(:nested_cb7) { load_fixture('cb7/nested.cb7') }
+      before do
+        nested_cb7.copy_to temp_cb7
+      end
+
+      let(:nested_cb7) { load_fixture 'cb7/nested.cb7' }
+      let(:temp_cb7) { File.join temp_dir, 'cb7/nested_cb7.cb7' }
+
       let(:extracted_folder_path) { extractor.extract }
       let(:nested_image) { File.join extracted_folder_path, 'subfolder', 'nested.jpg' }
 
@@ -88,7 +94,7 @@ RSpec.describe ComicBook::CB7::Extractor do
     end
 
     context 'with non-images in the archive' do
-      subject(:extractor) { described_class.new(temp_cb7) }
+      subject(:extractor) { described_class.new temp_cb7 }
 
       before do
         mixed_cb7.copy_to temp_cb7
