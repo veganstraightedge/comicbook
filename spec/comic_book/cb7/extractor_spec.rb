@@ -119,9 +119,11 @@ RSpec.describe ComicBook::CB7::Extractor do
     end
 
     context 'when delete_original is true' do
-      it 'deletes original archive' do
+      before do
         extractor.extract(nil, delete_original: true)
+      end
 
+      it 'deletes original archive' do
         expect(File.exist?(test_cb7)).to be false
       end
     end
