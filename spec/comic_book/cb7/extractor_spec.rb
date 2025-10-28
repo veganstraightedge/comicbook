@@ -145,10 +145,8 @@ RSpec.describe ComicBook::CB7::Extractor do
     end
 
     context 'when archive contains only non-image files' do
-      subject(:extracted_folder_path) { extractor.extract }
-
-      let(:extractor) { described_class.new(text_cb7) }
-      let(:text_cb7) { load_fixture('cb7/text_only.cb7') }
+      let(:cb7_file) { load_fixture('cb7/text_only.cb7') }
+      let(:temp_cb7_file) { File.join temp_dir, 'text_only.cb7' }
 
       it 'creates empty extraction folder' do
         expect(File.exist?(extracted_folder_path)).to be true
