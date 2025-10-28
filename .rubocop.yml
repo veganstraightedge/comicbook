@@ -18,6 +18,12 @@ Naming/VariableNumber:
   EnforcedStyle: snake_case
   AllowedIdentifiers:
     - cb7
+    - empty_cb7
+    - mixed_cb7
+    - nested_cb7
+    - simple_cb7
+    - test_cb7
+    - text_cb7
 
 Style/AsciiComments:
   Enabled: false

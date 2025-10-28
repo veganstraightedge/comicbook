@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 RSpec.describe ComicBook::CB7::Extractor do
-  let(:fixtures_dir) { File.join(File.dirname(__FILE__), 'fixtures', 'cb7') }
   let(:temp_dir) { Dir.mktmpdir }
 
   after do

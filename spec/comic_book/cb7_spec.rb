@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 RSpec.describe ComicBook::CB7 do
-  let(:fixtures_dir) { File.join(File.dirname(__FILE__), '..', 'fixtures', 'cb7') }
   let(:temp_dir) { Dir.mktmpdir }
 
   after do
@@ -11,7 +10,7 @@ RSpec.describe ComicBook::CB7 do
   describe '#initialize' do
     subject(:adapter) { described_class.new(simple_cb7) }
 
-    let(:simple_cb7) { load_fixture('cb7/simple.cb7' }
+    let(:simple_cb7) { load_fixture 'cb7/simple.cb7' }
 
     it 'stores absolute path' do
       expect(adapter.send(:path)).to eq File.expand_path(simple_cb7)
@@ -19,7 +18,7 @@ RSpec.describe ComicBook::CB7 do
   end
 
   describe '#archive' do
-    let(:source_folder) { load_fixture('cb7/simple.cb7' }
+    let(:source_folder) { load_fixture 'cb7/simple.cb7' }
     let(:adapter) { described_class.new(source_folder) }
 
     it 'creates a CB7 file from source folder' do
@@ -62,7 +61,7 @@ RSpec.describe ComicBook::CB7 do
   describe '#extract' do
     subject(:adapter) { described_class.new(simple_cb7) }
 
-    let(:simple_cb7) { load_fixture('cb7/simple.cb7' }
+    let(:simple_cb7) { load_fixture 'cb7/simple.cb7' }
 
     it 'extracts CB7 file to folder' do
       extracted_path = adapter.extract
