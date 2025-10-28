@@ -8,12 +8,17 @@ RSpec.describe ComicBook::CB7::Extractor do
   end
 
   describe '#initialize' do
-    subject(:extractor) { described_class.new simple_cb7 }
+    subject(:extractor) { described_class.new temp_file }
 
     let(:simple_cb7) { load_fixture 'cb7/simple.cb7' }
+    let(:temp_file) { File.join temp_dir, 'simple.cb7' }
+
+    before do
+      simple_cb7.copy_to temp_file
+    end
 
     it 'stores absolute path of archive file' do
-      expect(extractor.send(:archive_path)).to eq File.expand_path(simple_cb7)
+      expect(extractor.send(:archive_path)).to eq File.expand_path(temp_file)
     end
   end
 
@@ -62,12 +67,22 @@ RSpec.describe ComicBook::CB7::Extractor do
     end
 
     context 'with images in archive' do
-      let(:image_a) { File.join extracted_folder_path, 'simple', 'page1.jpg' }
-      let(:image_b) { File.join extracted_folder_path, 'simple', 'page2.png' }
-      let(:image_c) { File.join extracted_folder_path, 'simple', 'page3.gif' }
+      subject(:extractor) { described_class.new temp_cb7 }
+
+      before do
+        simple_cb7.copy_to temp_cb7
+      end
+
+      let(:simple_cb7) { load_fixture('cb7/simple.cb7') }
+      let(:temp_cb7) { File.join temp_dir, 'simple.cb7' }
+
       let(:extracted_folder_path) { extractor.extract }
+      let(:image_a) { File.join extracted_folder_path, 'page1.jpg' }
+      let(:image_b) { File.join extracted_folder_path, 'page2.png' }
+      let(:image_c) { File.join extracted_folder_path, 'page3.gif' }
 
       it 'extracts all image files from the archive' do
+        binding.irb
         expect(File.exist?(image_a)).to be true
         expect(File.exist?(image_b)).to be true
         expect(File.exist?(image_c)).to be true
@@ -82,7 +97,7 @@ RSpec.describe ComicBook::CB7::Extractor do
       end
 
       let(:nested_cb7) { load_fixture 'cb7/nested.cb7' }
-      let(:temp_cb7) { File.join temp_dir, 'cb7/nested_cb7.cb7' }
+      let(:temp_cb7) { File.join temp_dir, 'nested_cb7.cb7' }
 
       let(:extracted_folder_path) { extractor.extract }
       let(:nested_image) { File.join extracted_folder_path, 'subfolder', 'nested.jpg' }
@@ -101,7 +116,7 @@ RSpec.describe ComicBook::CB7::Extractor do
       end
 
       let(:mixed_cb7) { load_fixture('cb7/mixed.cb7') }
-      let(:temp_cb7) { File.join temp_dir, 'cb7/mixed.cb7' }
+      let(:temp_cb7) { File.join temp_dir, 'mixed.cb7' }
 
       let(:extracted_folder_path) { extractor.extract }
       let(:image_in_archive) { File.join(extracted_folder_path, 'mixed', 'page1.jpg') }
