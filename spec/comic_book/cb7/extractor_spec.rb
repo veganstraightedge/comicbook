@@ -152,13 +152,13 @@ RSpec.describe ComicBook::CB7::Extractor do
     end
 
     context 'when archive is empty' do
-      subject(:extractor) { described_class.new(empty_cb7) }
+      subject(:extractor) { described_class.new(test_cb7) }
       subject(:extracted_folder_path) { extractor.extract }
 
-      let(:empty_cb7) { File.join(temp_dir, 'empty.cb7') }
+      let(:test_cb7) { File.join(temp_dir, 'empty.cb7') }
 
       before do
-        FileUtils.cp(File.join(fixtures_dir, 'empty.cb7'), empty_cb7)
+        load_fixture('cb7/empty.cb7').copy_to test_cb7
       end
 
       it 'creates empty extraction folder' do
