@@ -8,9 +8,9 @@ RSpec.describe ComicBook::CB7::Extractor do
   end
 
   describe '#initialize' do
-    subject(:extractor) { described_class.new(simple_cb7) }
+    subject(:extractor) { described_class.new simple_cb7 }
 
-    let(:simple_cb7) { load_fixture('cb7/simple.cb7') }
+    let(:simple_cb7) { load_fixture 'cb7/simple.cb7' }
 
     it 'stores absolute path of archive file' do
       expect(extractor.send(:archive_path)).to eq File.expand_path(simple_cb7)
@@ -20,7 +20,7 @@ RSpec.describe ComicBook::CB7::Extractor do
   describe '#extract' do
     subject(:extractor) { described_class.new(simple_cb7) }
 
-    let(:simple_cb7) { load_fixture('cb7/simple.cb7') }
+    let(:simple_cb7) { load_fixture 'cb7/simple.cb7' }
 
     context 'with default .cb extension' do
       it 'extracts CB7 file to folder' do
