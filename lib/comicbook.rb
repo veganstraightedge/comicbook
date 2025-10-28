@@ -1,6 +1,6 @@
 require_relative 'comic_book/version'
 require_relative 'comic_book/page'
-require_relative 'comic_book/adapter/cbz'
+require_relative 'comic_book/cbz'
 require_relative 'comic_book/cli_helpers'
 
 class ComicBook
@@ -35,7 +35,7 @@ class ComicBook
   def archive source_folder, options = {}
     raise Error, 'Cannot archive a file' unless type == :folder
 
-    Adapter::CBZ.new(source_folder).archive source_folder, options
+    CBZ.new(source_folder).archive source_folder, options
   end
 
   def extract options = {}
@@ -86,8 +86,11 @@ class ComicBook
 
   def adapter
     case type
-    when :cbz, :cb7, :cbt, :cbr, :cba
-      Adapter::CBZ.new path # Start with CBZ for all archives
+    # when :cb7 then CB7.new path
+    # when :cba then CBA.new path
+    # when :cbr then CBR.new path
+    # when :cbt then CBT.new path
+    when :cbz then CBZ.new path
     else
       raise Error, "No adapter available for type: #{type}"
     end

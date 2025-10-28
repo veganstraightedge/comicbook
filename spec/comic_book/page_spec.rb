@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 RSpec.describe ComicBook::Page do
-  subject(:page) { described_class.new(file_path, file_name) }
+  subject(:page) { described_class.new file_path, file_name }
 
   let(:file_path) { '/path/to/page1.jpg' }
   let(:file_name) { 'page1.jpg' }

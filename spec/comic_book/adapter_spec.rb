@@ -1,7 +1,7 @@
 require 'spec_helper'
 
-RSpec.describe ComicBook::Adapter::Base do
-  subject(:adapter) { described_class.new('/path/to/test') }
+RSpec.describe ComicBook::Adapter do
+  subject(:adapter) { described_class.new '/path/to/test' }
 
   describe '#initialize' do
     it 'stores absolute path' do
@@ -13,7 +13,7 @@ RSpec.describe ComicBook::Adapter::Base do
     it 'raises NotImplementedError' do
       expect do
         adapter.archive('/source')
-      end.to raise_error(NotImplementedError, 'ComicBook::Adapter::Base must implement #archive')
+      end.to raise_error NotImplementedError, 'ComicBook::Adapter must implement #archive'
     end
   end
 
@@ -21,13 +21,13 @@ RSpec.describe ComicBook::Adapter::Base do
     it 'raises NotImplementedError' do
       expect do
         adapter.extract('/destination')
-      end.to raise_error(NotImplementedError, 'ComicBook::Adapter::Base must implement #extract')
+      end.to raise_error NotImplementedError, 'ComicBook::Adapter must implement #extract'
     end
   end
 
   describe '#pages' do
     it 'raises NotImplementedError' do
-      expect { adapter.pages }.to raise_error(NotImplementedError, 'ComicBook::Adapter::Base must implement #pages')
+      expect { adapter.pages }.to raise_error NotImplementedError, 'ComicBook::Adapter must implement #pages'
     end
   end
 end

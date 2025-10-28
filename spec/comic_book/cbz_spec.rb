@@ -1,7 +1,7 @@
 require 'spec_helper'
 
-RSpec.describe ComicBook::Adapter::CBZ do
-  subject(:adapter) { described_class.new(test_cbz) }
+RSpec.describe ComicBook::CBZ do
+  subject(:adapter) { described_class.new test_cbz }
 
   let(:temp_dir) { Dir.mktmpdir }
   let(:source_folder) { File.join(temp_dir, 'source') }
@@ -57,14 +57,14 @@ RSpec.describe ComicBook::Adapter::CBZ do
   end
 
   describe '#extract' do
-    subject(:adapter) { described_class.new(cbz_file) }
+    subject(:adapter) { described_class.new cbz_file }
 
     let(:cbz_file) { File.join(temp_dir, 'extract_test.cbz') }
 
     before do
       # Create a real CBZ file first using the source folder
-      source_adapter = described_class.new(source_folder)
-      output_path = source_adapter.archive(source_folder)
+      source_adapter = described_class.new source_folder
+      output_path = source_adapter.archive source_folder
       # Move the created archive to the expected location
       File.rename(output_path, cbz_file) if output_path != cbz_file
     end
@@ -113,7 +113,7 @@ RSpec.describe ComicBook::Adapter::CBZ do
   end
 
   describe '#pages' do
-    subject(:adapter) { described_class.new(cbz_file) }
+    subject(:adapter) { described_class.new cbz_file }
 
     let(:cbz_file) { File.join temp_dir, 'pages_test.cbz' }
     let(:pages) { adapter.pages }
@@ -122,8 +122,8 @@ RSpec.describe ComicBook::Adapter::CBZ do
     let(:page_two) { pages.find { |p| p.name == 'page2.png' } }
 
     # Create a real CBZ file first using the source folder
-    let(:source_adapter) { described_class.new(source_folder) }
-    let(:output_path)    { source_adapter.archive(source_folder) }
+    let(:source_adapter) { described_class.new source_folder }
+    let(:output_path)    { source_adapter.archive source_folder }
 
     before do
       # Move the created archive to the expected location

@@ -45,7 +45,7 @@ RSpec.describe ComicBook do
 
     context 'with a non-existent path' do
       it 'raises an error' do
-        expect { described_class.new('/non/existent/path') }.to raise_error ComicBook::Error, /Path does not exist/
+        expect { described_class.new '/non/existent/path' }.to raise_error ComicBook::Error, /Path does not exist/
       end
     end
 
@@ -55,7 +55,7 @@ RSpec.describe ComicBook do
       it 'raises an error' do
         File.write unsupported_file, 'content'
 
-        expect { described_class.new(unsupported_file) }.to raise_error ComicBook::Error, /Unsupported file type/
+        expect { described_class.new unsupported_file }.to raise_error ComicBook::Error, /Unsupported file type/
       end
     end
   end

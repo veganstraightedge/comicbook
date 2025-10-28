@@ -1,7 +1,7 @@
 require 'spec_helper'
 
-RSpec.describe ComicBook::Adapter::CBZ::Archiver do
-  subject(:archiver) { described_class.new(source_folder) }
+RSpec.describe ComicBook::CBZ::Archiver do
+  subject(:archiver) { described_class.new source_folder }
 
   let(:temp_dir) { Dir.mktmpdir }
   let(:source_folder) { File.join(temp_dir, 'source') }
@@ -118,7 +118,7 @@ RSpec.describe ComicBook::Adapter::CBZ::Archiver do
     end
 
     context 'when source folder is empty' do
-      subject(:archiver) { described_class.new(empty_folder) }
+      subject(:archiver) { described_class.new empty_folder }
 
       let(:empty_folder) { File.join(temp_dir, 'empty') }
 
@@ -137,7 +137,7 @@ RSpec.describe ComicBook::Adapter::CBZ::Archiver do
     end
 
     context 'when source folder has only non-image files' do
-      subject(:archiver) { described_class.new(text_folder) }
+      subject(:archiver) { described_class.new text_folder }
 
       let(:text_folder) { File.join(temp_dir, 'text_only') }
 
