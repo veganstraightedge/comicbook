@@ -24,6 +24,7 @@ Naming/VariableNumber:
     - simple_cb7
     - test_cb7
     - text_cb7
+    - temp_cb7
 
 Style/AsciiComments:
   Enabled: false

@@ -8,13 +8,13 @@ RSpec.describe ComicBook::CB7::Extractor do
   end
 
   describe '#initialize' do
-    subject(:extractor) { described_class.new temp_file }
+    subject(:extractor) { described_class.new temp_cb7_file }
 
-    before { cb7_file.copy_to temp_file }
+    before { cb7_file.copy_to temp_cb7_file }
 
-    let(:cb7_file) { load_fixture 'cb7/simple.cb7' }
-    let(:temp_file) { File.join temp_dir, 'simple.cb7' }
-    let(:destination_path) { File.expand_path temp_file }
+    let(:cb7_file)         { load_fixture 'cb7/simple.cb7' }
+    let(:temp_cb7_file)    { File.join temp_dir, 'simple.cb7' }
+    let(:destination_path) { File.expand_path temp_cb7_file }
 
     it 'stores absolute path of archive file' do
       expect(extractor.send(:archive_path)).to eq destination_path
@@ -81,7 +81,6 @@ RSpec.describe ComicBook::CB7::Extractor do
       let(:image_c) { File.join extracted_folder_path, 'page3.gif' }
 
       it 'extracts all image files from the archive' do
-        binding.irb
         expect(File.exist?(image_a)).to be true
         expect(File.exist?(image_b)).to be true
         expect(File.exist?(image_c)).to be true
