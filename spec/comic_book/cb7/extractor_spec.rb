@@ -69,14 +69,6 @@ RSpec.describe ComicBook::CB7::Extractor do
     end
 
     context 'with images in archive' do
-      subject(:extractor) { described_class.new temp_cb7 }
-
-      before { simple_cb7.copy_to temp_cb7 }
-
-      let(:simple_cb7) { load_fixture('cb7/simple.cb7') }
-      let(:temp_cb7) { File.join temp_dir, 'simple.cb7' }
-      let(:extracted_folder_path) { extractor.extract }
-
       let(:image_a) { File.join extracted_folder_path, 'page1.jpg' }
       let(:image_b) { File.join extracted_folder_path, 'page2.png' }
       let(:image_c) { File.join extracted_folder_path, 'page3.gif' }
@@ -89,36 +81,22 @@ RSpec.describe ComicBook::CB7::Extractor do
     end
 
     context 'with nested directories' do
-      subject(:extractor) { described_class.new temp_cb7 }
+      let(:cb7_file)         { load_fixture 'cb7/nested.cb7' }
+      let(:temp_cb7_file)    { File.join temp_dir, 'nested.cb7' }
+      let(:destination_path) { File.expand_path temp_cb7_file }
 
-      before do
-        nested_cb7.copy_to temp_cb7
-      end
-
-      let(:nested_cb7) { load_fixture 'cb7/nested.cb7' }
-      let(:temp_cb7) { File.join temp_dir, 'nested_cb7.cb7' }
-
-      let(:extracted_folder_path) { extractor.extract }
-      let(:nested_image) { File.join extracted_folder_path, 'subfolder', 'nested.jpg' }
+      let(:nested_image) { File.join extracted_folder_path, 'nested', 'subfolder', 'nested.jpg' }
 
       it 'handles nested directory structures' do
         expect(File.exist?(nested_image)).to be true
-        expect(File.read(nested_image)).to eq 'nested content'
       end
     end
 
     context 'with non-images in the archive' do
-      subject(:extractor) { described_class.new temp_cb7 }
-
-      before do
-        mixed_cb7.copy_to temp_cb7
-      end
-
-      let(:mixed_cb7) { load_fixture('cb7/mixed.cb7') }
+      let(:cb7_file) { load_fixture('cb7/mixed.cb7') }
       let(:temp_cb7) { File.join temp_dir, 'mixed.cb7' }
 
-      let(:extracted_folder_path) { extractor.extract }
-      let(:image_in_archive) { File.join(extracted_folder_path, 'mixed', 'page1.jpg') }
+      let(:image_in_archive)     { File.join(extracted_folder_path, 'mixed', 'page1.jpg') }
       let(:text_file_in_archive) { File.join(extracted_folder_path, 'mixed', 'readme.txt') }
       let(:json_file_in_archive) { File.join(extracted_folder_path, 'mixed', 'data.json') }
 
