@@ -80,9 +80,13 @@ RSpec.describe ComicBook::CB7::Extractor do
       end
 
       it 'preserves file contents during extraction' do
-        expect(File.exist?(image_a)).to be true
-        expect(File.exist?(image_b)).to be true
-        expect(File.exist?(image_c)).to be true
+        fixture_image_a = load_fixture('cb7/simple/page1.jpg')
+        fixture_image_b = load_fixture('cb7/simple/page2.png')
+        fixture_image_c = load_fixture('cb7/simple/page3.gif')
+
+        expect(File.read(image_a)).to eq fixture_image_a.read
+        expect(File.read(image_b)).to eq fixture_image_b.read
+        expect(File.read(image_c)).to eq fixture_image_c.read
       end
     end
 
