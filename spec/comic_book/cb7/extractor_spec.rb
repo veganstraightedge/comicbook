@@ -4,6 +4,7 @@ RSpec.describe ComicBook::CB7::Extractor do
   subject(:extractor) { described_class.new(test_cb7) }
 
   let(:temp_dir) { Dir.mktmpdir }
+  let(:extracted_folder_path) { extractor.extract }
 
   after do
     FileUtils.rm_rf temp_dir
@@ -29,8 +30,6 @@ RSpec.describe ComicBook::CB7::Extractor do
     end
 
     context 'with default .cb extension' do
-      let(:extracted_folder_path) { extractor.extract }
-
       it 'extracts CB7 file to folder' do
         expect(File.exist?(extracted_folder_path)).to be true
         expect(File.directory?(extracted_folder_path)).to be true
@@ -68,7 +67,6 @@ RSpec.describe ComicBook::CB7::Extractor do
     end
 
     context 'with images in archive' do
-      let(:extracted_folder_path) { extractor.extract }
       let(:image_a) { File.join(extracted_folder_path, 'page1.jpg') }
       let(:image_b) { File.join(extracted_folder_path, 'page2.png') }
       let(:image_c) { File.join(extracted_folder_path, 'page3.gif') }
@@ -92,7 +90,6 @@ RSpec.describe ComicBook::CB7::Extractor do
 
     context 'with nested directories' do
       let(:test_cb7) { File.join(temp_dir, 'nested.cb7') }
-      let(:extracted_folder_path) { extractor.extract }
       let(:nested_image) { File.join(extracted_folder_path, 'subfolder', 'nested.jpg') }
 
       before do
@@ -106,7 +103,6 @@ RSpec.describe ComicBook::CB7::Extractor do
 
     context 'with non-images in the archive' do
       let(:test_cb7) { File.join(temp_dir, 'mixed.cb7') }
-      let(:extracted_folder_path) { extractor.extract }
       let(:image_in_archive) { File.join(extracted_folder_path, 'page1.jpg') }
       let(:text_file_in_archive) { File.join(extracted_folder_path, 'readme.txt') }
       let(:json_file_in_archive) { File.join(extracted_folder_path, 'data.json') }
