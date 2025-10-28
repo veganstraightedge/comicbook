@@ -106,16 +106,16 @@ RSpec.describe ComicBook::CB7::Extractor do
     end
 
     context 'with non-images in the archive' do
-      subject(:extractor) { described_class.new(mixed_cb7) }
+      subject(:extractor) { described_class.new(test_cb7) }
 
-      let(:mixed_cb7) { File.join(temp_dir, 'mixed.cb7') }
+      let(:test_cb7) { File.join(temp_dir, 'mixed.cb7') }
       let(:extracted_folder_path) { extractor.extract }
       let(:image_in_archive) { File.join(extracted_folder_path, 'page1.jpg') }
       let(:text_file_in_archive) { File.join(extracted_folder_path, 'readme.txt') }
       let(:json_file_in_archive) { File.join(extracted_folder_path, 'data.json') }
 
       before do
-        FileUtils.cp(File.join(fixtures_dir, 'mixed.cb7'), mixed_cb7)
+        load_fixture('cb7/mixed.cb7').copy_to test_cb7
       end
 
       it 'ignores non-image files' do
