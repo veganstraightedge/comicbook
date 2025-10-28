@@ -178,6 +178,7 @@ RSpec.describe ComicBook::CB7::Extractor do
       let(:existing_destination) { File.join(temp_dir, 'existing') }
       let(:image_in_archive) { File.join(existing_destination, 'page1.jpg') }
       let(:old_file) { File.join(existing_destination, 'old_file.txt') }
+      let(:extracted_folder_path) { extractor.extract(existing_destination) }
 
       before do
         Dir.mkdir(existing_destination)
@@ -185,8 +186,6 @@ RSpec.describe ComicBook::CB7::Extractor do
       end
 
       it 'extracts into existing folder' do
-        extracted_folder_path = extractor.extract(existing_destination)
-
         expect(extracted_folder_path).to eq existing_destination
         expect(File.exist?(image_in_archive)).to be true
         expect(File.exist?(old_file)).to be true
