@@ -1,6 +1,7 @@
 require_relative 'comic_book/version'
 require_relative 'comic_book/page'
 require_relative 'comic_book/adapter/cbz'
+require_relative 'comic_book/cli_helpers'
 
 class ComicBook
   class Error < StandardError; end
