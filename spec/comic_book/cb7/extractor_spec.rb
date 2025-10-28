@@ -14,7 +14,7 @@ RSpec.describe ComicBook::CB7::Extractor do
     let(:test_cb7) { File.join(temp_dir, 'simple.cb7') }
 
     before do
-      FileUtils.cp(File.join(fixtures_dir, 'simple.cb7'), test_cb7)
+      load_fixture('cb7/simple.cb7').copy_to test_cb7
     end
 
     it 'stores absolute path of archive file' do
