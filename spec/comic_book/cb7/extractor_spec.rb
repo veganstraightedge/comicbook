@@ -147,8 +147,6 @@ RSpec.describe ComicBook::CB7::Extractor do
     end
 
     context 'when archive is empty' do
-      subject(:extracted_folder_path) { extractor.extract }
-
       let(:extractor) { described_class.new(test_cb7) }
       let(:test_cb7) { File.join(temp_dir, 'empty.cb7') }
 
