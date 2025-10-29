@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 RSpec.describe ComicBook::CB7::Archiver do
-  let(:fixtures_dir) { File.join(File.dirname(__FILE__), '..', '..', 'fixtures', 'cb7') }
   let(:temp_dir) { Dir.mktmpdir }
 
   after do
@@ -12,7 +11,7 @@ RSpec.describe ComicBook::CB7::Archiver do
     let(:source_folder) { File.join(temp_dir, 'simple') }
 
     before do
-      FileUtils.cp_r(File.join(fixtures_dir, 'simple'), source_folder)
+      FileUtils.cp_r(load_fixture('cb7/simple').path, source_folder)
     end
 
     it 'stores absolute path of source folder' do
@@ -24,10 +23,10 @@ RSpec.describe ComicBook::CB7::Archiver do
   describe '#archive' do
     context 'with simple fixture' do
       let(:source_folder) { File.join(temp_dir, 'simple') }
-      let(:expected_cb7) { File.join(fixtures_dir, 'simple.cb7') }
+      let(:expected_cb7) { load_fixture('cb7/simple.cb7').path }
 
       before do
-        FileUtils.cp_r(File.join(fixtures_dir, 'simple'), source_folder)
+        FileUtils.cp_r(load_fixture('cb7/simple').path, source_folder)
       end
 
       it 'creates a CB7 file with default extension' do
@@ -120,10 +119,10 @@ RSpec.describe ComicBook::CB7::Archiver do
 
     context 'with nested fixture' do
       let(:source_folder) { File.join(temp_dir, 'nested') }
-      let(:expected_cb7) { File.join(fixtures_dir, 'nested.cb7') }
+      let(:expected_cb7) { load_fixture('cb7/nested.cb7').path }
 
       before do
-        FileUtils.cp_r(File.join(fixtures_dir, 'nested'), source_folder)
+        FileUtils.cp_r(load_fixture('cb7/nested').path, source_folder)
       end
 
       it 'creates archive matching nested.cb7 fixture' do
@@ -162,10 +161,10 @@ RSpec.describe ComicBook::CB7::Archiver do
 
     context 'with mixed fixture' do
       let(:source_folder) { File.join(temp_dir, 'mixed') }
-      let(:expected_cb7) { File.join(fixtures_dir, 'mixed.cb7') }
+      let(:expected_cb7) { load_fixture('cb7/mixed.cb7').path }
 
       before do
-        FileUtils.cp_r(File.join(fixtures_dir, 'mixed'), source_folder)
+        FileUtils.cp_r(load_fixture('cb7/mixed').path, source_folder)
       end
 
       it 'creates archive matching mixed.cb7 fixture' do
@@ -205,10 +204,10 @@ RSpec.describe ComicBook::CB7::Archiver do
 
     context 'with empty fixture' do
       let(:source_folder) { File.join(temp_dir, 'empty') }
-      let(:expected_cb7) { File.join(fixtures_dir, 'empty.cb7') }
+      let(:expected_cb7) { load_fixture('cb7/empty.cb7').path }
 
       before do
-        FileUtils.cp_r(File.join(fixtures_dir, 'empty'), source_folder)
+        FileUtils.cp_r(load_fixture('cb7/empty').path, source_folder)
       end
 
       it 'creates archive matching empty.cb7 fixture' do
@@ -247,10 +246,10 @@ RSpec.describe ComicBook::CB7::Archiver do
 
     context 'with text_only fixture' do
       let(:source_folder) { File.join(temp_dir, 'text_only') }
-      let(:expected_cb7) { File.join(fixtures_dir, 'text_only.cb7') }
+      let(:expected_cb7) { load_fixture('cb7/text_only.cb7').path }
 
       before do
-        FileUtils.cp_r(File.join(fixtures_dir, 'text_only'), source_folder)
+        FileUtils.cp_r(load_fixture('cb7/text_only').path, source_folder)
       end
 
       it 'creates archive matching text_only.cb7 fixture' do

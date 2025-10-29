@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 RSpec.describe ComicBook::CB7 do
-  let(:fixtures_dir) { File.join(File.dirname(__FILE__), '..', 'fixtures', 'cb7') }
   let(:temp_dir) { Dir.mktmpdir }
 
   after do
@@ -14,7 +13,7 @@ RSpec.describe ComicBook::CB7 do
     let(:test_cb7) { File.join(temp_dir, 'simple.cb7') }
 
     before do
-      FileUtils.cp(File.join(fixtures_dir, 'simple.cb7'), test_cb7)
+      load_fixture('cb7/simple.cb7').copy_to(test_cb7)
     end
 
     it 'stores absolute path' do
@@ -27,7 +26,7 @@ RSpec.describe ComicBook::CB7 do
     let(:adapter) { described_class.new(source_folder) }
 
     before do
-      FileUtils.cp_r(File.join(fixtures_dir, 'simple'), source_folder)
+      FileUtils.cp_r(load_fixture('cb7/simple').path, source_folder)
     end
 
     it 'creates a CB7 file from source folder' do
@@ -73,7 +72,7 @@ RSpec.describe ComicBook::CB7 do
     let(:test_cb7) { File.join(temp_dir, 'simple.cb7') }
 
     before do
-      FileUtils.cp(File.join(fixtures_dir, 'simple.cb7'), test_cb7)
+      load_fixture('cb7/simple.cb7').copy_to(test_cb7)
     end
 
     it 'extracts CB7 file to folder' do
@@ -127,7 +126,7 @@ RSpec.describe ComicBook::CB7 do
     let(:test_cb7) { File.join(temp_dir, 'simple.cb7') }
 
     before do
-      FileUtils.cp(File.join(fixtures_dir, 'simple.cb7'), test_cb7)
+      load_fixture('cb7/simple.cb7').copy_to(test_cb7)
     end
 
     it 'returns array of Page objects' do
@@ -156,7 +155,7 @@ RSpec.describe ComicBook::CB7 do
       let(:mixed_cb7) { File.join(temp_dir, 'mixed.cb7') }
 
       before do
-        FileUtils.cp(File.join(fixtures_dir, 'mixed.cb7'), mixed_cb7)
+        load_fixture('cb7/mixed.cb7').copy_to(mixed_cb7)
       end
 
       it 'only includes image files' do
