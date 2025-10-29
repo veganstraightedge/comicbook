@@ -26,7 +26,9 @@ RSpec.describe ComicBook::CB7 do
     let(:adapter) { described_class.new(source_folder) }
 
     before do
-      FileUtils.cp_r(load_fixture('cb7/simple').path, source_folder)
+      load_fixture('cb7/simple/page1.jpg').copy_to File.join(source_folder, 'page1.jpg')
+      load_fixture('cb7/simple/page2.png').copy_to File.join(source_folder, 'page2.png')
+      load_fixture('cb7/simple/page3.gif').copy_to File.join(source_folder, 'page3.gif')
     end
 
     it 'creates a CB7 file from source folder' do
