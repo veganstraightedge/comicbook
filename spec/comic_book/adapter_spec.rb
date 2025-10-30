@@ -12,7 +12,7 @@ RSpec.describe ComicBook::Adapter do
   describe '#archive' do
     it 'raises NotImplementedError' do
       expect do
-        adapter.archive('/source')
+        adapter.archive '/source'
       end.to raise_error NotImplementedError, 'ComicBook::Adapter must implement #archive'
     end
   end

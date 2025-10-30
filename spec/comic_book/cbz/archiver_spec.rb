@@ -4,13 +4,13 @@ RSpec.describe ComicBook::CBZ::Archiver do
   subject(:archiver) { described_class.new source_folder }
 
   let(:temp_dir) { Dir.mktmpdir }
-  let(:source_folder) { File.join(temp_dir, 'source') }
+  let(:source_folder) { File.join temp_dir, 'source' }
 
   before do
-    Dir.mkdir(source_folder)
-    File.write(File.join(source_folder, 'page1.jpg'), 'image1 content')
-    File.write(File.join(source_folder, 'page2.png'), 'image2 content')
-    File.write(File.join(source_folder, 'page3.gif'), 'image3 content')
+    Dir.mkdir source_folder
+    File.write File.join(source_folder, 'page1.jpg'), 'image1 content'
+    File.write File.join(source_folder, 'page2.png'), 'image2 content'
+    File.write File.join(source_folder, 'page3.gif'), 'image3 content'
   end
 
   after do
@@ -33,7 +33,7 @@ RSpec.describe ComicBook::CBZ::Archiver do
     end
 
     it 'creates archive with custom extension' do
-      output_path = archiver.archive(extension: :zip)
+      output_path = archiver.archive extension: :zip
 
       expect(File).to exist output_path
       expect(File.extname(output_path)).to eq '.zip'
@@ -43,8 +43,8 @@ RSpec.describe ComicBook::CBZ::Archiver do
       output_path = archiver.archive
 
       Zip::File.open(output_path) do |zipfile|
-        entries = zipfile.map(&:name)
-        expect(entries).to include('page1.jpg', 'page2.png', 'page3.gif')
+        entries = zipfile.map &:name
+        expect(entries).to include 'page1.jpg', 'page2.png', 'page3.gif'
         expect(entries.length).to eq 3
       end
     end
@@ -53,15 +53,15 @@ RSpec.describe ComicBook::CBZ::Archiver do
       output_path = archiver.archive
 
       Zip::File.open(output_path) do |zipfile|
-        page1_entry = zipfile.find_entry('page1.jpg')
+        page1_entry = zipfile.find_entry 'page1.jpg'
         expect(page1_entry.get_input_stream.read).to eq 'image1 content'
       end
     end
 
     it 'sorts files alphabetically in the archive' do
       # Add files in non-alphabetical order
-      File.write(File.join(source_folder, 'zebra.jpg'), 'zebra content')
-      File.write(File.join(source_folder, 'alpha.png'), 'alpha content')
+      File.write File.join(source_folder, 'zebra.jpg'), 'zebra content'
+      File.write File.join(source_folder, 'alpha.png'), 'alpha content'
 
       output_path = archiver.archive
 

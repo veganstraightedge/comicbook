@@ -187,14 +187,14 @@ RSpec.describe ComicBook do
       end
 
       it 'creates a .cbz archive from folder' do
-        archive_path = cb.archive(test_folder)
+        archive_path = cb.archive test_folder
         expect(File).to exist archive_path
         expect(File.extname(archive_path)).to eq '.cbz'
       end
 
       it 'deletes original folder when delete_original is true' do
-        cb.archive(test_folder, delete_original: true)
-        expect(File).not_to exist(test_folder)
+        cb.archive test_folder, delete_original: true
+        expect(File).not_to exist test_folder
       end
     end
 
@@ -202,7 +202,7 @@ RSpec.describe ComicBook do
       subject(:cb) { described_class.new test_file }
 
       it 'raises error when trying to archive a file' do
-        expect { cb.archive(test_folder) }.to raise_error(ComicBook::Error, 'Cannot archive a file')
+        expect { cb.archive test_folder }.to raise_error(ComicBook::Error, 'Cannot archive a file')
       end
     end
   end
@@ -242,7 +242,7 @@ RSpec.describe ComicBook do
         end
 
         it 'deletes original file' do
-          expect(File).not_to exist(test_cbz)
+          expect(File).not_to exist test_cbz
         end
       end
     end
