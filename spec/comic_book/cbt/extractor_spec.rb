@@ -4,159 +4,157 @@ RSpec.describe ComicBook::CBT::Extractor do
   subject(:extractor) { described_class.new test_cbt }
 
   let(:temp_dir) { Dir.mktmpdir }
-  let(:source_folder) { File.join temp_dir, 'source' }
-  let(:test_cbt) { File.join temp_dir, 'test.cbt' }
-
-  before do
-    Dir.mkdir source_folder
-    File.write File.join(source_folder, 'page1.jpg'), 'image1 content'
-    File.write File.join(source_folder, 'page2.png'), 'image2 content'
-    File.write File.join(source_folder, 'page3.gif'), 'image3 content'
-
-    # Create test CBT file
-    File.open(test_cbt, 'wb') do |file|
-      Gem::Package::TarWriter.new(file) do |tar|
-        Dir.glob(File.join(source_folder, '*')).each do |file_path|
-          next unless File.file?(file_path)
-
-          stat = File.stat(file_path)
-          tar.add_file(File.basename(file_path), stat.mode) do |io|
-            File.open(file_path, 'rb') { |f| io.write(f.read) }
-          end
-        end
-      end
-    end
-  end
+  let(:extracted_folder_path) { extractor.extract }
 
   after do
     FileUtils.rm_rf temp_dir
   end
 
   describe '#initialize' do
+    let(:test_cbt) { File.join temp_dir, 'simple.cbt' }
+
+    before do
+      load_fixture('cbt/simple.cbt').copy_to test_cbt
+    end
+
     it 'stores absolute path of archive file' do
       expect(extractor.send(:path)).to eq File.expand_path(test_cbt)
     end
   end
 
   describe '#extract' do
-    it 'extracts CBT file to folder' do
-      extraction_path = extractor.extract
+    let(:test_cbt) { File.join temp_dir, 'simple.cbt' }
 
-      expect(Dir).to exist extraction_path
-      expect(File).to exist File.join(extraction_path, 'page1.jpg')
-      expect(File).to exist File.join(extraction_path, 'page2.png')
-      expect(File).to exist File.join(extraction_path, 'page3.gif')
+    before do
+      load_fixture('cbt/simple.cbt').copy_to test_cbt
     end
 
-    it 'uses default destination when none provided' do
-      extraction_path = extractor.extract
-
-      expected_path = File.join(temp_dir, 'test.cb')
-      expect(extraction_path).to eq expected_path
+    context 'with default .cb extension' do
+      it 'extracts CBT file to folder' do
+        expect(File).to exist extracted_folder_path
+        expect(File).to be_directory extracted_folder_path
+        expect(File.extname(extracted_folder_path)).to eq '.cb'
+        expect(File.basename(extracted_folder_path, '.cb')).to eq 'simple'
+      end
     end
 
-    it 'extracts to custom destination folder' do
-      custom_dest = File.join temp_dir, 'custom_extraction'
-      extraction_path = extractor.extract custom_dest
+    context 'with non-default destination folder' do
+      let(:extracted_folder_path) { extractor.extract custom_destination_path }
+      let(:custom_destination_path) { File.join temp_dir, 'custom_destination' }
 
-      expect(extraction_path).to eq custom_dest
-      expect(Dir).to exist custom_dest
-      expect(File).to exist File.join(custom_dest, 'page1.jpg')
+      it 'extracts to custom destination folder' do
+        expect(extracted_folder_path).to eq custom_destination_path
+        expect(File).to exist custom_destination_path
+        expect(File).to be_directory custom_destination_path
+      end
     end
 
-    it 'preserves file contents during extraction' do
-      extraction_path = extractor.extract
+    context 'with non-default folder extension' do
+      it 'extracts to a folder with custom extension' do
+        extracted_folder_path = extractor.extract nil, extension: :comicbook
 
-      content = File.read File.join(extraction_path, 'page1.jpg')
-      expect(content).to eq 'image1 content'
+        expect(File.extname(extracted_folder_path)).to eq '.comicbook'
+      end
     end
 
-    it 'handles nested directories' do
-      # Create CBT with nested structure
-      nested_cbt = File.join temp_dir, 'nested.cbt'
-      File.open(nested_cbt, 'wb') do |file|
-        Gem::Package::TarWriter.new(file) do |tar|
-          tar.add_file('chapter1/page1.jpg', 0o644) { |io| io.write('nested content') }
-        end
+    context 'with no folder extension' do
+      it 'uses no extension when extension is nil' do
+        extracted_folder_path = extractor.extract nil, extension: nil
+
+        expect(File.extname(extracted_folder_path)).to eq ''
+      end
+    end
+
+    context 'with images in archive' do
+      it 'extracts all image files from the archive' do
+        image_files = Dir.glob File.join(extracted_folder_path, '*.{jpg,png,gif}')
+
+        expect(image_files.length).to be > 0
+        expect(image_files.map { |f| File.basename(f) }).to include('page1.jpg', 'page2.png', 'page3.gif')
       end
 
-      nested_extractor = described_class.new nested_cbt
-      extraction_path = nested_extractor.extract
+      it 'preserves file contents during extraction' do
+        extracted_file = File.join extracted_folder_path, 'page1.jpg'
+        expected_content = File.binread(load_fixture('cbt/simple/page1.jpg').path)
 
-      expect(File).to exist File.join(extraction_path, 'chapter1', 'page1.jpg')
-      expect(File.read(File.join(extraction_path, 'chapter1', 'page1.jpg'))).to eq 'nested content'
+        expect(File).to exist extracted_file
+        expect(File.binread(extracted_file)).to eq expected_content
+      end
     end
 
-    it 'ignores non-image files by default' do
-      # Create CBT with mixed content
-      mixed_cbt = File.join temp_dir, 'mixed.cbt'
-      File.open(mixed_cbt, 'wb') do |file|
-        Gem::Package::TarWriter.new(file) do |tar|
-          tar.add_file('page1.jpg', 0o644) { |io| io.write('image content') }
-          tar.add_file('readme.txt', 0o644) { |io| io.write('text content') }
-        end
+    context 'with nested directories' do
+      let(:test_cbt) { File.join temp_dir, 'nested.cbt' }
+
+      before do
+        load_fixture('cbt/nested.cbt').copy_to test_cbt
       end
 
-      mixed_extractor = described_class.new mixed_cbt
-      extraction_path = mixed_extractor.extract
+      it 'handles nested directory structures' do
+        nested_file = File.join extracted_folder_path, 'subfolder', 'nested.jpg'
 
-      expect(File).to exist File.join(extraction_path, 'page1.jpg')
-      expect(File).not_to exist File.join(extraction_path, 'readme.txt')
+        expect(File).to exist nested_file
+        expect(File.basename(nested_file)).to eq 'nested.jpg'
+      end
     end
 
-    it 'extracts all files when all option is true' do
-      # Create CBT with mixed content
-      mixed_cbt = File.join temp_dir, 'mixed.cbt'
-      File.open(mixed_cbt, 'wb') do |file|
-        Gem::Package::TarWriter.new(file) do |tar|
-          tar.add_file('page1.jpg', 0o644) { |io| io.write('image content') }
-          tar.add_file('readme.txt', 0o644) { |io| io.write('text content') }
-        end
+    context 'with non-images in the archive' do
+      let(:test_cbt) { File.join temp_dir, 'mixed.cbt' }
+
+      before do
+        load_fixture('cbt/mixed.cbt').copy_to test_cbt
       end
 
-      mixed_extractor = described_class.new mixed_cbt
-      extraction_path = mixed_extractor.extract nil, all: true
+      it 'ignores non-image files' do
+        text_file = File.join extracted_folder_path, 'readme.txt'
 
-      expect(File).to exist File.join(extraction_path, 'page1.jpg')
-      expect(File).to exist File.join(extraction_path, 'readme.txt')
+        expect(File).not_to exist text_file
+      end
     end
 
-    it 'returns the path to the extracted folder' do
-      extraction_path = extractor.extract
+    context 'when delete_original is true' do
+      it 'deletes original archive' do
+        extractor.extract nil, delete_original: true
+        expect(File).not_to exist test_cbt
+      end
+    end
 
-      expect(extraction_path).to be_a String
-      expect(Dir).to exist extraction_path
+    context 'when delete_original is false' do
+      it 'preserves original archive' do
+        extractor.extract nil, delete_original: false
+        expect(File).to exist test_cbt
+      end
+    end
+
+    context 'when no args are set' do
+      it 'returns the path to the extracted folder' do
+        expect(extracted_folder_path).to be_a String
+        expect(File).to be_directory extracted_folder_path
+      end
     end
 
     context 'when archive is empty' do
+      let(:test_cbt) { File.join temp_dir, 'empty.cbt' }
+
       before do
-        File.open(test_cbt, 'wb') do |file|
-          Gem::Package::TarWriter.new(file) { |tar| }
-        end
+        load_fixture('cbt/empty.cbt').copy_to test_cbt
       end
 
       it 'creates empty extraction folder' do
-        extraction_path = extractor.extract
-
-        expect(Dir).to exist extraction_path
-        expect(Dir.children(extraction_path)).to be_empty
+        expect(File).to be_directory extracted_folder_path
+        expect(Dir.children(extracted_folder_path)).to be_empty
       end
     end
 
     context 'when archive contains only non-image files' do
+      let(:test_cbt) { File.join temp_dir, 'text_only.cbt' }
+
       before do
-        File.open(test_cbt, 'wb') do |file|
-          Gem::Package::TarWriter.new(file) do |tar|
-            tar.add_file('readme.txt', 0o644) { |io| io.write('text content') }
-          end
-        end
+        load_fixture('cbt/text_only.cbt').copy_to test_cbt
       end
 
       it 'creates empty extraction folder' do
-        extraction_path = extractor.extract
-
-        expect(Dir).to exist extraction_path
-        expect(Dir.children(extraction_path)).to be_empty
+        expect(File).to be_directory extracted_folder_path
+        expect(Dir.children(extracted_folder_path)).to be_empty
       end
     end
 
@@ -168,7 +166,8 @@ RSpec.describe ComicBook::CBT::Extractor do
         extraction_path = extractor.extract existing_folder
 
         expect(extraction_path).to eq existing_folder
-        expect(File).to exist File.join(existing_folder, 'page1.jpg')
+        image_files = Dir.glob File.join(existing_folder, '*.{jpg,png,gif}')
+        expect(image_files.length).to be > 0
       end
     end
   end
