@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 RSpec.describe ComicBook::CB7::Extractor do
-  subject(:extractor) { described_class.new(test_cb7) }
+  subject(:extractor) { described_class.new test_cb7 }
 
   let(:temp_dir) { Dir.mktmpdir }
   let(:extracted_folder_path) { extractor.extract }
@@ -32,7 +32,7 @@ RSpec.describe ComicBook::CB7::Extractor do
     context 'with default .cb extension' do
       it 'extracts CB7 file to folder' do
         expect(File).to exist extracted_folder_path
-        expect(File.directory?(extracted_folder_path)).to be true
+        expect(File).to be_directory extracted_folder_path
         expect(File.extname(extracted_folder_path)).to eq '.cb'
         expect(File.basename(extracted_folder_path, '.cb')).to eq 'simple'
       end
@@ -45,7 +45,7 @@ RSpec.describe ComicBook::CB7::Extractor do
       it 'extracts to custom destination folder' do
         expect(extracted_folder_path).to eq custom_destination_path
         expect(File).to exist custom_destination_path
-        expect(File.directory?(custom_destination_path)).to be true
+        expect(File).to be_directory custom_destination_path
       end
     end
 
@@ -141,7 +141,7 @@ RSpec.describe ComicBook::CB7::Extractor do
       it 'returns the path to the extracted folder' do
         expect(extracted_folder_path).to be_a String
         expect(File).to exist extracted_folder_path
-        expect(File.directory?(extracted_folder_path)).to be true
+        expect(File).to be_directory extracted_folder_path
       end
     end
 
@@ -154,8 +154,8 @@ RSpec.describe ComicBook::CB7::Extractor do
 
       it 'creates empty extraction folder' do
         expect(File).to exist extracted_folder_path
-        expect(File.directory?(extracted_folder_path)).to be true
-        expect(Dir.empty?(extracted_folder_path)).to be true
+        expect(File).to be_directory extracted_folder_path
+        expect(Dir).to be_empty extracted_folder_path
       end
     end
 
@@ -168,8 +168,8 @@ RSpec.describe ComicBook::CB7::Extractor do
 
       it 'creates empty extraction folder' do
         expect(File).to exist extracted_folder_path
-        expect(File.directory?(extracted_folder_path)).to be true
-        expect(Dir.empty?(extracted_folder_path)).to be true
+        expect(File).to be_directory extracted_folder_path
+        expect(Dir).to be_empty extracted_folder_path
       end
     end
 

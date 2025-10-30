@@ -34,8 +34,8 @@ RSpec.describe ComicBook::CBZ::Extractor do
       it 'extracts CBZ file to folder' do
         extracted_folder_path = extractor.extract
 
-        expect(File.exist?(extracted_folder_path)).to be true
-        expect(File.directory?(extracted_folder_path)).to be true
+        expect(File).to exist extracted_folder_path
+        expect(File).to be_directory extracted_folder_path
         expect(File.extname(extracted_folder_path)).to eq '.cb'
         expect(File.basename(extracted_folder_path, '.cb')).to eq 'test'
       end
@@ -47,8 +47,8 @@ RSpec.describe ComicBook::CBZ::Extractor do
         extracted_folder_path   = extractor.extract custom_destination_path
 
         expect(extracted_folder_path).to eq custom_destination_path
-        expect(File.exist?(custom_destination_path)).to be true
-        expect(File.directory?(custom_destination_path)).to be true
+        expect(File).to exist custom_destination_path
+        expect(File).to be_directory custom_destination_path
       end
     end
 
@@ -158,8 +158,8 @@ RSpec.describe ComicBook::CBZ::Extractor do
 
       it 'returns the path to the extracted folder' do
         expect(extracted_folder_path).to be_a String
-        expect(File.exist?(extracted_folder_path)).to be true
-        expect(File.directory?(extracted_folder_path)).to be true
+        expect(File).to exist extracted_folder_path
+        expect(File).to be_directory extracted_folder_path
       end
     end
 
@@ -177,8 +177,8 @@ RSpec.describe ComicBook::CBZ::Extractor do
 
       it 'creates empty extraction folder' do
         expect(File).to exist extracted_folder_path
-        expect(File.directory?(extracted_folder_path)).to be true
-        expect(Dir.empty?(extracted_folder_path)).to be true
+        expect(File).to be_directory extracted_folder_path
+        expect(Dir).to be_empty extracted_folder_path
       end
     end
 
@@ -197,8 +197,8 @@ RSpec.describe ComicBook::CBZ::Extractor do
 
       it 'creates empty extraction folder' do
         expect(File).to exist extractor_path
-        expect(File.directory?(extractor_path)).to be true
-        expect(Dir.empty?(extractor_path)).to be true
+        expect(File).to be_directory extractor_path
+        expect(Dir).to be_empty extractor_path
       end
     end
 
@@ -213,7 +213,7 @@ RSpec.describe ComicBook::CBZ::Extractor do
       end
 
       it 'extracts into existing folder' do
-        extracted_folder_path = extractor.extract(existing_destination)
+        extracted_folder_path = extractor.extract existing_destination
 
         expect(extracted_folder_path).to eq existing_destination
         expect(File).to exist image_in_archive

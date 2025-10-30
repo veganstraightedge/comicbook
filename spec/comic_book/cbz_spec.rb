@@ -73,7 +73,8 @@ RSpec.describe ComicBook::CBZ do
       extract_path = adapter.extract
 
       expect(File).to exist extract_path
-      expect(File.directory?(extract_path)).to be true
+      expect(File).to be_directory extract_path
+
       expect(File).to exist File.join(extract_path, 'page1.jpg')
       expect(File).to exist File.join(extract_path, 'page2.png')
     end

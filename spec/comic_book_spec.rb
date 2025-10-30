@@ -233,7 +233,7 @@ RSpec.describe ComicBook do
 
       it 'extracts archive to folder' do
         expect(File).to exist extracted_folder_path
-        expect(File.directory?(extracted_folder_path)).to be true
+        expect(File).to be_directory extracted_folder_path
       end
 
       context 'when delete_original is true' do
@@ -264,7 +264,7 @@ RSpec.describe ComicBook do
       extracted_folder_path = described_class.extract test_cbz
 
       expect(File).to exist extracted_folder_path
-      expect(File.directory?(extracted_folder_path)).to be true
+      expect(File).to be_directory extracted_folder_path
     end
   end
 end

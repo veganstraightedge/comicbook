@@ -81,7 +81,7 @@ RSpec.describe ComicBook::CB7 do
       extracted_path = adapter.extract
 
       expect(File).to exist extracted_path
-      expect(File.directory?(extracted_path)).to be true
+      expect(File).to be_directory extracted_path
     end
 
     it 'uses .cb extension by default' do
