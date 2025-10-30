@@ -31,7 +31,7 @@ class ComicBook
 
         if extension
           extension_str = extension.to_s
-          extension_str = extension_str[1..-1] if extension_str.start_with?('.')
+          extension_str = extension_str[1..] if extension_str.start_with?('.')
           archive_name << ".#{extension_str}"
         end
 
@@ -40,7 +40,7 @@ class ComicBook
       end
 
       def create_destination_directory destination
-        FileUtils.mkdir_p destination unless Dir.exist?(destination)
+        FileUtils.mkdir_p destination
       end
 
       def extract_files destination, options
@@ -65,7 +65,7 @@ class ComicBook
 
       def create_parent_directory file_path
         parent_dir = File.dirname file_path
-        FileUtils.mkdir_p parent_dir unless Dir.exist?(parent_dir)
+        FileUtils.mkdir_p parent_dir
       end
 
       def image_file? filename
