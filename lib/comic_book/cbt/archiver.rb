@@ -7,7 +7,7 @@ class ComicBook
 
       def archive options = {}
         extension = options.fetch :extension, :cbt
-        destination = options[:destination] || default_destination(extension)
+        destination = options[:destination] || determine_output_path(extension)
         delete_original = options.fetch :delete_original, false
 
         create_tar_file destination
@@ -20,9 +20,11 @@ class ComicBook
 
       attr_reader :source_folder
 
-      def default_destination extension = :cbt
-        basename = File.basename source_folder
-        "#{basename}.#{extension}"
+      def determine_output_path extension
+        base_name = File.basename source_folder, '.*'
+        dir_name  = File.dirname source_folder
+
+        File.expand_path File.join(dir_name, "#{base_name}.#{extension}")
       end
 
       def create_tar_file destination
