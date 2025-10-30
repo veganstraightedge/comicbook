@@ -93,11 +93,9 @@ RSpec.describe ComicBook::CBZ::Extractor do
 
       let(:nested_folder)         { File.join temp_dir,      'nested_source' }
       let(:subfolder)             { File.join nested_folder, 'subfolder' }
-
       let(:nested_cbz)            { File.join temp_dir,      'nested.cbz' }
       let(:nested_extractor)      { described_class.new nested_cbz }
       let(:extracted_folder_path) { nested_extractor.extract }
-
       let(:archiver)              { ComicBook::CBZ::Archiver.new nested_folder }
       let(:output_path)           { archiver.archive }
 
@@ -118,9 +116,9 @@ RSpec.describe ComicBook::CBZ::Extractor do
       let(:mixed_cbz)             { File.join temp_dir, 'mixed.cbz' }
       let(:mixed_extractor)       { described_class.new mixed_cbz }
       let(:extracted_folder_path) { mixed_extractor.extract }
-      let(:image_in_archive)      { File.join(extracted_folder_path, 'page1.jpg') }
-      let(:text_file_in_archive)  { File.join(extracted_folder_path, 'readme.txt') }
-      let(:json_file_inarchive)   { File.join(extracted_folder_path, 'data.json') }
+      let(:image_in_archive)      { File.join extracted_folder_path, 'page1.jpg' }
+      let(:text_file_in_archive)  { File.join extracted_folder_path, 'readme.txt' }
+      let(:json_file_inarchive)   { File.join extracted_folder_path, 'data.json' }
 
       before do
         Zip::File.open(mixed_cbz, create: true) do |zipfile|

@@ -66,45 +66,45 @@ RSpec.describe ComicBook::CBZ::Archiver do
       output_path = archiver.archive
 
       Zip::File.open(output_path) do |zipfile|
-        entries = zipfile.map(&:name)
+        entries = zipfile.map &:name
         expect(entries).to eq entries.sort
       end
     end
 
     it 'handles nested directories' do
-      nested_dir = File.join(source_folder, 'subfolder')
-      Dir.mkdir(nested_dir)
-      File.write(File.join(nested_dir, 'nested.jpg'), 'nested content')
+      nested_dir = File.join source_folder, 'subfolder'
+      Dir.mkdir nested_dir
+      File.write File.join(nested_dir, 'nested.jpg'), 'nested content'
 
       output_path = archiver.archive
 
       Zip::File.open(output_path) do |zipfile|
-        entries = zipfile.map(&:name)
-        expect(entries).to include('subfolder/nested.jpg')
+        entries = zipfile.map &:name
+        expect(entries).to include 'subfolder/nested.jpg'
       end
     end
 
     it 'ignores non-image files' do
-      File.write(File.join(source_folder, 'readme.txt'), 'text content')
-      File.write(File.join(source_folder, 'data.json'), '{}')
+      File.write File.join(source_folder, 'readme.txt'), 'text content'
+      File.write File.join(source_folder, 'data.json'), '{}'
 
       output_path = archiver.archive
 
       Zip::File.open(output_path) do |zipfile|
-        entries = zipfile.map(&:name)
-        expect(entries).not_to include('readme.txt', 'data.json')
-        expect(entries).to include('page1.jpg', 'page2.png', 'page3.gif')
+        entries = zipfile.map &:name
+        expect(entries).not_to include 'readme.txt', 'data.json'
+        expect(entries).to include 'page1.jpg', 'page2.png', 'page3.gif'
       end
     end
 
     it 'deletes original folder when delete_original is true' do
-      archiver.archive(delete_original: true)
+      archiver.archive delete_original: true
 
-      expect(File).not_to exist(source_folder)
+      expect(File).not_to exist source_folder
     end
 
     it 'preserves original folder when delete_original is false' do
-      archiver.archive(delete_original: false)
+      archiver.archive delete_original: false
 
       expect(File).to exist source_folder
     end
@@ -112,7 +112,7 @@ RSpec.describe ComicBook::CBZ::Archiver do
     it 'returns the path to the created archive' do
       output_path = archiver.archive
 
-      expect(output_path).to be_a(String)
+      expect(output_path).to be_a String
       expect(File).to exist output_path
       expect(File.dirname(output_path)).to eq File.dirname(source_folder)
     end
@@ -120,10 +120,10 @@ RSpec.describe ComicBook::CBZ::Archiver do
     context 'when source folder is empty' do
       subject(:archiver) { described_class.new empty_folder }
 
-      let(:empty_folder) { File.join(temp_dir, 'empty') }
+      let(:empty_folder) { File.join temp_dir, 'empty' }
 
       before do
-        Dir.mkdir(empty_folder)
+        Dir.mkdir empty_folder
       end
 
       it 'creates an empty archive' do
@@ -139,18 +139,18 @@ RSpec.describe ComicBook::CBZ::Archiver do
     context 'when source folder has only non-image files' do
       subject(:archiver) { described_class.new text_folder }
 
-      let(:text_folder) { File.join(temp_dir, 'text_only') }
+      let(:text_folder) { File.join temp_dir, 'text_only' }
+      let(:output_path) { archiver.archive }
 
       before do
-        Dir.mkdir(text_folder)
-        File.write(File.join(text_folder, 'readme.txt'), 'text')
-        File.write(File.join(text_folder, 'config.json'), '{}')
+        Dir.mkdir text_folder
+        File.write File.join(text_folder, 'readme.txt'), 'text'
+        File.write File.join(text_folder, 'config.json'), '{}'
       end
 
       it 'creates an empty archive' do
-        output_path = archiver.archive
-
         expect(File).to exist output_path
+
         Zip::File.open(output_path) do |zipfile|
           expect(zipfile.entries).to be_empty
         end
