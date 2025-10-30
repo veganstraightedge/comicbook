@@ -50,14 +50,14 @@ RSpec.describe ComicBook::CBT::Archiver do
         created_entries = []
         File.open(output_path, 'rb') do |file|
           Gem::Package::TarReader.new(file) do |tar|
-            tar.each { |entry| created_entries << entry.full_name if entry.file? }
+            tar.each { created_entries << it.full_name if it.file? }
           end
         end
 
         expected_entries = []
         File.open(expected_cbt, 'rb') do |file|
           Gem::Package::TarReader.new(file) do |tar|
-            tar.each { |entry| expected_entries << entry.full_name if entry.file? }
+            tar.each { expected_entries << it.full_name if it.file? }
           end
         end
 
@@ -77,7 +77,7 @@ RSpec.describe ComicBook::CBT::Archiver do
 
         File.open(output_path, 'rb') do |file|
           Gem::Package::TarReader.new(file) do |tar|
-            entries = tar.map { |entry| entry.full_name if entry.file? }.compact
+            entries = tar.map { it.full_name if it.file? }.compact
             expect(entries).to include('page1.jpg', 'page2.png', 'page3.gif')
           end
         end
@@ -89,7 +89,7 @@ RSpec.describe ComicBook::CBT::Archiver do
 
         File.open(output_path, 'rb') do |file|
           Gem::Package::TarReader.new(file) do |tar|
-            entry = tar.find { |e| e.full_name == 'page1.jpg' }
+            entry = tar.find { it.full_name == 'page1.jpg' }
             expected_content = File.binread(load_fixture('cbt/simple/page1.jpg').path)
             expect(entry.read).to eq expected_content
           end
@@ -132,7 +132,7 @@ RSpec.describe ComicBook::CBT::Archiver do
         created_entries = []
         File.open(output_path, 'rb') do |file|
           Gem::Package::TarReader.new(file) do |tar|
-            tar.each { |entry| created_entries << entry.full_name if entry.file? }
+            tar.each { created_entries << it.full_name if it.file? }
           end
         end
 
@@ -145,7 +145,7 @@ RSpec.describe ComicBook::CBT::Archiver do
 
         File.open(output_path, 'rb') do |file|
           Gem::Package::TarReader.new(file) do |tar|
-            nested_entry = tar.find { |entry| entry.full_name == 'subfolder/nested.jpg' }
+            nested_entry = tar.find { it.full_name == 'subfolder/nested.jpg' }
             expect(nested_entry).not_to be_nil
           end
         end
@@ -167,7 +167,7 @@ RSpec.describe ComicBook::CBT::Archiver do
         created_entries = []
         File.open(output_path, 'rb') do |file|
           Gem::Package::TarReader.new(file) do |tar|
-            tar.each { |entry| created_entries << entry.full_name if entry.file? }
+            tar.each { created_entries << it.full_name if it.file? }
           end
         end
 
@@ -181,7 +181,7 @@ RSpec.describe ComicBook::CBT::Archiver do
 
         File.open(output_path, 'rb') do |file|
           Gem::Package::TarReader.new(file) do |tar|
-            entries = tar.map { |entry| entry.full_name if entry.file? }.compact
+            entries = tar.map { it.full_name if it.file? }.compact
             expect(entries).to include('page1.jpg')
             expect(entries).not_to include('readme.txt')
           end
@@ -244,7 +244,7 @@ RSpec.describe ComicBook::CBT::Archiver do
 
         File.open(output_path, 'rb') do |file|
           Gem::Package::TarReader.new(file) do |tar|
-            entries = tar.map { |entry| entry.full_name if entry.file? }.compact
+            entries = tar.map { it.full_name if it.file? }.compact
             expect(entries).to be_empty
           end
         end

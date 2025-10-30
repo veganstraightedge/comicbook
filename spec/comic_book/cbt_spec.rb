@@ -43,7 +43,7 @@ RSpec.describe ComicBook::CBT do
 
       File.open(output_path, 'rb') do |file|
         Gem::Package::TarReader.new(file) do |tar|
-          entries = tar.map { |entry| entry.full_name if entry.file? }.compact
+          entries = tar.map { it.full_name if it.file? }.compact
           expect(entries).to include('page1.jpg', 'page2.png', 'page3.gif')
         end
       end
@@ -139,7 +139,7 @@ RSpec.describe ComicBook::CBT do
       pages = adapter.pages
 
       expect(pages).to be_an Array
-      expect(pages.all? { |page| page.is_a? ComicBook::Page }).to be true
+      expect(pages).to be_all ComicBook::Page
     end
 
     it 'sorts pages alphabetically by name' do

@@ -119,8 +119,8 @@ RSpec.describe ComicBook::CBZ do
     let(:cbz_file) { File.join temp_dir, 'pages_test.cbz' }
     let(:pages) { adapter.pages }
     let(:page_names) { pages.map &:name }
-    let(:page_one) { pages.find { |p| p.name == 'page1.jpg' } }
-    let(:page_two) { pages.find { |p| p.name == 'page2.png' } }
+    let(:page_one) { pages.find { it.name == 'page1.jpg' } }
+    let(:page_two) { pages.find { it.name == 'page2.png' } }
 
     # Create a real CBZ file first using the source folder
     let(:source_adapter) { described_class.new source_folder }
