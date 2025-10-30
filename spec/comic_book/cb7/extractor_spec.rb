@@ -31,7 +31,7 @@ RSpec.describe ComicBook::CB7::Extractor do
 
     context 'with default .cb extension' do
       it 'extracts CB7 file to folder' do
-        expect(File.exist?(extracted_folder_path)).to be true
+        expect(File).to exist extracted_folder_path
         expect(File.directory?(extracted_folder_path)).to be true
         expect(File.extname(extracted_folder_path)).to eq '.cb'
         expect(File.basename(extracted_folder_path, '.cb')).to eq 'simple'
@@ -44,7 +44,7 @@ RSpec.describe ComicBook::CB7::Extractor do
 
       it 'extracts to custom destination folder' do
         expect(extracted_folder_path).to eq custom_destination_path
-        expect(File.exist?(custom_destination_path)).to be true
+        expect(File).to exist custom_destination_path
         expect(File.directory?(custom_destination_path)).to be true
       end
     end
@@ -75,9 +75,9 @@ RSpec.describe ComicBook::CB7::Extractor do
       let(:fixture_image_c) { load_fixture('cb7/simple/page3.gif') }
 
       it 'extracts all image files from the archive' do
-        expect(File.exist?(image_a)).to be true
-        expect(File.exist?(image_b)).to be true
-        expect(File.exist?(image_c)).to be true
+        expect(File).to exist image_a
+        expect(File).to exist image_b
+        expect(File).to exist image_c
       end
 
       it 'preserves file contents during extraction' do
@@ -96,7 +96,7 @@ RSpec.describe ComicBook::CB7::Extractor do
       end
 
       it 'handles nested directory structures' do
-        expect(File.exist?(nested_image)).to be true
+        expect(File).to exist nested_image
       end
     end
 
@@ -111,9 +111,9 @@ RSpec.describe ComicBook::CB7::Extractor do
       end
 
       it 'ignores non-image files' do
-        expect(File.exist?(image_in_archive)).to be true
-        expect(File.exist?(text_file_in_archive)).to be false
-        expect(File.exist?(json_file_in_archive)).to be false
+        expect(File).to exist image_in_archive
+        expect(File).not_to exist(text_file_in_archive)
+        expect(File).not_to exist(json_file_in_archive)
       end
     end
 
@@ -123,7 +123,7 @@ RSpec.describe ComicBook::CB7::Extractor do
       end
 
       it 'deletes original archive' do
-        expect(File.exist?(test_cb7)).to be false
+        expect(File).not_to exist(test_cb7)
       end
     end
 
@@ -133,14 +133,14 @@ RSpec.describe ComicBook::CB7::Extractor do
       end
 
       it 'preserves original archive' do
-        expect(File.exist?(test_cb7)).to be true
+        expect(File).to exist test_cb7
       end
     end
 
     context 'when no args are set' do
       it 'returns the path to the extracted folder' do
         expect(extracted_folder_path).to be_a String
-        expect(File.exist?(extracted_folder_path)).to be true
+        expect(File).to exist extracted_folder_path
         expect(File.directory?(extracted_folder_path)).to be true
       end
     end
@@ -153,7 +153,7 @@ RSpec.describe ComicBook::CB7::Extractor do
       end
 
       it 'creates empty extraction folder' do
-        expect(File.exist?(extracted_folder_path)).to be true
+        expect(File).to exist extracted_folder_path
         expect(File.directory?(extracted_folder_path)).to be true
         expect(Dir.empty?(extracted_folder_path)).to be true
       end
@@ -167,7 +167,7 @@ RSpec.describe ComicBook::CB7::Extractor do
       end
 
       it 'creates empty extraction folder' do
-        expect(File.exist?(extracted_folder_path)).to be true
+        expect(File).to exist extracted_folder_path
         expect(File.directory?(extracted_folder_path)).to be true
         expect(Dir.empty?(extracted_folder_path)).to be true
       end
@@ -186,8 +186,8 @@ RSpec.describe ComicBook::CB7::Extractor do
 
       it 'extracts into existing folder' do
         expect(extracted_folder_path).to eq existing_destination
-        expect(File.exist?(image_in_archive)).to be true
-        expect(File.exist?(old_file)).to be true
+        expect(File).to exist image_in_archive
+        expect(File).to exist old_file
       end
     end
   end

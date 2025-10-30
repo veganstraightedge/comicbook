@@ -27,7 +27,7 @@ RSpec.describe ComicBook::CBZ::Archiver do
     it 'creates a CBZ file with default extension' do
       output_path = archiver.archive
 
-      expect(File.exist?(output_path)).to be true
+      expect(File).to exist output_path
       expect(File.extname(output_path)).to eq '.cbz'
       expect(File.basename(output_path, '.cbz')).to eq 'source'
     end
@@ -35,7 +35,7 @@ RSpec.describe ComicBook::CBZ::Archiver do
     it 'creates archive with custom extension' do
       output_path = archiver.archive(extension: :zip)
 
-      expect(File.exist?(output_path)).to be true
+      expect(File).to exist output_path
       expect(File.extname(output_path)).to eq '.zip'
     end
 
@@ -100,20 +100,20 @@ RSpec.describe ComicBook::CBZ::Archiver do
     it 'deletes original folder when delete_original is true' do
       archiver.archive(delete_original: true)
 
-      expect(File.exist?(source_folder)).to be false
+      expect(File).not_to exist(source_folder)
     end
 
     it 'preserves original folder when delete_original is false' do
       archiver.archive(delete_original: false)
 
-      expect(File.exist?(source_folder)).to be true
+      expect(File).to exist source_folder
     end
 
     it 'returns the path to the created archive' do
       output_path = archiver.archive
 
       expect(output_path).to be_a(String)
-      expect(File.exist?(output_path)).to be true
+      expect(File).to exist output_path
       expect(File.dirname(output_path)).to eq File.dirname(source_folder)
     end
 
@@ -129,7 +129,7 @@ RSpec.describe ComicBook::CBZ::Archiver do
       it 'creates an empty archive' do
         output_path = archiver.archive
 
-        expect(File.exist?(output_path)).to be true
+        expect(File).to exist output_path
         Zip::File.open(output_path) do |zipfile|
           expect(zipfile.entries).to be_empty
         end
@@ -150,7 +150,7 @@ RSpec.describe ComicBook::CBZ::Archiver do
       it 'creates an empty archive' do
         output_path = archiver.archive
 
-        expect(File.exist?(output_path)).to be true
+        expect(File).to exist output_path
         Zip::File.open(output_path) do |zipfile|
           expect(zipfile.entries).to be_empty
         end

@@ -188,13 +188,13 @@ RSpec.describe ComicBook do
 
       it 'creates a .cbz archive from folder' do
         archive_path = cb.archive(test_folder)
-        expect(File.exist?(archive_path)).to be true
+        expect(File).to exist archive_path
         expect(File.extname(archive_path)).to eq '.cbz'
       end
 
       it 'deletes original folder when delete_original is true' do
         cb.archive(test_folder, delete_original: true)
-        expect(File.exist?(test_folder)).to be false
+        expect(File).not_to exist(test_folder)
       end
     end
 
@@ -232,7 +232,7 @@ RSpec.describe ComicBook do
       end
 
       it 'extracts archive to folder' do
-        expect(File.exist?(extracted_folder_path)).to be true
+        expect(File).to exist extracted_folder_path
         expect(File.directory?(extracted_folder_path)).to be true
       end
 
@@ -242,7 +242,7 @@ RSpec.describe ComicBook do
         end
 
         it 'deletes original file' do
-          expect(File.exist?(test_cbz)).to be false
+          expect(File).not_to exist(test_cbz)
         end
       end
     end
@@ -263,7 +263,7 @@ RSpec.describe ComicBook do
     it 'is a shorthand for load().extract()' do
       extracted_folder_path = described_class.extract test_cbz
 
-      expect(File.exist?(extracted_folder_path)).to be true
+      expect(File).to exist extracted_folder_path
       expect(File.directory?(extracted_folder_path)).to be true
     end
   end

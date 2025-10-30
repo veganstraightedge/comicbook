@@ -27,7 +27,7 @@ RSpec.describe ComicBook::CBZ do
     it 'creates a CBZ file from source folder' do
       output_path = adapter.archive(source_folder)
 
-      expect(File.exist?(output_path)).to be true
+      expect(File).to exist output_path
       expect(File.extname(output_path)).to eq '.cbz'
     end
 
@@ -42,12 +42,12 @@ RSpec.describe ComicBook::CBZ do
 
     it 'deletes original folder when delete_original is true' do
       adapter.archive(source_folder, delete_original: true)
-      expect(File.exist?(source_folder)).to be false
+      expect(File).not_to exist(source_folder)
     end
 
     it 'preserves original folder when delete_original is false' do
       adapter.archive(source_folder, delete_original: false)
-      expect(File.exist?(source_folder)).to be true
+      expect(File).to exist source_folder
     end
 
     it 'uses custom extension when specified' do
@@ -72,10 +72,10 @@ RSpec.describe ComicBook::CBZ do
     it 'extracts CBZ file to folder' do
       extract_path = adapter.extract
 
-      expect(File.exist?(extract_path)).to be true
+      expect(File).to exist extract_path
       expect(File.directory?(extract_path)).to be true
-      expect(File.exist?(File.join(extract_path, 'page1.jpg'))).to be true
-      expect(File.exist?(File.join(extract_path, 'page2.png'))).to be true
+      expect(File).to exist File.join(extract_path, 'page1.jpg')
+      expect(File).to exist File.join(extract_path, 'page2.png')
     end
 
     it 'uses .cb extension by default' do
@@ -98,17 +98,17 @@ RSpec.describe ComicBook::CBZ do
       extract_path = adapter.extract(custom_dest)
 
       expect(extract_path).to eq custom_dest
-      expect(File.exist?(custom_dest)).to be true
+      expect(File).to exist custom_dest
     end
 
     it 'deletes original file when delete_original is true' do
       adapter.extract(nil, delete_original: true)
-      expect(File.exist?(cbz_file)).to be false
+      expect(File).not_to exist(cbz_file)
     end
 
     it 'preserves original file when delete_original is false' do
       adapter.extract(nil, delete_original: false)
-      expect(File.exist?(cbz_file)).to be true
+      expect(File).to exist cbz_file
     end
   end
 

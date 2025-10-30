@@ -34,7 +34,7 @@ RSpec.describe ComicBook::CB7 do
     it 'creates a CB7 file from source folder' do
       output_path = adapter.archive(source_folder)
 
-      expect(File.exist?(output_path)).to be true
+      expect(File).to exist output_path
       expect(File.extname(output_path)).to eq '.cb7'
     end
 
@@ -52,13 +52,13 @@ RSpec.describe ComicBook::CB7 do
     it 'deletes original folder when delete_original is true' do
       adapter.archive(source_folder, delete_original: true)
 
-      expect(File.exist?(source_folder)).to be false
+      expect(File).not_to exist(source_folder)
     end
 
     it 'preserves original folder when delete_original is false' do
       adapter.archive(source_folder, delete_original: false)
 
-      expect(File.exist?(source_folder)).to be true
+      expect(File).to exist source_folder
     end
 
     it 'uses custom extension when specified' do
@@ -80,7 +80,7 @@ RSpec.describe ComicBook::CB7 do
     it 'extracts CB7 file to folder' do
       extracted_path = adapter.extract
 
-      expect(File.exist?(extracted_path)).to be true
+      expect(File).to exist extracted_path
       expect(File.directory?(extracted_path)).to be true
     end
 
@@ -107,18 +107,19 @@ RSpec.describe ComicBook::CB7 do
       extracted_path = adapter.extract(custom_destination)
 
       expect(extracted_path).to eq custom_destination
+      expect(File).to exist custom_destination
     end
 
     it 'deletes original file when delete_original is true' do
       adapter.extract(nil, delete_original: true)
 
-      expect(File.exist?(test_cb7)).to be false
+      expect(File).not_to exist(test_cb7)
     end
 
     it 'preserves original file when delete_original is false' do
       adapter.extract(nil, delete_original: false)
 
-      expect(File.exist?(test_cb7)).to be true
+      expect(File).to exist test_cb7
     end
   end
 

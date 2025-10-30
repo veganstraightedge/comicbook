@@ -37,7 +37,7 @@ RSpec.describe ComicBook::CB7::Archiver do
         archiver = described_class.new source_folder
         output_path = archiver.archive
 
-        expect(File.exist?(output_path)).to be true
+        expect(File).to exist output_path
         expect(File.extname(output_path)).to eq '.cb7'
         expect(File.basename(output_path, '.cb7')).to eq 'simple'
       end
@@ -68,7 +68,7 @@ RSpec.describe ComicBook::CB7::Archiver do
         archiver = described_class.new source_folder
         output_path = archiver.archive extension: :cb7
 
-        expect(File.exist?(output_path)).to be true
+        expect(File).to exist output_path
         expect(File.extname(output_path)).to eq '.cb7'
       end
 
@@ -101,14 +101,14 @@ RSpec.describe ComicBook::CB7::Archiver do
         archiver = described_class.new source_folder
         archiver.archive(delete_original: true)
 
-        expect(File.exist?(source_folder)).to be false
+        expect(File).not_to exist(source_folder)
       end
 
       it 'preserves original folder when delete_original is false' do
         archiver = described_class.new source_folder
         archiver.archive(delete_original: false)
 
-        expect(File.exist?(source_folder)).to be true
+        expect(File).to exist source_folder
       end
 
       it 'returns the path to the created archive' do
@@ -116,7 +116,7 @@ RSpec.describe ComicBook::CB7::Archiver do
         output_path = archiver.archive
 
         expect(output_path).to be_a String
-        expect(File.exist?(output_path)).to be true
+        expect(File).to exist output_path
         expect(File.dirname(output_path)).to eq File.dirname(source_folder)
       end
     end
@@ -238,7 +238,7 @@ RSpec.describe ComicBook::CB7::Archiver do
         archiver = described_class.new source_folder
         output_path = archiver.archive
 
-        expect(File.exist?(output_path)).to be true
+        expect(File).to exist output_path
         File.open(output_path, 'rb') do |file|
           SevenZipRuby::Reader.open(file) do |szr|
             expect(szr.entries).to be_empty
@@ -281,7 +281,7 @@ RSpec.describe ComicBook::CB7::Archiver do
         archiver = described_class.new source_folder
         output_path = archiver.archive
 
-        expect(File.exist?(output_path)).to be true
+        expect(File).to exist output_path
         File.open(output_path, 'rb') do |file|
           SevenZipRuby::Reader.open(file) do |szr|
             expect(szr.entries).to be_empty
