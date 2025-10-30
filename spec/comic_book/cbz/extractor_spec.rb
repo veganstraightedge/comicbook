@@ -64,7 +64,7 @@ RSpec.describe ComicBook::CBZ::Extractor do
       it 'uses no extension when extension is nil' do
         extracted_folder_path = extractor.extract nil, extension: nil
 
-        expect(File.extname(extracted_folder_path)).to eq ''
+        expect(File.extname(extracted_folder_path)).to be_empty
         expect(File.basename(extracted_folder_path)).to eq 'test'
       end
     end

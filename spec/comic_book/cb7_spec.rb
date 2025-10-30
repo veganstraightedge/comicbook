@@ -4,7 +4,7 @@ RSpec.describe ComicBook::CB7 do
   let(:temp_dir) { Dir.mktmpdir }
 
   after do
-    FileUtils.rm_rf(temp_dir)
+    FileUtils.rm_rf temp_dir
   end
 
   describe '#initialize' do
@@ -23,7 +23,7 @@ RSpec.describe ComicBook::CB7 do
 
   describe '#archive' do
     let(:source_folder) { File.join(temp_dir, 'source') }
-    let(:adapter) { described_class.new(source_folder) }
+    let(:adapter) { described_class.new source_folder }
 
     before do
       load_fixture('cb7/simple/page1.jpg').copy_to File.join(source_folder, 'page1.jpg')
@@ -99,7 +99,7 @@ RSpec.describe ComicBook::CB7 do
     it 'uses no extension when extension is nil' do
       extracted_path = adapter.extract(nil, extension: nil)
 
-      expect(File.extname(extracted_path)).to eq ''
+      expect(File.extname(extracted_path)).to be_empty
     end
 
     it 'extracts to custom destination when specified' do

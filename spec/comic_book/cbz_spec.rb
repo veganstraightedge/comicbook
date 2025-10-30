@@ -90,7 +90,7 @@ RSpec.describe ComicBook::CBZ do
 
     it 'uses no extension when extension is nil' do
       extract_path = adapter.extract(nil, extension: nil)
-      expect(File.extname(extract_path)).to eq ''
+      expect(File.extname(extract_path)).to be_empty
     end
 
     it 'extracts to custom destination when specified' do
