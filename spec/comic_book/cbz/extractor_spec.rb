@@ -76,9 +76,9 @@ RSpec.describe ComicBook::CBZ::Extractor do
       let(:extracted_folder_path) { extractor.extract }
 
       it 'extracts all image files from the archive' do
-        expect(File.exist?(image_a)).to be true
-        expect(File.exist?(image_b)).to be true
-        expect(File.exist?(image_c)).to be true
+        expect(File).to exist image_a
+        expect(File).to exist image_b
+        expect(File).to exist image_c
       end
 
       it 'preserves file contents during extraction' do
@@ -107,7 +107,7 @@ RSpec.describe ComicBook::CBZ::Extractor do
       end
 
       it 'handles nested directory structures' do
-        expect(File.exist?(nested_image)).to be true
+        expect(File).to exist nested_image
         expect(File.read(nested_image)).to eq 'nested content'
       end
     end
@@ -129,9 +129,9 @@ RSpec.describe ComicBook::CBZ::Extractor do
       end
 
       it 'ignores non-image files' do
-        expect(File.exist?(image_in_archive)).to be true
-        expect(File.exist?(text_file_in_archive)).to be false
-        expect(File.exist?(json_file_inarchive)).to be false
+        expect(File).to exist image_in_archive
+        expect(File).not_to exist text_file_in_archive
+        expect(File).not_to exist json_file_inarchive
       end
     end
 
@@ -139,15 +139,15 @@ RSpec.describe ComicBook::CBZ::Extractor do
       it 'deletes original archive' do
         extractor.extract nil, delete_original: true
 
-        expect(File.exist?(test_cbz)).to be false
+        expect(File).not_to exist test_cbz
       end
     end
 
     context 'when delete_original is false' do
       it 'preserves original archive' do
-        extractor.extract(nil, delete_original: false)
+        extractor.extract nil, delete_original: false
 
-        expect(File.exist?(test_cbz)).to be true
+        expect(File).to exist test_cbz
       end
     end
 

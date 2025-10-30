@@ -50,9 +50,9 @@ RSpec.describe ComicBook::CB7 do
     end
 
     it 'deletes original folder when delete_original is true' do
-      adapter.archive(source_folder, delete_original: true)
+      adapter.archive source_folder, delete_original: true
 
-      expect(File).not_to exist(source_folder)
+      expect(File).not_to exist source_folder
     end
 
     it 'preserves original folder when delete_original is false' do
@@ -111,9 +111,9 @@ RSpec.describe ComicBook::CB7 do
     end
 
     it 'deletes original file when delete_original is true' do
-      adapter.extract(nil, delete_original: true)
+      adapter.extract nil, delete_original: true
 
-      expect(File).not_to exist(test_cb7)
+      expect(File).not_to exist test_cb7
     end
 
     it 'preserves original file when delete_original is false' do

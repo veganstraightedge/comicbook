@@ -99,14 +99,14 @@ RSpec.describe ComicBook::CB7::Archiver do
 
       it 'deletes original folder when delete_original is true' do
         archiver = described_class.new source_folder
-        archiver.archive(delete_original: true)
+        archiver.archive delete_original: true
 
-        expect(File).not_to exist(source_folder)
+        expect(File).not_to exist source_folder
       end
 
       it 'preserves original folder when delete_original is false' do
         archiver = described_class.new source_folder
-        archiver.archive(delete_original: false)
+        archiver.archive delete_original: false
 
         expect(File).to exist source_folder
       end

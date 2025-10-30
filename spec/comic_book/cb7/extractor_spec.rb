@@ -112,18 +112,18 @@ RSpec.describe ComicBook::CB7::Extractor do
 
       it 'ignores non-image files' do
         expect(File).to exist image_in_archive
-        expect(File).not_to exist(text_file_in_archive)
-        expect(File).not_to exist(json_file_in_archive)
+        expect(File).not_to exist text_file_in_archive
+        expect(File).not_to exist json_file_in_archive
       end
     end
 
     context 'when delete_original is true' do
       before do
-        extractor.extract(nil, delete_original: true)
+        extractor.extract nil, delete_original: true
       end
 
       it 'deletes original archive' do
-        expect(File).not_to exist(test_cb7)
+        expect(File).not_to exist test_cb7
       end
     end
 
