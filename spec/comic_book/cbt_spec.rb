@@ -68,8 +68,7 @@ RSpec.describe ComicBook::CBT do
 
   describe '#extract' do
     subject(:adapter) do
-      described_class
-        .new test_cbt
+      described_class.new test_cbt
     end
 
     let(:test_cbt) { File.join temp_dir, 'simple.cbt' }
