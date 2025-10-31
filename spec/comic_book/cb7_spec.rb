@@ -135,7 +135,7 @@ RSpec.describe ComicBook::CB7 do
     it 'returns array of Page objects' do
       pages = adapter.pages
 
-      expect(pages).to all(be_a(ComicBook::Page))
+      expect(pages).to be_all ComicBook::Page
       expect(pages.length).to eq 3
     end
 

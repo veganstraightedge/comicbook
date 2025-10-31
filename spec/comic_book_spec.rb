@@ -170,7 +170,7 @@ RSpec.describe ComicBook do
       end
 
       it 'returns an array of Page objects' do
-        expect(pages).to all(be_a(ComicBook::Page))
+        expect(pages).to be_all ComicBook::Page
         expect(pages.length).to eq 3
       end
 
@@ -224,7 +224,7 @@ RSpec.describe ComicBook do
       subject(:cb) { described_class.new test_file }
 
       let(:test_file) { File.join temp_dir, 'simple.cbz' }
-      let(:test_folder) { File.join temp_dir, 'dummy_folder' }
+      let(:test_folder) { File.join temp_dir, 'simple_folder' }
 
       before do
         load_fixture('cbz/simple.cbz').copy_to test_file

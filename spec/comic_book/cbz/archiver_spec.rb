@@ -51,7 +51,7 @@ RSpec.describe ComicBook::CBZ::Archiver do
           created_entries = zipfile.map(&:name).sort
         end
 
-        expect(created_entries).to eq ['page1.jpg', 'page2.png', 'page3.gif']
+        expect(created_entries).to eq %w[page1.jpg page2.png page3.gif]
       end
 
       it 'creates archive with custom extension' do
@@ -68,7 +68,7 @@ RSpec.describe ComicBook::CBZ::Archiver do
 
         Zip::File.open(output_path) do |zipfile|
           entries = zipfile.map(&:name)
-          expect(entries).to include('page1.jpg', 'page2.png', 'page3.gif')
+          expect(entries).to eq %w[page1.jpg page2.png page3.gif]
           expect(entries.length).to eq 3
         end
       end
@@ -79,7 +79,8 @@ RSpec.describe ComicBook::CBZ::Archiver do
 
         Zip::File.open(output_path) do |zipfile|
           page1_entry = zipfile.find_entry('page1.jpg')
-          original_content = File.read(load_fixture('originals/simple/page1.jpg').path, mode: 'rb')
+          original_image_path = File.join source_folder, 'page1.jpg'
+          original_content = File.read original_image_path, mode: 'rb'
           expect(page1_entry.get_input_stream.read).to eq original_content
         end
       end
@@ -125,7 +126,7 @@ RSpec.describe ComicBook::CBZ::Archiver do
           created_entries = zipfile.map(&:name).sort
         end
 
-        expect(created_entries).to eq ['page1.jpg', 'subfolder/nested.jpg']
+        expect(created_entries).to eq %w[page1.jpg subfolder/nested.jpg]
       end
 
       it 'includes nested files' do
@@ -133,8 +134,8 @@ RSpec.describe ComicBook::CBZ::Archiver do
         output_path = archiver.archive
 
         Zip::File.open(output_path) do |zipfile|
-          entries = zipfile.map(&:name)
-          expect(entries).to include('subfolder/nested.jpg')
+          entries = zipfile.map &:name
+          expect(entries).to include 'subfolder/nested.jpg'
         end
       end
     end
@@ -166,8 +167,8 @@ RSpec.describe ComicBook::CBZ::Archiver do
 
         Zip::File.open(output_path) do |zipfile|
           entries = zipfile.map(&:name)
-          expect(entries).to include('page1.jpg')
-          expect(entries).not_to include('readme.txt', 'data.json')
+          expect(entries).to include 'page1.jpg'
+          expect(entries).not_to include 'readme.txt', 'data.json'
         end
       end
     end

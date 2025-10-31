@@ -71,7 +71,7 @@ describe 'Component' do
   it 'uses RSpec matchers' do
     expect(File).to exist output_path
     expect(pages).to be_an Array
-    expect(pages).to all(be_a(ComicBook::Page))
+    expect(pages).to be_all ComicBook::Page
   end
 end
 ```
