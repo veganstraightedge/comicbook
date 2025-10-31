@@ -4,13 +4,13 @@ RSpec.describe ComicBook::CBZ do
   subject(:adapter) { described_class.new test_cbz }
 
   let(:temp_dir) { Dir.mktmpdir }
-  let(:source_folder) { File.join(temp_dir, 'source') }
-  let(:test_cbz) { File.join(temp_dir, 'test.cbz') }
+  let(:source_folder) { File.join temp_dir, 'source' }
+  let(:test_cbz) { File.join temp_dir, 'test.cbz' }
 
   before do
-    Dir.mkdir(source_folder)
-    File.write(File.join(source_folder, 'page1.jpg'), 'image1 content')
-    File.write(File.join(source_folder, 'page2.png'), 'image2 content')
+    Dir.mkdir source_folder
+    File.write File.join(source_folder, 'page1.jpg'), 'image1 content'
+    File.write File.join(source_folder, 'page2.png'), 'image2 content'
   end
 
   after do
