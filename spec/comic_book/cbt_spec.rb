@@ -10,7 +10,7 @@ RSpec.describe ComicBook::CBT do
   describe '#initialize' do
     subject(:adapter) { described_class.new(test_cbt) }
 
-    let(:test_cbt) { File.join(temp_dir, 'simple.cbt') }
+    let(:test_cbt) { File.join temp_dir, 'simple.cbt' }
 
     before do
       load_fixture('cbt/simple.cbt').copy_to(test_cbt)
@@ -22,13 +22,13 @@ RSpec.describe ComicBook::CBT do
   end
 
   describe '#archive' do
-    let(:source_folder) { File.join(temp_dir, 'source') }
+    let(:source_folder) { File.join temp_dir, 'source' }
     let(:adapter) { described_class.new source_folder }
 
     before do
-      load_fixture('cbt/simple/page1.jpg').copy_to File.join(source_folder, 'page1.jpg')
-      load_fixture('cbt/simple/page2.png').copy_to File.join(source_folder, 'page2.png')
-      load_fixture('cbt/simple/page3.gif').copy_to File.join(source_folder, 'page3.gif')
+      load_fixture('originals/simple/page1.jpg').copy_to File.join(source_folder, 'page1.jpg')
+      load_fixture('originals/simple/page2.png').copy_to File.join(source_folder, 'page2.png')
+      load_fixture('originals/simple/page3.gif').copy_to File.join(source_folder, 'page3.gif')
     end
 
     it 'creates a CBT file from source folder' do
