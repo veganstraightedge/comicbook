@@ -11,9 +11,9 @@ RSpec.describe ComicBook::CBT::Archiver do
     let(:source_folder) { File.join temp_dir, 'simple' }
 
     before do
-      load_fixture('cbt/simple/page1.jpg').copy_to File.join(source_folder, 'page1.jpg')
-      load_fixture('cbt/simple/page2.png').copy_to File.join(source_folder, 'page2.png')
-      load_fixture('cbt/simple/page3.gif').copy_to File.join(source_folder, 'page3.gif')
+      load_fixture('originals/simple/page1.jpg').copy_to File.join(source_folder, 'page1.jpg')
+      load_fixture('originals/simple/page2.png').copy_to File.join(source_folder, 'page2.png')
+      load_fixture('originals/simple/page3.gif').copy_to File.join(source_folder, 'page3.gif')
     end
 
     it 'stores absolute path of source folder' do
@@ -28,9 +28,9 @@ RSpec.describe ComicBook::CBT::Archiver do
       let(:expected_cbt) { load_fixture('cbt/simple.cbt').path }
 
       before do
-        load_fixture('cbt/simple/page1.jpg').copy_to File.join(source_folder, 'page1.jpg')
-        load_fixture('cbt/simple/page2.png').copy_to File.join(source_folder, 'page2.png')
-        load_fixture('cbt/simple/page3.gif').copy_to File.join(source_folder, 'page3.gif')
+        load_fixture('originals/simple/page1.jpg').copy_to File.join(source_folder, 'page1.jpg')
+        load_fixture('originals/simple/page2.png').copy_to File.join(source_folder, 'page2.png')
+        load_fixture('originals/simple/page3.gif').copy_to File.join(source_folder, 'page3.gif')
       end
 
       it 'creates a CBT file with default extension' do
@@ -90,7 +90,7 @@ RSpec.describe ComicBook::CBT::Archiver do
         File.open(output_path, 'rb') do |file|
           Gem::Package::TarReader.new(file) do |tar|
             entry = tar.find { it.full_name == 'page1.jpg' }
-            expected_content = File.binread(load_fixture('cbt/simple/page1.jpg').path)
+            expected_content = File.binread(load_fixture('originals/simple/page1.jpg').path)
             expect(entry.read).to eq expected_content
           end
         end
@@ -121,8 +121,8 @@ RSpec.describe ComicBook::CBT::Archiver do
       let(:source_folder) { File.join temp_dir, 'nested' }
 
       before do
-        load_fixture('cbt/nested/page1.jpg').copy_to File.join(source_folder, 'page1.jpg')
-        load_fixture('cbt/nested/subfolder/nested.jpg').copy_to File.join(source_folder, 'subfolder', 'nested.jpg')
+        load_fixture('originals/nested/page1.jpg').copy_to File.join(source_folder, 'page1.jpg')
+        load_fixture('originals/nested/subfolder/nested.jpg').copy_to File.join(source_folder, 'subfolder', 'nested.jpg')
       end
 
       it 'creates archive matching nested.cbt fixture' do
@@ -156,8 +156,8 @@ RSpec.describe ComicBook::CBT::Archiver do
       let(:source_folder) { File.join temp_dir, 'mixed' }
 
       before do
-        load_fixture('cbt/mixed/page1.jpg').copy_to File.join(source_folder, 'page1.jpg')
-        load_fixture('cbt/mixed/readme.txt').copy_to File.join(source_folder, 'readme.txt')
+        load_fixture('originals/mixed/page1.jpg').copy_to File.join(source_folder, 'page1.jpg')
+        load_fixture('originals/mixed/readme.txt').copy_to File.join(source_folder, 'readme.txt')
       end
 
       it 'creates archive matching mixed.cbt fixture' do
@@ -224,7 +224,7 @@ RSpec.describe ComicBook::CBT::Archiver do
       let(:source_folder) { File.join temp_dir, 'text_only' }
 
       before do
-        load_fixture('cbt/text_only/readme.txt').copy_to File.join(source_folder, 'readme.txt')
+        load_fixture('originals/text_only/readme.txt').copy_to File.join(source_folder, 'readme.txt')
       end
 
       it 'creates archive matching text_only.cbt fixture' do
