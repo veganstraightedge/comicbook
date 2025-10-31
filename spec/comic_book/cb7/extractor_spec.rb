@@ -70,9 +70,9 @@ RSpec.describe ComicBook::CB7::Extractor do
       let(:image_a) { File.join extracted_folder_path, 'page1.jpg' }
       let(:image_b) { File.join extracted_folder_path, 'page2.png' }
       let(:image_c) { File.join extracted_folder_path, 'page3.gif' }
-      let(:fixture_image_a) { load_fixture 'cb7/simple/page1.jpg' }
-      let(:fixture_image_b) { load_fixture 'cb7/simple/page2.png' }
-      let(:fixture_image_c) { load_fixture 'cb7/simple/page3.gif' }
+      let(:fixture_image_a) { load_fixture 'originals/simple/page1.jpg' }
+      let(:fixture_image_b) { load_fixture 'originals/simple/page2.png' }
+      let(:fixture_image_c) { load_fixture 'originals/simple/page3.gif' }
 
       it 'extracts all image files from the archive' do
         expect(File).to exist image_a
