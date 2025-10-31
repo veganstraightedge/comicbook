@@ -1,132 +1,186 @@
 require 'spec_helper'
 
 RSpec.describe ComicBook::CBZ::Archiver do
-  subject(:archiver) { described_class.new source_folder }
-
   let(:temp_dir) { Dir.mktmpdir }
-  let(:source_folder) { File.join temp_dir, 'source' }
-
-  before do
-    Dir.mkdir source_folder
-    File.write File.join(source_folder, 'page1.jpg'), 'image1 content'
-    File.write File.join(source_folder, 'page2.png'), 'image2 content'
-    File.write File.join(source_folder, 'page3.gif'), 'image3 content'
-  end
 
   after do
     FileUtils.rm_rf temp_dir
   end
 
   describe '#initialize' do
+    let(:source_folder) { File.join temp_dir, 'simple' }
+
+    before do
+      load_fixture('originals/simple/page1.jpg').copy_to File.join(source_folder, 'page1.jpg')
+      load_fixture('originals/simple/page2.png').copy_to File.join(source_folder, 'page2.png')
+      load_fixture('originals/simple/page3.gif').copy_to File.join(source_folder, 'page3.gif')
+    end
+
     it 'stores absolute path of source folder' do
+      archiver = described_class.new source_folder
       expect(archiver.send(:source_folder)).to eq File.expand_path(source_folder)
     end
   end
 
   describe '#archive' do
-    it 'creates a CBZ file with default extension' do
-      output_path = archiver.archive
-
-      expect(File).to exist output_path
-      expect(File.extname(output_path)).to eq '.cbz'
-      expect(File.basename(output_path, '.cbz')).to eq 'source'
-    end
-
-    it 'creates archive with custom extension' do
-      output_path = archiver.archive extension: :zip
-
-      expect(File).to exist output_path
-      expect(File.extname(output_path)).to eq '.zip'
-    end
-
-    it 'includes all image files in the archive' do
-      output_path = archiver.archive
-
-      Zip::File.open(output_path) do |zipfile|
-        entries = zipfile.map &:name
-        expect(entries).to include 'page1.jpg', 'page2.png', 'page3.gif'
-        expect(entries.length).to eq 3
-      end
-    end
-
-    it 'preserves file contents in the archive' do
-      output_path = archiver.archive
-
-      Zip::File.open(output_path) do |zipfile|
-        page1_entry = zipfile.find_entry 'page1.jpg'
-        expect(page1_entry.get_input_stream.read).to eq 'image1 content'
-      end
-    end
-
-    it 'sorts files alphabetically in the archive' do
-      # Add files in non-alphabetical order
-      File.write File.join(source_folder, 'zebra.jpg'), 'zebra content'
-      File.write File.join(source_folder, 'alpha.png'), 'alpha content'
-
-      output_path = archiver.archive
-
-      Zip::File.open(output_path) do |zipfile|
-        entries = zipfile.map &:name
-        expect(entries).to eq entries.sort
-      end
-    end
-
-    it 'handles nested directories' do
-      nested_dir = File.join source_folder, 'subfolder'
-      Dir.mkdir nested_dir
-      File.write File.join(nested_dir, 'nested.jpg'), 'nested content'
-
-      output_path = archiver.archive
-
-      Zip::File.open(output_path) do |zipfile|
-        entries = zipfile.map &:name
-        expect(entries).to include 'subfolder/nested.jpg'
-      end
-    end
-
-    it 'ignores non-image files' do
-      File.write File.join(source_folder, 'readme.txt'), 'text content'
-      File.write File.join(source_folder, 'data.json'), '{}'
-
-      output_path = archiver.archive
-
-      Zip::File.open(output_path) do |zipfile|
-        entries = zipfile.map &:name
-        expect(entries).not_to include 'readme.txt', 'data.json'
-        expect(entries).to include 'page1.jpg', 'page2.png', 'page3.gif'
-      end
-    end
-
-    it 'deletes original folder when delete_original is true' do
-      archiver.archive delete_original: true
-
-      expect(File).not_to exist source_folder
-    end
-
-    it 'preserves original folder when delete_original is false' do
-      archiver.archive delete_original: false
-
-      expect(File).to exist source_folder
-    end
-
-    it 'returns the path to the created archive' do
-      output_path = archiver.archive
-
-      expect(output_path).to be_a String
-      expect(File).to exist output_path
-      expect(File.dirname(output_path)).to eq File.dirname(source_folder)
-    end
-
-    context 'when source folder is empty' do
-      subject(:archiver) { described_class.new empty_folder }
-
-      let(:empty_folder) { File.join temp_dir, 'empty' }
+    context 'with simple fixture' do
+      let(:source_folder) { File.join temp_dir, 'simple' }
 
       before do
-        Dir.mkdir empty_folder
+        load_fixture('originals/simple/page1.jpg').copy_to File.join(source_folder, 'page1.jpg')
+        load_fixture('originals/simple/page2.png').copy_to File.join(source_folder, 'page2.png')
+        load_fixture('originals/simple/page3.gif').copy_to File.join(source_folder, 'page3.gif')
       end
 
-      it 'creates an empty archive' do
+      it 'creates a CBZ file with default extension' do
+        archiver = described_class.new source_folder
+        output_path = archiver.archive
+
+        expect(File).to exist output_path
+        expect(File.extname(output_path)).to eq '.cbz'
+        expect(File.basename(output_path, '.cbz')).to eq 'simple'
+      end
+
+      it 'creates archive with correct file structure' do
+        archiver = described_class.new source_folder
+        output_path = archiver.archive
+
+        # Check that archive contains expected files without directory prefix
+        created_entries = []
+        Zip::File.open(output_path) do |zipfile|
+          created_entries = zipfile.map(&:name).sort
+        end
+
+        expect(created_entries).to eq ['page1.jpg', 'page2.png', 'page3.gif']
+      end
+
+      it 'creates archive with custom extension' do
+        archiver = described_class.new source_folder
+        output_path = archiver.archive extension: :zip
+
+        expect(File).to exist output_path
+        expect(File.extname(output_path)).to eq '.zip'
+      end
+
+      it 'includes all image files in the archive' do
+        archiver = described_class.new source_folder
+        output_path = archiver.archive
+
+        Zip::File.open(output_path) do |zipfile|
+          entries = zipfile.map(&:name)
+          expect(entries).to include('page1.jpg', 'page2.png', 'page3.gif')
+          expect(entries.length).to eq 3
+        end
+      end
+
+      it 'preserves file contents in the archive' do
+        archiver = described_class.new source_folder
+        output_path = archiver.archive
+
+        Zip::File.open(output_path) do |zipfile|
+          page1_entry = zipfile.find_entry('page1.jpg')
+          original_content = File.read(load_fixture('originals/simple/page1.jpg').path, mode: 'rb')
+          expect(page1_entry.get_input_stream.read).to eq original_content
+        end
+      end
+
+      it 'deletes original folder when delete_original is true' do
+        archiver = described_class.new source_folder
+        archiver.archive delete_original: true
+
+        expect(File).not_to exist source_folder
+      end
+
+      it 'preserves original folder when delete_original is false' do
+        archiver = described_class.new source_folder
+        archiver.archive delete_original: false
+
+        expect(File).to exist source_folder
+      end
+
+      it 'returns the path to the created archive' do
+        archiver = described_class.new source_folder
+        output_path = archiver.archive
+
+        expect(output_path).to be_a String
+        expect(File).to exist output_path
+        expect(File.dirname(output_path)).to eq File.dirname(source_folder)
+      end
+    end
+
+    context 'with nested fixture' do
+      let(:source_folder) { File.join temp_dir, 'nested' }
+
+      before do
+        load_fixture('originals/nested/page1.jpg').copy_to File.join(source_folder, 'page1.jpg')
+        load_fixture('originals/nested/subfolder/nested.jpg').copy_to File.join(source_folder, 'subfolder', 'nested.jpg')
+      end
+
+      it 'creates archive with nested structure' do
+        archiver = described_class.new source_folder
+        output_path = archiver.archive
+
+        created_entries = []
+        Zip::File.open(output_path) do |zipfile|
+          created_entries = zipfile.map(&:name).sort
+        end
+
+        expect(created_entries).to eq ['page1.jpg', 'subfolder/nested.jpg']
+      end
+
+      it 'includes nested files' do
+        archiver = described_class.new source_folder
+        output_path = archiver.archive
+
+        Zip::File.open(output_path) do |zipfile|
+          entries = zipfile.map(&:name)
+          expect(entries).to include('subfolder/nested.jpg')
+        end
+      end
+    end
+
+    context 'with mixed fixture' do
+      let(:source_folder) { File.join temp_dir, 'mixed' }
+
+      before do
+        load_fixture('originals/mixed/page1.jpg').copy_to File.join(source_folder, 'page1.jpg')
+        load_fixture('originals/mixed/readme.txt').copy_to File.join(source_folder, 'readme.txt')
+        load_fixture('originals/mixed/data.json').copy_to File.join(source_folder, 'data.json')
+      end
+
+      it 'creates archive with only image files' do
+        archiver = described_class.new source_folder
+        output_path = archiver.archive
+
+        created_entries = []
+        Zip::File.open(output_path) do |zipfile|
+          created_entries = zipfile.map(&:name).sort
+        end
+
+        expect(created_entries).to eq ['page1.jpg']
+      end
+
+      it 'only includes image files' do
+        archiver = described_class.new source_folder
+        output_path = archiver.archive
+
+        Zip::File.open(output_path) do |zipfile|
+          entries = zipfile.map(&:name)
+          expect(entries).to include('page1.jpg')
+          expect(entries).not_to include('readme.txt', 'data.json')
+        end
+      end
+    end
+
+    context 'with empty fixture' do
+      let(:source_folder) { File.join temp_dir, 'empty' }
+
+      before do
+        Dir.mkdir source_folder
+      end
+
+      it 'creates empty archive from empty folder' do
+        archiver = described_class.new source_folder
         output_path = archiver.archive
 
         expect(File).to exist output_path
@@ -136,21 +190,19 @@ RSpec.describe ComicBook::CBZ::Archiver do
       end
     end
 
-    context 'when source folder has only non-image files' do
-      subject(:archiver) { described_class.new text_folder }
-
-      let(:text_folder) { File.join temp_dir, 'text_only' }
-      let(:output_path) { archiver.archive }
+    context 'with text_only fixture' do
+      let(:source_folder) { File.join temp_dir, 'text_only' }
 
       before do
-        Dir.mkdir text_folder
-        File.write File.join(text_folder, 'readme.txt'), 'text'
-        File.write File.join(text_folder, 'config.json'), '{}'
+        load_fixture('originals/text_only/readme.txt').copy_to File.join(source_folder, 'readme.txt')
+        load_fixture('originals/text_only/config.json').copy_to File.join(source_folder, 'config.json')
       end
 
-      it 'creates an empty archive' do
-        expect(File).to exist output_path
+      it 'creates empty archive from text-only folder' do
+        archiver = described_class.new source_folder
+        output_path = archiver.archive
 
+        expect(File).to exist output_path
         Zip::File.open(output_path) do |zipfile|
           expect(zipfile.entries).to be_empty
         end

@@ -2,13 +2,6 @@ require 'spec_helper'
 
 RSpec.describe ComicBook do
   let(:temp_dir) { Dir.mktmpdir }
-  let(:test_file) { File.join(temp_dir, 'test.cbz') }
-  let(:test_folder) { File.join(temp_dir, 'test_folder') }
-
-  before do
-    File.write test_file, 'dummy content'
-    Dir.mkdir test_folder
-  end
 
   after do
     FileUtils.rm_rf temp_dir
@@ -22,7 +15,12 @@ RSpec.describe ComicBook do
     context 'with a file path' do
       subject(:cb) { described_class.new test_file }
 
+      let(:test_file) { File.join temp_dir, 'simple.cbz' }
       let(:test_file_path) { File.expand_path test_file }
+
+      before do
+        load_fixture('cbz/simple.cbz').copy_to test_file
+      end
 
       it 'creates a ComicBook instance with a file path' do
         expect(cb).to be_a described_class
@@ -34,7 +32,12 @@ RSpec.describe ComicBook do
     context 'with a folder path' do
       subject(:cb) { described_class.new test_folder }
 
+      let(:test_folder) { File.join temp_dir, 'test_folder' }
       let(:test_folder_path) { File.expand_path test_folder }
+
+      before do
+        Dir.mkdir test_folder
+      end
 
       it 'creates a ComicBook instance with a folder path' do
         expect(cb).to be_a described_class
@@ -52,9 +55,11 @@ RSpec.describe ComicBook do
     context 'with an unsupported file type' do
       let(:unsupported_file) { File.join temp_dir, 'test.txt' }
 
-      it 'raises an error' do
+      before do
         File.write unsupported_file, 'content'
+      end
 
+      it 'raises an error' do
         expect { described_class.new unsupported_file }.to raise_error ComicBook::Error, /Unsupported file type/
       end
     end
@@ -62,6 +67,12 @@ RSpec.describe ComicBook do
 
   describe '.load' do
     subject(:cb) { described_class.load test_file }
+
+    let(:test_file) { File.join temp_dir, 'simple.cbz' }
+
+    before do
+      load_fixture('cbz/simple.cbz').copy_to test_file
+    end
 
     it 'returns a ComicBook instance' do
       expect(cb).to be_a described_class
@@ -131,6 +142,11 @@ RSpec.describe ComicBook do
     subject(:type) { cb.type }
 
     let(:cb) { described_class.new test_folder }
+    let(:test_folder) { File.join temp_dir, 'test_folder.cb' }
+
+    before do
+      Dir.mkdir test_folder
+    end
 
     context 'when loading a .cb folder' do
       it 'detects folders' do
@@ -144,18 +160,17 @@ RSpec.describe ComicBook do
       subject(:pages) { cb.pages }
 
       let(:cb) { described_class.new test_folder }
-      let(:page_names) { pages.map &:name }
+      let(:test_folder) { File.join temp_dir, 'simple' }
+      let(:page_names) { pages.map(&:name) }
 
       before do
-        %w[page1.jpg page2.png page3.gif].map do |filename|
-          file_path = File.join(test_folder, filename)
-          File.write(file_path, 'image content')
-          file_path
-        end
+        load_fixture('originals/simple/page1.jpg').copy_to File.join(test_folder, 'page1.jpg')
+        load_fixture('originals/simple/page2.png').copy_to File.join(test_folder, 'page2.png')
+        load_fixture('originals/simple/page3.gif').copy_to File.join(test_folder, 'page3.gif')
       end
 
       it 'returns an array of Page objects' do
-        expect(pages).to be_all ComicBook::Page
+        expect(pages).to all(be_a(ComicBook::Page))
         expect(pages.length).to eq 3
       end
 
@@ -168,6 +183,11 @@ RSpec.describe ComicBook do
       subject(:pages) { cb.pages }
 
       let(:cb) { described_class.new test_file }
+      let(:test_file) { File.join temp_dir, 'invalid.cbz' }
+
+      before do
+        File.write test_file, 'invalid zip content'
+      end
 
       it 'raises error for invalid zip file' do
         expect { pages }.to raise_error(Zip::Error)
@@ -179,27 +199,37 @@ RSpec.describe ComicBook do
     context 'with a folder' do
       subject(:cb) { described_class.new test_folder }
 
+      let(:test_folder) { File.join temp_dir, 'simple' }
+
       before do
-        %w[page1.jpg page2.png].map do |filename|
-          file_path = File.join(test_folder, filename)
-          File.write(file_path, 'image content')
-        end
+        load_fixture('originals/simple/page1.jpg').copy_to File.join(test_folder, 'page1.jpg')
+        load_fixture('originals/simple/page2.png').copy_to File.join(test_folder, 'page2.png')
       end
 
       it 'creates a .cbz archive from folder' do
         archive_path = cb.archive test_folder
+
         expect(File).to exist archive_path
         expect(File.extname(archive_path)).to eq '.cbz'
       end
 
       it 'deletes original folder when delete_original is true' do
         cb.archive test_folder, delete_original: true
+
         expect(File).not_to exist test_folder
       end
     end
 
     context 'with an archive file' do
       subject(:cb) { described_class.new test_file }
+
+      let(:test_file) { File.join temp_dir, 'simple.cbz' }
+      let(:test_folder) { File.join temp_dir, 'dummy_folder' }
+
+      before do
+        load_fixture('cbz/simple.cbz').copy_to test_file
+        Dir.mkdir test_folder
+      end
 
       it 'raises error when trying to archive a file' do
         expect { cb.archive test_folder }.to raise_error(ComicBook::Error, 'Cannot archive a file')
@@ -211,6 +241,12 @@ RSpec.describe ComicBook do
     context 'with a folder' do
       subject(:cb) { described_class.new test_folder }
 
+      let(:test_folder) { File.join temp_dir, 'simple' }
+
+      before do
+        Dir.mkdir test_folder
+      end
+
       it 'raises error when trying to extract a folder' do
         expect { cb.extract }.to raise_error(ComicBook::Error, 'Cannot extract a folder')
       end
@@ -220,11 +256,10 @@ RSpec.describe ComicBook do
       subject(:cb) { described_class.new test_cbz }
 
       let(:extracted_folder_path) { cb.extract }
-      let(:source_folder) { File.join(temp_dir, 'source') }
+      let(:source_folder) { File.join temp_dir, 'source' }
       let(:test_cbz) do
-        Dir.mkdir source_folder
-        File.write File.join(source_folder, 'page1.jpg'), 'image1'
-        File.write File.join(source_folder, 'page2.png'), 'image2'
+        load_fixture('originals/simple/page1.jpg').copy_to File.join(source_folder, 'page1.jpg')
+        load_fixture('originals/simple/page2.png').copy_to File.join(source_folder, 'page2.png')
 
         # Create a real CBZ file using our archive method
         folder_cb = described_class.new source_folder
@@ -251,9 +286,7 @@ RSpec.describe ComicBook do
   describe '.extract' do
     let(:source_folder) { File.join temp_dir, 'source' }
     let(:test_cbz) do
-      Dir.mkdir source_folder
-      test_image = File.join source_folder, 'page1.jpg'
-      File.write test_image, 'image1'
+      load_fixture('originals/simple/page1.jpg').copy_to File.join(source_folder, 'page1.jpg')
 
       # Create a real CBZ file
       folder_cb = described_class.new source_folder
