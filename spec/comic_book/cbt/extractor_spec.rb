@@ -75,7 +75,7 @@ RSpec.describe ComicBook::CBT::Extractor do
 
       it 'preserves file contents during extraction' do
         extracted_file = File.join extracted_folder_path, 'page1.jpg'
-        expected_content = File.binread(load_fixture('cbt/simple/page1.jpg').path)
+        expected_content = File.binread(load_fixture('originals/simple/page1.jpg').path)
 
         expect(File).to exist extracted_file
         expect(File.binread(extracted_file)).to eq expected_content
