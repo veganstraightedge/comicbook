@@ -67,7 +67,7 @@ RSpec.describe ComicBook::CBT::Extractor do
 
     context 'with images in archive' do
       it 'extracts all image files from the archive' do
-        image_files = Dir.glob File.join(extracted_folder_path, '*.{jpg,png,gif}')
+        image_files = Dir.glob File.join(extracted_folder_path, ComicBook::IMAGE_GLOB_PATTERN)
 
         expect(image_files.length).to be > 0
         expect(image_files.map { File.basename(it) }).to include('page1.jpg', 'page2.png', 'page3.gif')
