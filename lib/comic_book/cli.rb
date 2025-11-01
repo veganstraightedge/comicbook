@@ -85,7 +85,9 @@ class ComicBook
       validate_archive_args! from_path, to_path
 
       cb = ComicBook.new from_path
-      cb.archive from_path, { to: to_path }.compact
+      options = to_path ? { to: to_path } : {}
+
+      cb.archive from_path, options
 
       puts "Archived #{from_path}#{" to #{to_path}" if to_path}"
     end
@@ -110,8 +112,7 @@ class ComicBook
       raise ComicBook::Error, "Source folder not found: #{from_path}" unless File.exist?(from_path)
       raise ComicBook::Error, "Source must be a directory: #{from_path}" unless File.directory?(from_path)
       # to
-      raise ComicBook::Error, 'Destination folder required' unless to_path
-      raise ComicBook::Error, "Destination already exists: #{to_path}" if File.exist?(to_path)
+      raise ComicBook::Error, "Destination already exists: #{to_path}" if to_path && File.exist?(to_path)
 
       nil
     end
