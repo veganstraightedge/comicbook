@@ -1,28 +1,49 @@
 # ComicBook
 
-TODO: Delete this and the text below, and describe your gem
+A Ruby library and CLI tool for managing comic books archives.
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/comicbook`. To experiment with that code, run `bin/console` for an interactive prompt.
+**`extract`** — to open a `.cb*` file.
+
+**`archive`** — to create a `.cb*` file (default: `.cbz`).
+
+Currently supported formats, `archive` and `extract`:
+- CB7 — [7zip](https://en.wikipedia.org/wiki/7-Zip)
+- CBT — [Tar](https://en.wikipedia.org/wiki/Tar_(computing))
+- CBZ — [Zip](https://en.wikipedia.org/wiki/ZIP_(file_format))
+
+Planned formats , only `extract`:
+
+- **CBR** — [RAR](https://en.wikipedia.org/wiki/WinRAR) is proprietary without an open source implementation license. People use WinRAR (Windows-only) to create .rar files. Or `unrar` on Linux/macOS to open .rar files. Extracting support is provided because a large number of comic books are archived in .cbr/.rar format, primarily by Windows users. No support for creating `.cbr` files will ever be added until RAR is opensource (or reverse engineered).
+- **CBA** — [ACE](https://en.wikipedia.org/wiki/WinAce) is both proprietary and very old/outdated/unsupported. ACE extracting support is provided for historical posterity and completeness.
 
 ## Installation
 
-TODO: Replace `UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG` with your gem name right after releasing it to RubyGems.org. Please do not do it earlier due to security reasons. Alternatively, replace this section with instructions to install your gem from git if you don't plan to release to RubyGems.org.
-
 Install the gem and add to the application's Gemfile by executing:
 
-```bash
-bundle add UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG
+```sh
+bundle add comicbook
 ```
 
 If bundler is not being used to manage dependencies, install the gem by executing:
 
-```bash
-gem install UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG
+```sh
+gem install comicbook
 ```
 
 ## Usage
 
-TODO: Write usage instructions here
+In Ruby, you can use the `ComicBook` class to `extract` comic books archives from various formats. You `archive` a folder of images to create a comic book archive.
+
+### Extracting
+
+```ruby
+ComicBook.extract 'path/to/archive.cbz'
+```
+### Archiving
+
+```ruby
+ComicBook.archive 'path/to/archive'
+```
 
 ## Development
 
