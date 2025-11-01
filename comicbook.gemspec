@@ -45,7 +45,7 @@ Gem::Specification.new do |spec|
     end
   end
 
-  spec.executables   = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
+  spec.executables   = ['comicbook']
   spec.require_paths = ['lib']
   spec.bindir        = 'exe'
 

@@ -1,0 +1,6 @@
+#!/usr/bin/env ruby
+
+require_relative '../lib/comicbook'
+require_relative '../lib/comic_book/cli'
+
+ComicBook::CLI.start ARGV
