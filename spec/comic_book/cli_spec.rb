@@ -14,13 +14,13 @@ RSpec.describe ComicBook::CLI do
     let(:cli_instance) { instance_double described_class }
 
     before do
-      allow(described_class).to receive(:new).and_return(cli_instance)
-      allow(cli_instance).to receive(:start).with(['--help'])
+      allow(described_class).to receive(:new).and_return cli_instance
+      allow(cli_instance).to receive(:start).with ['--help']
       described_class.start '--help'
     end
 
     it 'creates new instance and calls start' do
-      expect(cli_instance).to have_received(:start).with(['--help'])
+      expect(cli_instance).to have_received(:start).with ['--help']
     end
   end
 
@@ -41,158 +41,229 @@ RSpec.describe ComicBook::CLI do
 
     context 'with unknown command' do
       it 'shows error and help' do
-        expect { cli.start(['unknown']) }.to output(/Unknown command: unknown/).to_stdout
-                                                                               .and raise_error(SystemExit)
+        expect { cli.start 'unknown' }
+          .to raise_error(SystemExit)
+          .and output(/Unknown command: unknown/)
+          .to_stdout
       end
     end
 
     context 'with ComicBook::Error' do
+      before do
+        allow(ComicBook).to receive(:extract).and_raise ComicBook::Error, 'Test error'
+        allow(File).to receive(:exist?).and_return true
+      end
+
       it 'shows error message and exits' do
-        allow(ComicBook).to receive(:extract).and_raise(ComicBook::Error, 'Test error')
-        allow(File).to receive(:exist?).and_return(true)
-        expect { cli.start(['extract', 'test.cbz']) }.to output(/Error: Test error/).to_stdout
-                                                                                    .and raise_error(SystemExit)
+        expect { cli.start ['extract', 'test.cbz'] }
+          .to raise_error(SystemExit)
+          .and output(/Error: Test error/)
+          .to_stdout
       end
     end
   end
 
   describe 'extract command' do
     before do
-      load_fixture('cbz/simple.cbz').copy_to(cbz_file)
+      load_fixture('cbz/simple.cbz').copy_to cbz_file
     end
 
     context 'with valid file' do
-      it 'extracts file' do
-        allow(ComicBook).to receive(:extract).with(cbz_file, {})
-        expect { cli.start(['extract', cbz_file]) }.to output(/Extracted #{Regexp.escape(cbz_file)}/).to_stdout
-        expect(ComicBook).to have_received(:extract).with(cbz_file, {})
+      before do
+        allow(ComicBook).to receive(:extract).with cbz_file, {}
       end
 
-      it 'extracts file with --to option' do
-        to_path = File.join(temp_dir, 'output')
-        allow(ComicBook).to receive(:extract).with(cbz_file, { to: to_path })
-        expect do
-          cli.start(['extract', cbz_file, '--to', to_path])
-        end.to output(/Extracted.*to #{Regexp.escape(to_path)}/).to_stdout
-        expect(ComicBook).to have_received(:extract).with(cbz_file, { to: to_path })
+      it 'extracts cbz file' do
+        expect { cli.start ['extract', cbz_file] }
+          .to output(/Extracted #{Regexp.escape(cbz_file)}/)
+          .to_stdout
+
+        expect(ComicBook).to have_received(:extract).with cbz_file, {}
       end
 
-      it 'extracts file with --from option' do
-        allow(ComicBook).to receive(:extract).with(cbz_file, {})
-        expect { cli.start(['extract', '--from', cbz_file]) }.to output(/Extracted #{Regexp.escape(cbz_file)}/).to_stdout
-        expect(ComicBook).to have_received(:extract).with(cbz_file, {})
+      context 'with --to option' do
+        let(:to_path) { File.join(temp_dir, 'output') }
+
+        before do
+          allow(ComicBook).to receive(:extract).with cbz_file, { to: to_path }
+        end
+
+        it 'extracts file' do
+          expect { cli.start ['extract', cbz_file, '--to', to_path] }
+            .to output(/Extracted.*to #{Regexp.escape(to_path)}/)
+            .to_stdout
+
+          expect(ComicBook).to have_received(:extract).with cbz_file, { to: to_path }
+        end
+      end
+
+      context 'with --from option' do
+        it 'extracts file' do
+          expect { cli.start ['extract', '--from', cbz_file] }
+            .to output(/Extracted #{Regexp.escape(cbz_file)}/)
+            .to_stdout
+
+          expect(ComicBook).to have_received(:extract).with cbz_file, {}
+        end
       end
     end
 
     context 'with missing source file' do
       it 'shows error for nonexistent file' do
-        expect { cli.start(['extract', 'nonexistent.cbz']) }.to output(/Error: Source file not found/).to_stdout
-                                                            .and raise_error(SystemExit)
+        expect { cli.start ['extract', 'nonexistent.cbz'] }
+          .to raise_error(SystemExit)
+          .and output(/Error: Source file not found/)
+          .to_stdout
       end
 
       it 'shows error for no source file' do
-        expect { cli.start(['extract']) }.to output(/Error: Source file required/).to_stdout
-                                         .and raise_error(SystemExit)
+        expect { cli.start 'extract' }
+          .to raise_error(SystemExit)
+          .and output(/Error: Source file required/)
+          .to_stdout
       end
     end
 
     context 'with existing destination' do
-      it 'shows error when destination exists' do
-        existing_path = File.join(temp_dir, 'existing')
-        FileUtils.touch(existing_path)
+      let(:existing_path) { File.join temp_dir, 'existing' }
 
-        expect do
-          cli.start(['extract', cbz_file, '--to', existing_path])
-        end.to output(/Error: Destination already exists/).to_stdout
-           .and raise_error(SystemExit)
+      before do
+        FileUtils.touch existing_path
+      end
+
+      it 'shows error when destination exists' do
+        expect { cli.start ['extract', cbz_file, '--to', existing_path] }
+          .to raise_error(SystemExit)
+          .and output(/Error: Destination already exists/)
+          .to_stdout
       end
     end
 
     context 'with unsupported formats' do
-      it 'shows error for CBR files' do
-        cbr_file = File.join(temp_dir, 'test.cbr')
-        FileUtils.touch(cbr_file)
+      context 'with CBR files' do
+        let(:cbr_file) { File.join temp_dir, 'test.cbr' }
 
-        expect { cli.start(['extract', cbr_file]) }.to output(/Error: Unsupported format: .cbr/).to_stdout
-                                                   .and raise_error(SystemExit)
+        before do
+          FileUtils.touch cbr_file
+        end
+
+        it 'shows error' do
+          expect { cli.start ['extract', cbr_file] }
+            .to raise_error(SystemExit)
+            .and output(/Error: Unsupported format: .cbr/)
+            .to_stdout
+        end
       end
 
-      it 'shows error for CBA files' do
-        cba_file = File.join(temp_dir, 'test.cba')
-        FileUtils.touch(cba_file)
+      context 'with CBA files' do
+        let(:cba_file) { File.join temp_dir, 'test.cba' }
 
-        expect { cli.start(['extract', cba_file]) }.to output(/Error: Unsupported format: .cba/).to_stdout
-                                                   .and raise_error(SystemExit)
+        before do
+          FileUtils.touch cba_file
+        end
+
+        it 'shows error' do
+          expect { cli.start ['extract', cba_file] }
+            .to raise_error(SystemExit)
+            .and output(/Error: Unsupported format: .cba/)
+            .to_stdout
+        end
       end
     end
   end
 
   describe 'archive command' do
     before do
-      FileUtils.mkdir_p(test_folder)
-      FileUtils.touch(File.join(test_folder, 'page1.jpg'))
+      FileUtils.mkdir_p test_folder
+      FileUtils.touch File.join(test_folder, 'page1.jpg')
     end
 
     context 'with valid folder' do
+      let(:comic_book) { instance_double ComicBook }
+
+      before do
+        allow(ComicBook).to receive(:new).with(test_folder).and_return comic_book
+        allow(comic_book).to receive(:archive).with(test_folder, {})
+      end
+
       it 'archives folder' do
-        comic_book = instance_double(ComicBook)
-        allow(ComicBook).to receive(:new).with(test_folder).and_return(comic_book)
-        allow(comic_book).to receive(:archive).with(test_folder, {})
-
-        expect { cli.start(['archive', test_folder]) }.to output(/Archived #{Regexp.escape(test_folder)}/).to_stdout
+        expect { cli.start ['archive', test_folder] }
+          .to output(/Archived #{Regexp.escape(test_folder)}/)
+          .to_stdout
       end
 
-      it 'archives folder with --to option' do
-        to_path = File.join(temp_dir, 'output.cbz')
-        comic_book = instance_double(ComicBook)
-        allow(ComicBook).to receive(:new).with(test_folder).and_return(comic_book)
-        allow(comic_book).to receive(:archive).with(test_folder, { to: to_path })
+      context 'with --to option' do
+        let(:to_path) { File.join(temp_dir, 'output.cbz') }
 
-        expect do
-          cli.start(['archive', test_folder, '--to', to_path])
-        end.to output(/Archived.*to #{Regexp.escape(to_path)}/).to_stdout
+        before do
+          allow(ComicBook).to receive(:new).with(test_folder).and_return comic_book
+          allow(comic_book).to receive(:archive).with test_folder, { to: to_path }
+        end
+
+        it 'archives folder to specified path' do
+          expect { cli.start ['archive', test_folder, '--to', to_path] }
+            .to output(/Archived.*to #{Regexp.escape(to_path)}/)
+            .to_stdout
+        end
       end
 
-      it 'archives folder with --from option' do
-        comic_book = instance_double(ComicBook)
-        allow(ComicBook).to receive(:new).with(test_folder).and_return(comic_book)
-        allow(comic_book).to receive(:archive).with(test_folder, {})
+      context 'with --from option' do
+        before do
+          allow(ComicBook).to receive(:new).with(test_folder).and_return comic_book
+          allow(comic_book).to receive(:archive).with test_folder, {}
+        end
 
-        expect do
-          cli.start(['archive', '--from', test_folder])
-        end.to output(/Archived #{Regexp.escape(test_folder)}/).to_stdout
+        it 'archives folder with --from option' do
+          expect { cli.start ['archive', '--from', test_folder] }
+            .to output(/Archived #{Regexp.escape(test_folder)}/)
+            .to_stdout
+        end
       end
     end
 
     context 'with missing source folder' do
       it 'shows error for nonexistent folder' do
-        expect { cli.start(%w[archive nonexistent]) }.to output(/Error: Source folder not found/).to_stdout
-                                                     .and raise_error(SystemExit)
+        expect { cli.start %w[archive nonexistent] }
+          .to raise_error(SystemExit)
+          .and output(/Error: Source folder not found/)
+          .to_stdout
       end
 
       it 'shows error for no source folder' do
-        expect { cli.start(['archive']) }.to output(/Error: Source folder required/).to_stdout
-                                         .and raise_error(SystemExit)
+        expect { cli.start 'archive' }
+          .to raise_error(SystemExit)
+          .and output(/Error: Source folder required/)
+          .to_stdout
       end
 
-      it 'shows error when source is not a directory' do
-        file_path = File.join(temp_dir, 'notdir.txt')
-        FileUtils.touch(file_path)
+      context 'when source is not a directory' do
+        let(:file_path) { File.join temp_dir, 'notdir.txt' }
 
-        expect { cli.start(['archive', file_path]) }.to output(/Error: Source must be a directory/).to_stdout
-                                                    .and raise_error(SystemExit)
+        before do
+          FileUtils.touch file_path
+        end
+
+        it 'shows error' do
+          expect { cli.start ['archive', file_path] }
+            .to raise_error(SystemExit)
+            .and output(/Error: Source must be a directory/)
+            .to_stdout
+        end
       end
     end
 
     context 'with existing destination' do
-      it 'shows error when destination exists' do
-        existing_path = File.join(temp_dir, 'existing.cbz')
-        FileUtils.touch(existing_path)
+      let(:existing_path) { File.join temp_dir, 'existing.cbz' }
 
-        expect do
-          cli.start(['archive', test_folder, '--to', existing_path])
-        end.to output(/Error: Destination already exists/).to_stdout
-           .and raise_error(SystemExit)
+      before do
+        FileUtils.touch existing_path
+      end
+
+      it 'shows error when destination exists' do
+        expect { cli.start ['archive', test_folder, '--to', existing_path] }
+          .to raise_error(SystemExit)
+          .and output(/Error: Destination already exists/)
+          .to_stdout
       end
     end
   end

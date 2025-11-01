@@ -10,6 +10,8 @@ class ComicBook
     end
 
     def start argv
+      argv = Array(argv)
+
       if argv.empty? || argv.include?('-h') || argv.include?('--help')
         show_help
         return
