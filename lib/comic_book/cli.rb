@@ -10,15 +10,14 @@ class ComicBook
     end
 
     def start argv
-      argv = Array(argv)
+      argv = Array argv
 
       if argv.empty? || argv.include?('-h') || argv.include?('--help')
         show_help
         return
       end
 
-      command = argv.shift
-      case command
+      case command = argv.shift
       when 'extract' then extract(argv)
       when 'archive' then archive(argv)
       else
@@ -43,13 +42,13 @@ class ComicBook
           comicbook -h, --help
 
         Commands:
-          extract   Extract comic book archive
-          archive   Create comic book archive
+          extract     Extract comic book archive
+          archive     Create comic book archive
 
         Options:
-          --from    Source path (optional, first arg is default)
-          --to      Destination path
-          -h, --help Show this help
+          --from      Source path (optional, first arg is default)
+          --to        Destination path
+          --help, -h  Show this help
       HELP
     end
 
@@ -84,31 +83,37 @@ class ComicBook
       from_path ||= remaining.first
 
       validate_archive_args! from_path, to_path
-      ComicBook.new(from_path).archive(from_path, { to: to_path }.compact)
+
+      cb = ComicBook.new from_path
+      cb.archive from_path, { to: to_path }.compact
+
       puts "Archived #{from_path}#{" to #{to_path}" if to_path}"
     end
 
     def validate_extract_args! from_path, to_path
+      # from
       raise ComicBook::Error, 'Source file required' unless from_path
       raise ComicBook::Error, "Source file not found: #{from_path}" unless File.exist?(from_path)
-
+      # to
       raise ComicBook::Error, "Destination already exists: #{to_path}" if to_path && File.exist?(to_path)
 
-      # Check for unsupported formats
+      # formats
       ext = File.extname(from_path).downcase
-      return if SUPPORTED_FORMATS.include? ext
+      raise ComicBook::Error, "Unsupported format: #{ext} (not yet implemented)" unless SUPPORTED_FORMATS.include?(ext)
 
-      raise ComicBook::Error, "Unsupported format: #{ext} (not yet implemented)"
+      nil
     end
 
     def validate_archive_args! from_path, to_path
+      # from
       raise ComicBook::Error, 'Source folder required' unless from_path
       raise ComicBook::Error, "Source folder not found: #{from_path}" unless File.exist?(from_path)
       raise ComicBook::Error, "Source must be a directory: #{from_path}" unless File.directory?(from_path)
+      # to
+      raise ComicBook::Error, 'Destination folder required' unless to_path
+      raise ComicBook::Error, "Destination already exists: #{to_path}" if File.exist?(to_path)
 
-      return unless to_path && File.exist?(to_path)
-
-      raise ComicBook::Error, "Destination already exists: #{to_path}"
+      nil
     end
   end
 end

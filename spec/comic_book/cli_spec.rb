@@ -4,8 +4,8 @@ require 'tmpdir'
 
 RSpec.describe ComicBook::CLI do
   let(:cli) { described_class.new }
-  let(:temp_dir) { Dir.mktmpdir }
-  let(:cbz_file) { File.join temp_dir, 'test.cbz' }
+  let(:temp_dir)    { Dir.mktmpdir }
+  let(:cbz_file)    { File.join temp_dir, 'test.cbz' }
   let(:test_folder) { File.join temp_dir, 'test_folder' }
 
   after { FileUtils.rm_rf temp_dir }
