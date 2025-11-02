@@ -11,7 +11,7 @@ class ComicBook
       def extract options = {}
         extension = options.fetch :extension, :cb
         delete_original = options.fetch :delete_original, false
-        destination_folder = options[:destination]
+        destination_folder = options[:to]
 
         destination = destination_folder || determine_extract_path(extension)
         create_destination_directory destination

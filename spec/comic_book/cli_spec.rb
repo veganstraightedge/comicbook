@@ -183,7 +183,7 @@ RSpec.describe ComicBook::CLI do
 
       before do
         allow(ComicBook).to receive(:new).with(test_folder).and_return comic_book
-        allow(comic_book).to receive(:archive).with(test_folder, {})
+        allow(comic_book).to receive(:archive).with(no_args)
       end
 
       it 'archives folder' do
@@ -197,7 +197,7 @@ RSpec.describe ComicBook::CLI do
 
         before do
           allow(ComicBook).to receive(:new).with(test_folder).and_return comic_book
-          allow(comic_book).to receive(:archive).with test_folder, { to: to_path }
+          allow(comic_book).to receive(:archive).with(to: to_path)
         end
 
         it 'archives folder to specified path' do
@@ -210,7 +210,7 @@ RSpec.describe ComicBook::CLI do
       context 'with --from option' do
         before do
           allow(ComicBook).to receive(:new).with(test_folder).and_return comic_book
-          allow(comic_book).to receive(:archive).with test_folder, {}
+          allow(comic_book).to receive(:archive).with(no_args)
         end
 
         it 'archives folder with --from option' do

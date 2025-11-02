@@ -7,7 +7,7 @@ class ComicBook
 
       def archive options = {}
         extension = options.fetch :extension, :cbt
-        destination = options[:destination] || determine_output_path(extension)
+        destination = options[:to] || determine_output_path(extension)
         delete_original = options.fetch :delete_original, false
 
         create_tar_file destination

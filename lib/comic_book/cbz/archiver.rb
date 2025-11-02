@@ -9,7 +9,7 @@ class ComicBook
         extension       = options.fetch :extension, :cbz
         delete_original = options.fetch :delete_original, false
 
-        output_path = determine_output_path extension
+        output_path = options[:to] || determine_output_path(extension)
         create_zip_archive output_path
         cleanup_source_folder if delete_original
 

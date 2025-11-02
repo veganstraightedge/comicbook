@@ -43,9 +43,9 @@ The system uses the Adapter pattern to provide a unified interface across differ
 
 ```ruby
 class ComicBook::Adapter
-  def archive(source_folder, options = {})      # Create archive from folder
-  def extract(destination_folder, options = {}) # Extract archive to folder
-  def pages                                     # Get array of Page objects
+  def archive(options = {})      # Create archive from folder (to: destination_path)
+  def extract(options = {})      # Extract archive to folder (to: destination_path)
+  def pages                      # Get array of Page objects
 end
 ```
 

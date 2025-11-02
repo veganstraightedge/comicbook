@@ -100,7 +100,7 @@ RSpec.describe ComicBook::CBZ do
 
     it 'extracts to custom destination when specified' do
       custom_dest = File.join temp_dir, 'custom_extract'
-      extract_path = adapter.extract destination: custom_dest
+      extract_path = adapter.extract to: custom_dest
 
       expect(extract_path).to eq custom_dest
       expect(File).to exist custom_dest

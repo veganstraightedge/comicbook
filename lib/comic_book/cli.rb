@@ -85,9 +85,12 @@ class ComicBook
       validate_archive_args! from_path, to_path
 
       cb = ComicBook.new from_path
-      options = to_path ? { to: to_path } : {}
 
-      cb.archive from_path, options
+      if to_path
+        cb.archive to: to_path
+      else
+        cb.archive
+      end
 
       puts "Archived #{from_path}#{" to #{to_path}" if to_path}"
     end

@@ -39,7 +39,7 @@ RSpec.describe ComicBook::CBZ::Extractor do
     end
 
     context 'with non-default destination folder' do
-      let(:extracted_folder_path) { extractor.extract destination: custom_destination_path }
+      let(:extracted_folder_path) { extractor.extract to: custom_destination_path }
       let(:custom_destination_path) { File.join temp_dir, 'custom_destination' }
 
       it 'extracts to custom destination folder' do
@@ -189,7 +189,7 @@ RSpec.describe ComicBook::CBZ::Extractor do
 
     context 'when destination folder already exists' do
       let(:existing_destination) { File.join temp_dir, 'existing' }
-      let(:extracted_folder_path) { extractor.extract destination: existing_destination }
+      let(:extracted_folder_path) { extractor.extract to: existing_destination }
       let(:image_in_archive) { File.join existing_destination, 'simple', 'page1.jpg' }
       let(:old_file) { File.join existing_destination, 'old_file.txt' }
 

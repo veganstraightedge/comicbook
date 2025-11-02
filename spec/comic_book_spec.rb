@@ -207,16 +207,25 @@ RSpec.describe ComicBook do
       end
 
       it 'creates a .cbz archive from folder' do
-        archive_path = cb.archive test_folder
+        archive_path = cb.archive
 
         expect(File).to exist archive_path
         expect(File.extname(archive_path)).to eq '.cbz'
       end
 
       it 'deletes original folder when delete_original is true' do
-        cb.archive test_folder, delete_original: true
+        cb.archive delete_original: true
 
         expect(File).not_to exist test_folder
+      end
+
+      it 'creates archive at specified path when using to option' do
+        custom_path = File.join temp_dir, 'custom_name.cbz'
+        archive_path = cb.archive to: custom_path
+
+        expect(archive_path).to eq custom_path
+        expect(File).to exist custom_path
+        expect(File.extname(custom_path)).to eq '.cbz'
       end
     end
 
@@ -232,7 +241,7 @@ RSpec.describe ComicBook do
       end
 
       it 'raises error when trying to archive a file' do
-        expect { cb.archive test_folder }.to raise_error(ComicBook::Error, 'Cannot archive a file')
+        expect { cb.archive }.to raise_error(ComicBook::Error, 'Cannot archive a file')
       end
     end
   end
@@ -263,12 +272,21 @@ RSpec.describe ComicBook do
 
         # Create a real CBZ file using our archive method
         folder_cb = described_class.new source_folder
-        folder_cb.archive source_folder
+        folder_cb.archive
       end
 
       it 'extracts archive to folder' do
         expect(File).to exist extracted_folder_path
         expect(File).to be_directory extracted_folder_path
+      end
+
+      it 'extracts to specified path when using to option' do
+        custom_path = File.join temp_dir, 'custom_extraction'
+        extract_path = cb.extract to: custom_path
+
+        expect(extract_path).to eq custom_path
+        expect(File).to exist custom_path
+        expect(File).to be_directory custom_path
       end
 
       context 'when delete_original is true' do
@@ -290,7 +308,7 @@ RSpec.describe ComicBook do
 
       # Create a real CBZ file
       folder_cb = described_class.new source_folder
-      folder_cb.archive source_folder
+      folder_cb.archive
     end
 
     it 'is a shorthand for load().extract()' do

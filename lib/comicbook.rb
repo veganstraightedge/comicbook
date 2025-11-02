@@ -34,10 +34,10 @@ class ComicBook
     end
   end
 
-  def archive source_folder, options = {}
+  def archive options = {}
     raise Error, 'Cannot archive a file' unless type == :folder
 
-    CBZ.new(source_folder).archive options
+    CBZ.new(path).archive options
   end
 
   def extract options = {}
