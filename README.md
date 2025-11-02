@@ -1,5 +1,6 @@
 # ComicBook
 
+⚠️ Under construction. ⚠️
 A Ruby library and CLI tool for managing comic books archives.
 
 **`extract`** — to open a `.cb*` file.
