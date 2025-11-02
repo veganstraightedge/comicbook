@@ -7,11 +7,11 @@ class ComicBook
       @path = File.expand_path path
     end
 
-    def archive source_folder, options = {}
+    def archive options = {}
       raise NotImplementedError, "#{self.class} must implement #archive"
     end
 
-    def extract destination_folder, options = {}
+    def extract options = {}
       raise NotImplementedError, "#{self.class} must implement #extract"
     end
 

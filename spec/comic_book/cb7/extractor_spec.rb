@@ -39,7 +39,7 @@ RSpec.describe ComicBook::CB7::Extractor do
     end
 
     context 'with non-default destination folder' do
-      let(:extracted_folder_path) { extractor.extract custom_destination_path }
+      let(:extracted_folder_path) { extractor.extract destination: custom_destination_path }
       let(:custom_destination_path) { File.join temp_dir, 'custom_destination' }
 
       it 'extracts to custom destination folder' do
@@ -50,7 +50,7 @@ RSpec.describe ComicBook::CB7::Extractor do
     end
 
     context 'with non-default folder extension' do
-      let(:extracted_folder_path) { extractor.extract nil, extension: :comicbook }
+      let(:extracted_folder_path) { extractor.extract extension: :comicbook }
 
       it 'extracts to a folder with custom extension' do
         expect(File.extname(extracted_folder_path)).to eq '.comicbook'
@@ -58,7 +58,7 @@ RSpec.describe ComicBook::CB7::Extractor do
     end
 
     context 'with no folder extension' do
-      let(:extracted_folder_path) { extractor.extract nil, extension: nil }
+      let(:extracted_folder_path) { extractor.extract extension: nil }
 
       it 'uses no extension when extension is nil' do
         expect(File.extname(extracted_folder_path)).to be_empty
@@ -119,7 +119,7 @@ RSpec.describe ComicBook::CB7::Extractor do
 
     context 'when delete_original is true' do
       before do
-        extractor.extract nil, delete_original: true
+        extractor.extract delete_original: true
       end
 
       it 'deletes original archive' do
@@ -129,7 +129,7 @@ RSpec.describe ComicBook::CB7::Extractor do
 
     context 'when delete_original is false' do
       before do
-        extractor.extract nil, delete_original: false
+        extractor.extract delete_original: false
       end
 
       it 'preserves original archive' do
@@ -177,7 +177,7 @@ RSpec.describe ComicBook::CB7::Extractor do
       let(:existing_destination) { File.join temp_dir, 'existing' }
       let(:image_in_archive) { File.join existing_destination, 'page1.jpg' }
       let(:old_file) { File.join existing_destination, 'old_file.txt' }
-      let(:extracted_folder_path) { extractor.extract existing_destination }
+      let(:extracted_folder_path) { extractor.extract destination: existing_destination }
 
       before do
         Dir.mkdir existing_destination

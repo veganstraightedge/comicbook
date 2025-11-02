@@ -32,14 +32,14 @@ RSpec.describe ComicBook::CB7 do
     end
 
     it 'creates a CB7 file from source folder' do
-      output_path = adapter.archive source_folder
+      output_path = adapter.archive
 
       expect(File).to exist output_path
       expect(File.extname(output_path)).to eq '.cb7'
     end
 
     it 'includes image files in the archive' do
-      output_path = adapter.archive source_folder
+      output_path = adapter.archive
 
       File.open(output_path, 'rb') do |file|
         SevenZipRuby::Reader.open(file) do |szr|
@@ -50,19 +50,19 @@ RSpec.describe ComicBook::CB7 do
     end
 
     it 'deletes original folder when delete_original is true' do
-      adapter.archive source_folder, delete_original: true
+      adapter.archive delete_original: true
 
       expect(File).not_to exist source_folder
     end
 
     it 'preserves original folder when delete_original is false' do
-      adapter.archive source_folder, delete_original: false
+      adapter.archive delete_original: false
 
       expect(File).to exist source_folder
     end
 
     it 'uses custom extension when specified' do
-      output_path = adapter.archive source_folder, extension: :cb7
+      output_path = adapter.archive extension: :cb7
 
       expect(File.extname(output_path)).to eq '.cb7'
     end
@@ -91,33 +91,33 @@ RSpec.describe ComicBook::CB7 do
     end
 
     it 'uses custom extension when specified' do
-      extracted_path = adapter.extract nil, extension: :comicbook
+      extracted_path = adapter.extract extension: :comicbook
 
       expect(File.extname(extracted_path)).to eq '.comicbook'
     end
 
     it 'uses no extension when extension is nil' do
-      extracted_path = adapter.extract nil, extension: nil
+      extracted_path = adapter.extract extension: nil
 
       expect(File.extname(extracted_path)).to be_empty
     end
 
     it 'extracts to custom destination when specified' do
       custom_destination = File.join temp_dir, 'custom'
-      extracted_path = adapter.extract custom_destination
+      extracted_path = adapter.extract destination: custom_destination
 
       expect(extracted_path).to eq custom_destination
       expect(File).to exist custom_destination
     end
 
     it 'deletes original file when delete_original is true' do
-      adapter.extract nil, delete_original: true
+      adapter.extract delete_original: true
 
       expect(File).not_to exist test_cb7
     end
 
     it 'preserves original file when delete_original is false' do
-      adapter.extract nil, delete_original: false
+      adapter.extract delete_original: false
 
       expect(File).to exist test_cb7
     end

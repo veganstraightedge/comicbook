@@ -75,8 +75,8 @@ class ComicBook
       to_path   = nil
 
       parser = OptionParser.new do |opts|
-        opts.on('--from PATH', 'Source folder path') { from_path = path }
-        opts.on('--to PATH',   'Destination path')   { to_path   = path }
+        opts.on('--from PATH', 'Source folder path') { from_path = it }
+        opts.on('--to PATH',   'Destination path')   { to_path   = it }
       end
 
       remaining = parser.parse argv

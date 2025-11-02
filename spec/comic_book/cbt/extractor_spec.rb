@@ -39,7 +39,7 @@ RSpec.describe ComicBook::CBT::Extractor do
     end
 
     context 'with non-default destination folder' do
-      let(:extracted_folder_path) { extractor.extract custom_destination_path }
+      let(:extracted_folder_path) { extractor.extract destination: custom_destination_path }
       let(:custom_destination_path) { File.join temp_dir, 'custom_destination' }
 
       it 'extracts to custom destination folder' do
@@ -51,7 +51,7 @@ RSpec.describe ComicBook::CBT::Extractor do
 
     context 'with non-default folder extension' do
       it 'extracts to a folder with custom extension' do
-        extracted_folder_path = extractor.extract nil, extension: :comicbook
+        extracted_folder_path = extractor.extract extension: :comicbook
 
         expect(File.extname(extracted_folder_path)).to eq '.comicbook'
       end
@@ -59,7 +59,7 @@ RSpec.describe ComicBook::CBT::Extractor do
 
     context 'with no folder extension' do
       it 'uses no extension when extension is nil' do
-        extracted_folder_path = extractor.extract nil, extension: nil
+        extracted_folder_path = extractor.extract extension: nil
 
         expect(File.extname(extracted_folder_path)).to eq ''
       end
@@ -113,14 +113,14 @@ RSpec.describe ComicBook::CBT::Extractor do
 
     context 'when delete_original is true' do
       it 'deletes original archive' do
-        extractor.extract nil, delete_original: true
+        extractor.extract delete_original: true
         expect(File).not_to exist test_cbt
       end
     end
 
     context 'when delete_original is false' do
       it 'preserves original archive' do
-        extractor.extract nil, delete_original: false
+        extractor.extract delete_original: false
         expect(File).to exist test_cbt
       end
     end
@@ -163,7 +163,7 @@ RSpec.describe ComicBook::CBT::Extractor do
         existing_folder = File.join temp_dir, 'existing'
         Dir.mkdir existing_folder
 
-        extraction_path = extractor.extract existing_folder
+        extraction_path = extractor.extract destination: existing_folder
 
         expect(extraction_path).to eq existing_folder
         image_files = Dir.glob File.join(existing_folder, '*.{jpg,png,gif}')

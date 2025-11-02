@@ -5,9 +5,10 @@ class ComicBook
         @archive_path = File.expand_path(archive_path)
       end
 
-      def extract destination_folder = nil, options = {}
-        extension       = options.fetch :extension, :cb
+      def extract options = {}
+        extension = options.fetch :extension, :cb
         delete_original = options.fetch :delete_original, false
+        destination_folder = options[:destination]
 
         destination = destination_folder || determine_extract_path(extension)
         extract_zip_contents destination

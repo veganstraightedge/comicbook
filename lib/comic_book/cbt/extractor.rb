@@ -8,9 +8,10 @@ class ComicBook
         @path = File.expand_path path
       end
 
-      def extract destination_folder = nil, options = {}
+      def extract options = {}
         extension = options.fetch :extension, :cb
         delete_original = options.fetch :delete_original, false
+        destination_folder = options[:destination]
 
         destination = destination_folder || determine_extract_path(extension)
         create_destination_directory destination

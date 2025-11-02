@@ -5,12 +5,12 @@ require_relative 'cb7/extractor'
 
 class ComicBook
   class CB7 < Adapter
-    def archive source_folder, options = {}
-      Archiver.new(source_folder).archive options
+    def archive options = {}
+      Archiver.new(path).archive options
     end
 
-    def extract destination_folder = nil, options = {}
-      Extractor.new(path).extract destination_folder, options
+    def extract options = {}
+      Extractor.new(path).extract options
     end
 
     def pages = collect_pages_from_7z
