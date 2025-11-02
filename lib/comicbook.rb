@@ -23,6 +23,10 @@ class ComicBook
     new path
   end
 
+  def self.archive path, options = {}
+    new(path).archive options
+  end
+
   def self.extract path, options = {}
     new(path).extract options
   end
