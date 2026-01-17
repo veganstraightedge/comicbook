@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    comicbook (0.1.0)
+    comicbook (0.2.0)
       rubyzip (>= 3.2.2)
       seven-zip (~> 1.4)
 
