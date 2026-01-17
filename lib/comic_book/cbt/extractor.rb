@@ -55,7 +55,7 @@ class ComicBook
           Gem::Package::TarReader.new(file) do |tar|
             tar.each do |entry|
               next unless entry.file?
-              next unless options[:all] || image_file?(entry.full_name)
+              next if options[:images_only] && !image_file?(entry.full_name)
 
               extract_single_file entry, destination
             end

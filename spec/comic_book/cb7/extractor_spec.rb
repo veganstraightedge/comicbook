@@ -110,19 +110,19 @@ RSpec.describe ComicBook::CB7::Extractor do
         load_fixture('cb7/mixed.cb7').copy_to test_cb7
       end
 
-      it 'ignores non-image files' do
+      it 'extracts all files including non-images' do
         expect(File).to exist image_in_archive
-        expect(File).not_to exist text_file_in_archive
-        expect(File).not_to exist json_file_in_archive
+        expect(File).to exist text_file_in_archive
+        expect(File).to exist json_file_in_archive
       end
 
-      context 'when all option is true' do
-        let(:extracted_folder_path) { extractor.extract all: true }
+      context 'when images_only option is true' do
+        let(:extracted_folder_path) { extractor.extract images_only: true }
 
-        it 'extracts all files including non-images' do
+        it 'extracts only image files' do
           expect(File).to exist image_in_archive
-          expect(File).to exist text_file_in_archive
-          expect(File).to exist json_file_in_archive
+          expect(File).not_to exist text_file_in_archive
+          expect(File).not_to exist json_file_in_archive
         end
       end
     end
@@ -160,20 +160,6 @@ RSpec.describe ComicBook::CB7::Extractor do
 
       before do
         load_fixture('cb7/empty.cb7').copy_to test_cb7
-      end
-
-      it 'creates empty extraction folder' do
-        expect(File).to exist extracted_folder_path
-        expect(File).to be_directory extracted_folder_path
-        expect(Dir).to be_empty extracted_folder_path
-      end
-    end
-
-    context 'when archive contains only non-image files' do
-      let(:test_cb7) { File.join temp_dir, 'text_only.cb7' }
-
-      before do
-        load_fixture('cb7/text_only.cb7').copy_to test_cb7
       end
 
       it 'creates empty extraction folder' do

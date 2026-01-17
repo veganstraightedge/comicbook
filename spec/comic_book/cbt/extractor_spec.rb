@@ -106,17 +106,17 @@ RSpec.describe ComicBook::CBT::Extractor do
         load_fixture('cbt/mixed.cbt').copy_to test_cbt
       end
 
-      it 'ignores non-image files' do
+      it 'extracts all files including non-images' do
         expect(File).to exist image_in_archive
-        expect(File).not_to exist text_file_in_archive
+        expect(File).to exist text_file_in_archive
       end
 
-      context 'when all option is true' do
-        let(:extracted_folder_path) { extractor.extract all: true }
+      context 'when images_only option is true' do
+        let(:extracted_folder_path) { extractor.extract images_only: true }
 
-        it 'extracts all files including non-images' do
+        it 'extracts only image files' do
           expect(File).to exist image_in_archive
-          expect(File).to exist text_file_in_archive
+          expect(File).not_to exist text_file_in_archive
         end
       end
     end
@@ -147,19 +147,6 @@ RSpec.describe ComicBook::CBT::Extractor do
 
       before do
         load_fixture('cbt/empty.cbt').copy_to test_cbt
-      end
-
-      it 'creates empty extraction folder' do
-        expect(File).to be_directory extracted_folder_path
-        expect(Dir.children(extracted_folder_path)).to be_empty
-      end
-    end
-
-    context 'when archive contains only non-image files' do
-      let(:test_cbt) { File.join temp_dir, 'text_only.cbt' }
-
-      before do
-        load_fixture('cbt/text_only.cbt').copy_to test_cbt
       end
 
       it 'creates empty extraction folder' do

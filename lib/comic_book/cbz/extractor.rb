@@ -62,7 +62,8 @@ class ComicBook
       def extract_files destination_basename, options
         Zip::File.open(archive_path) do |zipfile|
           zipfile.each do |entry|
-            next unless options[:all] || image_file?(entry.name)
+            next if entry.directory?
+            next if options[:images_only] && !image_file?(entry.name)
 
             extract_single_file entry, destination_basename
           end

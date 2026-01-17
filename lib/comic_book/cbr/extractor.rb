@@ -53,10 +53,10 @@ class ComicBook
       def extract_contents destination, options
         FileUtils.mkdir_p destination
         CLIHelpers.unrar_extract archive_path, destination
-        delete_extracted_non_images destination unless options[:all]
+        delete_non_images destination if options[:images_only]
       end
 
-      def delete_extracted_non_images destination
+      def delete_non_images destination
         archive_entries = CLIHelpers.unrar_list archive_path
 
         archive_entries.each do |entry|

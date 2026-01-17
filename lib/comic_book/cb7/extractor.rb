@@ -56,7 +56,8 @@ class ComicBook
         File.open(archive_path, 'rb') do |file|
           SevenZipRuby::Reader.open(file) do |seven_zip_reader|
             seven_zip_reader.entries.each do |entry|
-              next unless entry.file? && (options[:all] || image_file?(entry.path))
+              next unless entry.file?
+              next if options[:images_only] && !image_file?(entry.path)
 
               extract_single_file entry, destination, seven_zip_reader
             end
