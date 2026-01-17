@@ -5,4 +5,8 @@ require 'rubocop/rake_task'
 RSpec::Core::RakeTask.new :spec
 RuboCop::RakeTask.new
 
+desc 'Run tests and linter'
 task default: %i[spec rubocop]
+
+desc 'Alias of default: spec linter'
+task test: %i[spec rubocop]
