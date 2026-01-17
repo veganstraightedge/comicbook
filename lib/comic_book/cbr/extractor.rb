@@ -52,6 +52,10 @@ class ComicBook
 
       def extract_contents destination, options
         FileUtils.mkdir_p destination
+        extract_files destination, options
+      end
+
+      def extract_files destination, options
         CLIHelpers.unrar_extract archive_path, destination
         delete_non_images destination if options[:images_only]
       end

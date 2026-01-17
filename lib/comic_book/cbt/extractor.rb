@@ -53,13 +53,17 @@ class ComicBook
       def extract_contents destination, options
         File.open(archive_path, 'rb') do |file|
           Gem::Package::TarReader.new(file) do |tar|
-            tar.each do |entry|
-              next unless entry.file?
-              next if options[:images_only] && !image_file?(entry.full_name)
-
-              extract_single_file entry, destination
-            end
+            extract_files destination, options, tar
           end
+        end
+      end
+
+      def extract_files destination, options, tar
+        tar.each do |entry|
+          next unless entry.file?
+          next if options[:images_only] && !image_file?(entry.full_name)
+
+          extract_single_file entry, destination
         end
       end
 
