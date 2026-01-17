@@ -4,17 +4,24 @@ require 'open3'
 class ComicBook
   class CLIHelpers
     class << self
-      def platform_dir
+      def binary_path name
         case RUBY_PLATFORM
-        when /darwin/  then 'macos'
-        when /linux/   then 'linux'
-        when /mingw/   then 'windows'
-        else raise "Unsupported platform: #{RUBY_PLATFORM}"
+        when /darwin/
+          File.expand_path("../vendor/macos/#{name}", __FILE__)
+        when /linux/
+          check_linux_dependency! name
+          name
+        when /mingw/
+          File.expand_path("../vendor/windows/#{name}", __FILE__)
+        else
+          raise "Unsupported platform: #{RUBY_PLATFORM}"
         end
       end
 
-      def binary_path name
-        File.expand_path("../vendor/#{platform_dir}/#{name}", __FILE__)
+      def check_linux_dependency! name
+        return if system("which #{name} > /dev/null 2>&1")
+
+        raise Error, "#{name} is not installed. Install it with: sudo apt-get install unar"
       end
 
       def lsar_list archive_path
