@@ -6,7 +6,7 @@ gemspec
 gem 'irb'
 gem 'rake'
 gem 'rspec'
-gem 'rspec-file_fixtures', '~> 0.1.10'
+gem 'rspec-file_fixtures'
 
 gem 'rubocop'
 gem 'rubocop-performance'
