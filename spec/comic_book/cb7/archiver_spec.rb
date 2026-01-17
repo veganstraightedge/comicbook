@@ -47,15 +47,15 @@ RSpec.describe ComicBook::CB7::Archiver do
         # Compare archive contents with fixture
         created_entries = []
         File.open(output_path, 'rb') do |file|
-          SevenZipRuby::Reader.open(file) do |szr|
-            created_entries = szr.entries.map(&:path).sort
+          SevenZipRuby::Reader.open(file) do |seven_zip_reader|
+            created_entries = seven_zip_reader.entries.map(&:path).sort
           end
         end
 
         expected_entries = []
         File.open(expected_cb7, 'rb') do |file|
-          SevenZipRuby::Reader.open(file) do |szr|
-            expected_entries = szr.entries.map(&:path).sort
+          SevenZipRuby::Reader.open(file) do |seven_zip_reader|
+            expected_entries = seven_zip_reader.entries.map(&:path).sort
           end
         end
 
@@ -73,8 +73,8 @@ RSpec.describe ComicBook::CB7::Archiver do
         output_path = archiver.archive
 
         File.open(output_path, 'rb') do |file|
-          SevenZipRuby::Reader.open(file) do |szr|
-            entries = szr.entries.map &:path
+          SevenZipRuby::Reader.open(file) do |seven_zip_reader|
+            entries = seven_zip_reader.entries.map &:path
             expect(entries).to include 'page1.jpg', 'page2.png', 'page3.gif'
             expect(entries.length).to eq 3
           end
@@ -85,9 +85,9 @@ RSpec.describe ComicBook::CB7::Archiver do
         output_path = archiver.archive
 
         File.open(output_path, 'rb') do |file|
-          SevenZipRuby::Reader.open(file) do |szr|
-            page1_entry = szr.entries.find { it.path == 'page1.jpg' }
-            expect(szr.extract_data(page1_entry)).not_to be_empty
+          SevenZipRuby::Reader.open(file) do |seven_zip_reader|
+            page1_entry = seven_zip_reader.entries.find { it.path == 'page1.jpg' }
+            expect(seven_zip_reader.extract_data(page1_entry)).not_to be_empty
           end
         end
       end
@@ -127,15 +127,15 @@ RSpec.describe ComicBook::CB7::Archiver do
 
         created_entries = []
         File.open(output_path, 'rb') do |file|
-          SevenZipRuby::Reader.open(file) do |szr|
-            created_entries = szr.entries.map(&:path).sort
+          SevenZipRuby::Reader.open(file) do |seven_zip_reader|
+            created_entries = seven_zip_reader.entries.map(&:path).sort
           end
         end
 
         expected_entries = []
         File.open(expected_cb7, 'rb') do |file|
-          SevenZipRuby::Reader.open(file) do |szr|
-            expected_entries = szr.entries.map(&:path).sort
+          SevenZipRuby::Reader.open(file) do |seven_zip_reader|
+            expected_entries = seven_zip_reader.entries.map(&:path).sort
           end
         end
 
@@ -146,8 +146,8 @@ RSpec.describe ComicBook::CB7::Archiver do
         output_path = archiver.archive
 
         File.open(output_path, 'rb') do |file|
-          SevenZipRuby::Reader.open(file) do |szr|
-            entries = szr.entries.map(&:path)
+          SevenZipRuby::Reader.open(file) do |seven_zip_reader|
+            entries = seven_zip_reader.entries.map(&:path)
             expect(entries).to include('subfolder/nested.jpg')
           end
         end
@@ -169,15 +169,15 @@ RSpec.describe ComicBook::CB7::Archiver do
 
         created_entries = []
         File.open(output_path, 'rb') do |file|
-          SevenZipRuby::Reader.open(file) do |szr|
-            created_entries = szr.entries.map(&:path).sort
+          SevenZipRuby::Reader.open(file) do |seven_zip_reader|
+            created_entries = seven_zip_reader.entries.map(&:path).sort
           end
         end
 
         expected_entries = []
         File.open(expected_cb7, 'rb') do |file|
-          SevenZipRuby::Reader.open(file) do |szr|
-            expected_entries = szr.entries.map(&:path).sort
+          SevenZipRuby::Reader.open(file) do |seven_zip_reader|
+            expected_entries = seven_zip_reader.entries.map(&:path).sort
           end
         end
 
@@ -188,8 +188,8 @@ RSpec.describe ComicBook::CB7::Archiver do
         output_path = archiver.archive
 
         File.open(output_path, 'rb') do |file|
-          SevenZipRuby::Reader.open(file) do |szr|
-            entries = szr.entries.map &:path
+          SevenZipRuby::Reader.open(file) do |seven_zip_reader|
+            entries = seven_zip_reader.entries.map &:path
             expect(entries).not_to include 'readme.txt', 'data.json'
             expect(entries).to include 'page1.jpg'
           end
@@ -206,15 +206,15 @@ RSpec.describe ComicBook::CB7::Archiver do
 
         created_entries = []
         File.open(output_path, 'rb') do |file|
-          SevenZipRuby::Reader.open(file) do |szr|
-            created_entries = szr.entries.map(&:path).sort
+          SevenZipRuby::Reader.open(file) do |seven_zip_reader|
+            created_entries = seven_zip_reader.entries.map(&:path).sort
           end
         end
 
         expected_entries = []
         File.open(expected_cb7, 'rb') do |file|
-          SevenZipRuby::Reader.open(file) do |szr|
-            expected_entries = szr.entries.map(&:path).sort
+          SevenZipRuby::Reader.open(file) do |seven_zip_reader|
+            expected_entries = seven_zip_reader.entries.map(&:path).sort
           end
         end
 
@@ -226,8 +226,8 @@ RSpec.describe ComicBook::CB7::Archiver do
 
         expect(File).to exist output_path
         File.open(output_path, 'rb') do |file|
-          SevenZipRuby::Reader.open(file) do |szr|
-            expect(szr.entries).to be_empty
+          SevenZipRuby::Reader.open(file) do |seven_zip_reader|
+            expect(seven_zip_reader.entries).to be_empty
           end
         end
       end
@@ -247,15 +247,15 @@ RSpec.describe ComicBook::CB7::Archiver do
 
         created_entries = []
         File.open(output_path, 'rb') do |file|
-          SevenZipRuby::Reader.open(file) do |szr|
-            created_entries = szr.entries.map(&:path).sort
+          SevenZipRuby::Reader.open(file) do |seven_zip_reader|
+            created_entries = seven_zip_reader.entries.map(&:path).sort
           end
         end
 
         expected_entries = []
         File.open(expected_cb7, 'rb') do |file|
-          SevenZipRuby::Reader.open(file) do |szr|
-            expected_entries = szr.entries.map(&:path).sort
+          SevenZipRuby::Reader.open(file) do |seven_zip_reader|
+            expected_entries = seven_zip_reader.entries.map(&:path).sort
           end
         end
 
@@ -267,8 +267,8 @@ RSpec.describe ComicBook::CB7::Archiver do
 
         expect(File).to exist output_path
         File.open(output_path, 'rb') do |file|
-          SevenZipRuby::Reader.open(file) do |szr|
-            expect(szr.entries).to be_empty
+          SevenZipRuby::Reader.open(file) do |seven_zip_reader|
+            expect(seven_zip_reader.entries).to be_empty
           end
         end
       end

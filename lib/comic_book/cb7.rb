@@ -21,8 +21,8 @@ class ComicBook
       pages = []
 
       File.open(path, 'rb') do |file|
-        SevenZipRuby::Reader.open(file) do |szr|
-          szr.entries.each do |entry|
+        SevenZipRuby::Reader.open(file) do |seven_zip_reader|
+          seven_zip_reader.entries.each do |entry|
             next unless entry.file? && image_file?(entry.path)
 
             pages << create_page_from_entry(entry)

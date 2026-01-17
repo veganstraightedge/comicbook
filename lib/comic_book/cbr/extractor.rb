@@ -1,5 +1,5 @@
 class ComicBook
-  class CBT < Adapter
+  class CBR < Adapter
     class Extractor
       def initialize archive_path
         @archive_path = File.expand_path archive_path
@@ -12,7 +12,7 @@ class ComicBook
 
         destination = destination_folder || determine_extract_path(extension)
         create_destination_directory destination
-        extract_contents destination, options
+        extract_contents destination
         cleanup_archive_file if delete_original
 
         destination
@@ -50,24 +50,21 @@ class ComicBook
         FileUtils.mkdir_p parent_dir
       end
 
-      def extract_contents destination, options
-        File.open(archive_path, 'rb') do |file|
-          Gem::Package::TarReader.new(file) do |tar|
-            tar.each do |entry|
-              next unless entry.file?
-              next unless options[:all] || image_file?(entry.full_name)
-
-              extract_single_file entry, destination
-            end
-          end
-        end
+      def extract_contents destination
+        FileUtils.mkdir_p destination
+        CLIHelpers.unrar_extract archive_path, destination
+        delete_extracted_non_images destination
       end
 
-      def extract_single_file entry, destination
-        file_path = File.join destination, entry.full_name
-        create_parent_directory file_path
+      def delete_extracted_non_images destination
+        archive_entries = CLIHelpers.unrar_list archive_path
 
-        File.binwrite file_path, entry.read
+        archive_entries.each do |entry|
+          next if image_file?(entry)
+
+          file_path = File.join(destination, entry)
+          FileUtils.rm_f(file_path)
+        end
       end
     end
   end

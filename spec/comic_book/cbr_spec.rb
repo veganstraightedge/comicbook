@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe ComicBook::CB7 do
+RSpec.describe ComicBook::CBR do
   let(:temp_dir) { Dir.mktmpdir }
 
   after do
@@ -8,16 +8,16 @@ RSpec.describe ComicBook::CB7 do
   end
 
   describe '#initialize' do
-    subject(:adapter) { described_class.new(test_cb7) }
+    subject(:adapter) { described_class.new(test_cbr) }
 
-    let(:test_cb7) { File.join(temp_dir, 'simple.cb7') }
+    let(:test_cbr) { File.join(temp_dir, 'simple.cbr') }
 
     before do
-      load_fixture('cb7/simple.cb7').copy_to(test_cb7)
+      load_fixture('cbr/simple.cbr').copy_to(test_cbr)
     end
 
     it 'stores absolute path' do
-      expect(adapter.send(:path)).to eq File.expand_path(test_cb7)
+      expect(adapter.send(:path)).to eq File.expand_path(test_cbr)
     end
   end
 
@@ -27,57 +27,23 @@ RSpec.describe ComicBook::CB7 do
 
     before do
       load_fixture('originals/simple/page1.jpg').copy_to File.join(source_folder, 'page1.jpg')
-      load_fixture('originals/simple/page2.png').copy_to File.join(source_folder, 'page2.png')
-      load_fixture('originals/simple/page3.gif').copy_to File.join(source_folder, 'page3.gif')
     end
 
-    it 'creates a CB7 file from source folder' do
-      output_path = adapter.archive
-
-      expect(File).to exist output_path
-      expect(File.extname(output_path)).to eq '.cb7'
-    end
-
-    it 'includes image files in the archive' do
-      output_path = adapter.archive
-
-      File.open(output_path, 'rb') do |file|
-        SevenZipRuby::Reader.open(file) do |seven_zip_reader|
-          entries = seven_zip_reader.entries.map(&:path)
-          expect(entries).to include('page1.jpg', 'page2.png', 'page3.gif')
-        end
-      end
-    end
-
-    it 'deletes original folder when delete_original is true' do
-      adapter.archive delete_original: true
-
-      expect(File).not_to exist source_folder
-    end
-
-    it 'preserves original folder when delete_original is false' do
-      adapter.archive delete_original: false
-
-      expect(File).to exist source_folder
-    end
-
-    it 'uses custom extension when specified' do
-      output_path = adapter.archive extension: :cb7
-
-      expect(File.extname(output_path)).to eq '.cb7'
+    it 'raises error because RAR is proprietary' do
+      expect { adapter.archive }.to raise_error(ComicBook::Error, /not supported/)
     end
   end
 
   describe '#extract' do
-    subject(:adapter) { described_class.new(test_cb7) }
+    subject(:adapter) { described_class.new(test_cbr) }
 
-    let(:test_cb7) { File.join(temp_dir, 'simple.cb7') }
+    let(:test_cbr) { File.join(temp_dir, 'simple.cbr') }
 
     before do
-      load_fixture('cb7/simple.cb7').copy_to(test_cb7)
+      load_fixture('cbr/simple.cbr').copy_to(test_cbr)
     end
 
-    it 'extracts CB7 file to folder' do
+    it 'extracts CBR file to folder' do
       extracted_path = adapter.extract
 
       expect(File).to exist extracted_path
@@ -113,23 +79,23 @@ RSpec.describe ComicBook::CB7 do
     it 'deletes original file when delete_original is true' do
       adapter.extract delete_original: true
 
-      expect(File).not_to exist test_cb7
+      expect(File).not_to exist test_cbr
     end
 
     it 'preserves original file when delete_original is false' do
       adapter.extract delete_original: false
 
-      expect(File).to exist test_cb7
+      expect(File).to exist test_cbr
     end
   end
 
   describe '#pages' do
-    subject(:adapter) { described_class.new(test_cb7) }
+    subject(:adapter) { described_class.new(test_cbr) }
 
-    let(:test_cb7) { File.join(temp_dir, 'simple.cb7') }
+    let(:test_cbr) { File.join(temp_dir, 'simple.cbr') }
 
     before do
-      load_fixture('cb7/simple.cb7').copy_to(test_cb7)
+      load_fixture('cbr/simple.cbr').copy_to(test_cbr)
     end
 
     it 'returns array of Page objects' do
@@ -153,12 +119,12 @@ RSpec.describe ComicBook::CB7 do
     end
 
     context 'with non-image files in the archive' do
-      subject(:adapter) { described_class.new(mixed_cb7) }
+      subject(:adapter) { described_class.new(mixed_cbr) }
 
-      let(:mixed_cb7) { File.join(temp_dir, 'mixed.cb7') }
+      let(:mixed_cbr) { File.join(temp_dir, 'mixed.cbr') }
 
       before do
-        load_fixture('cb7/mixed.cb7').copy_to(mixed_cb7)
+        load_fixture('cbr/mixed.cbr').copy_to(mixed_cbr)
       end
 
       it 'only includes image files' do

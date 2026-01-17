@@ -18,7 +18,7 @@ RSpec.describe ComicBook::CBT::Extractor do
     end
 
     it 'stores absolute path of archive file' do
-      expect(extractor.send(:path)).to eq File.expand_path(test_cbt)
+      expect(extractor.send(:archive_path)).to eq File.expand_path(test_cbt)
     end
   end
 
