@@ -10,7 +10,7 @@ class ComicBook
         delete_original = options.fetch :delete_original, false
 
         output_path = options[:to] || determine_output_path(extension)
-        create_zip_archive output_path
+        create_archive output_path
         cleanup_source_folder if delete_original
 
         output_path
@@ -27,10 +27,10 @@ class ComicBook
         File.expand_path File.join(dir_name, "#{base_name}.#{extension}")
       end
 
-      def create_zip_archive output_path
-        Zip::File.open(output_path, create: true) do |zipfile|
+      def create_archive output_path
+        Zip::File.open(output_path, create: true) do |writer|
           find_image_files.each do |file|
-            add_file_to_zip zipfile, file
+            add_file writer, file
           end
         end
       end
@@ -40,12 +40,12 @@ class ComicBook
         Dir.glob(pattern, File::FNM_CASEFOLD).sort
       end
 
-      def add_file_to_zip zipfile, file
+      def add_file writer, file
         file_path     = Pathname.new file
         source_path   = Pathname.new source_folder
         relative_path = file_path.relative_path_from source_path
 
-        zipfile.add relative_path.to_s, file
+        writer.add relative_path.to_s, file
       end
 
       def cleanup_source_folder

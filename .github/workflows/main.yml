@@ -14,12 +14,14 @@ jobs:
     strategy:
       matrix:
         ruby:
-          - '3.4.7'
+          - "4.0.0"
 
     steps:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
+      - name: Install unar
+        run: sudo apt-get update && sudo apt-get install -y unar
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:

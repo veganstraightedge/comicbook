@@ -160,7 +160,7 @@ RSpec.describe ComicBook::CBT::Archiver do
         load_fixture('originals/mixed/readme.txt').copy_to File.join(source_folder, 'readme.txt')
       end
 
-      it 'creates archive matching mixed.cbt fixture' do
+      it 'creates archive with only image files' do
         archiver = described_class.new source_folder
         output_path = archiver.archive
 
@@ -171,8 +171,7 @@ RSpec.describe ComicBook::CBT::Archiver do
           end
         end
 
-        expect(created_entries).to include('page1.jpg')
-        expect(created_entries).not_to include('readme.txt')
+        expect(created_entries).to eq ['page1.jpg']
       end
 
       it 'only includes image files' do

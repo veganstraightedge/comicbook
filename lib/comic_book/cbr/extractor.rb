@@ -1,5 +1,5 @@
 class ComicBook
-  class CB7 < Adapter
+  class CBR < Adapter
     class Extractor
       def initialize archive_path
         @archive_path = File.expand_path archive_path
@@ -52,28 +52,23 @@ class ComicBook
 
       def extract_contents destination, options
         FileUtils.mkdir_p destination
-
-        File.open(archive_path, 'rb') do |file|
-          SevenZipRuby::Reader.open(file) do |seven_zip_reader|
-            extract_files destination, options, seven_zip_reader
-          end
-        end
+        extract_files destination, options
       end
 
-      def extract_files destination, options, seven_zip_reader
-        seven_zip_reader.entries.each do |entry|
-          next unless entry.file?
-          next if options[:images_only] && !image_file?(entry.path)
-
-          extract_single_file entry, destination, seven_zip_reader
-        end
+      def extract_files destination, options
+        CLIHelpers.unar_extract archive_path, destination
+        delete_non_images destination if options[:images_only]
       end
 
-      def extract_single_file entry, destination, seven_zip_reader
-        file_path = File.join destination, entry.path
-        create_parent_directory file_path
+      def delete_non_images destination
+        archive_entries = CLIHelpers.lsar_list archive_path
 
-        File.binwrite(file_path, seven_zip_reader.extract_data(entry))
+        archive_entries.each do |entry|
+          next if image_file?(entry)
+
+          file_path = File.join(destination, entry)
+          FileUtils.rm_f(file_path)
+        end
       end
     end
   end

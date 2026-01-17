@@ -1,7 +1,7 @@
 require 'spec_helper'
 
-RSpec.describe ComicBook::CBZ::Extractor do
-  subject(:extractor) { described_class.new test_cbz }
+RSpec.describe ComicBook::CBR::Extractor do
+  subject(:extractor) { described_class.new test_cbr }
 
   let(:temp_dir) { Dir.mktmpdir }
   let(:extracted_folder_path) { extractor.extract }
@@ -11,26 +11,26 @@ RSpec.describe ComicBook::CBZ::Extractor do
   end
 
   describe '#initialize' do
-    let(:test_cbz) { File.join temp_dir, 'simple.cbz' }
+    let(:test_cbr) { File.join temp_dir, 'simple.cbr' }
 
     before do
-      load_fixture('cbz/simple.cbz').copy_to test_cbz
+      load_fixture('cbr/simple.cbr').copy_to test_cbr
     end
 
     it 'stores absolute path of archive file' do
-      expect(extractor.send(:archive_path)).to eq File.expand_path(test_cbz)
+      expect(extractor.send(:archive_path)).to eq File.expand_path(test_cbr)
     end
   end
 
   describe '#extract' do
-    let(:test_cbz) { File.join temp_dir, 'simple.cbz' }
+    let(:test_cbr) { File.join temp_dir, 'simple.cbr' }
 
     before do
-      load_fixture('cbz/simple.cbz').copy_to test_cbz
+      load_fixture('cbr/simple.cbr').copy_to test_cbr
     end
 
     context 'with default .cb extension' do
-      it 'extracts CBZ file to folder' do
+      it 'extracts CBR file to folder' do
         expect(File).to exist extracted_folder_path
         expect(File).to be_directory extracted_folder_path
         expect(File.extname(extracted_folder_path)).to eq '.cb'
@@ -67,9 +67,12 @@ RSpec.describe ComicBook::CBZ::Extractor do
     end
 
     context 'with images in archive' do
-      let(:image_a) { File.join extracted_folder_path, 'simple', 'page1.jpg' }
-      let(:image_b) { File.join extracted_folder_path, 'simple', 'page2.png' }
-      let(:image_c) { File.join extracted_folder_path, 'simple', 'page3.gif' }
+      let(:image_a) { File.join extracted_folder_path, 'page1.jpg' }
+      let(:image_b) { File.join extracted_folder_path, 'page2.png' }
+      let(:image_c) { File.join extracted_folder_path, 'page3.gif' }
+      let(:fixture_image_a) { load_fixture 'originals/simple/page1.jpg' }
+      let(:fixture_image_b) { load_fixture 'originals/simple/page2.png' }
+      let(:fixture_image_c) { load_fixture 'originals/simple/page3.gif' }
 
       it 'extracts all image files from the archive' do
         expect(File).to exist image_a
@@ -78,54 +81,37 @@ RSpec.describe ComicBook::CBZ::Extractor do
       end
 
       it 'preserves file contents during extraction' do
-        original_content_a = File.read(load_fixture('originals/simple/page1.jpg').path, mode: 'rb')
-        original_content_b = File.read(load_fixture('originals/simple/page2.png').path, mode: 'rb')
-        original_content_c = File.read(load_fixture('originals/simple/page3.gif').path, mode: 'rb')
-
-        expect(File.read(image_a, mode: 'rb')).to eq original_content_a
-        expect(File.read(image_b, mode: 'rb')).to eq original_content_b
-        expect(File.read(image_c, mode: 'rb')).to eq original_content_c
+        expect(File.read(image_a)).to eq fixture_image_a.read
+        expect(File.read(image_b)).to eq fixture_image_b.read
+        expect(File.read(image_c)).to eq fixture_image_c.read
       end
     end
 
     context 'with nested directories' do
-      subject(:extractor) { described_class.new nested_cbz }
-
-      let(:nested_cbz) { File.join temp_dir, 'nested.cbz' }
-      let(:extracted_folder_path) { extractor.extract }
-      let(:nested_image) { File.join extracted_folder_path, 'nested', 'subfolder', 'nested.jpg' }
+      let(:test_cbr) { File.join temp_dir, 'nested.cbr' }
+      let(:nested_image) { File.join extracted_folder_path, 'subfolder', 'nested.jpg' }
 
       before do
-        load_fixture('cbz/nested.cbz').copy_to nested_cbz
+        load_fixture('cbr/nested.cbr').copy_to test_cbr
       end
 
       it 'handles nested directory structures' do
         expect(File).to exist nested_image
-        original_content = File.read(load_fixture('originals/nested/subfolder/nested.jpg').path, mode: 'rb')
-        expect(File.read(nested_image, mode: 'rb')).to eq original_content
       end
     end
 
     context 'with non-images in the archive' do
-      subject(:extractor) do
-        described_class
-          .new mixed_cbz
-      end
-
-      let(:mixed_cbz) { File.join temp_dir, 'mixed.cbz' }
-      let(:extracted_folder_path) { extractor.extract }
-      let(:image_in_archive) { File.join extracted_folder_path, 'mixed', 'page1.jpg' }
-      let(:text_file_in_archive) { File.join extracted_folder_path, 'mixed', 'readme.txt' }
-      let(:json_file_in_archive) { File.join extracted_folder_path, 'mixed', 'data.json' }
+      let(:test_cbr)             { File.join temp_dir, 'mixed.cbr' }
+      let(:image_in_archive)     { File.join extracted_folder_path, 'page1.jpg' }
+      let(:text_file_in_archive) { File.join extracted_folder_path, 'readme.txt' }
 
       before do
-        load_fixture('cbz/mixed.cbz').copy_to mixed_cbz
+        load_fixture('cbr/mixed.cbr').copy_to test_cbr
       end
 
       it 'extracts all files including non-images' do
         expect(File).to exist image_in_archive
         expect(File).to exist text_file_in_archive
-        expect(File).to exist json_file_in_archive
       end
 
       context 'when images_only option is true' do
@@ -134,24 +120,27 @@ RSpec.describe ComicBook::CBZ::Extractor do
         it 'extracts only image files' do
           expect(File).to exist image_in_archive
           expect(File).not_to exist text_file_in_archive
-          expect(File).not_to exist json_file_in_archive
         end
       end
     end
 
     context 'when delete_original is true' do
-      it 'deletes original archive' do
+      before do
         extractor.extract delete_original: true
+      end
 
-        expect(File).not_to exist test_cbz
+      it 'deletes original archive' do
+        expect(File).not_to exist test_cbr
       end
     end
 
     context 'when delete_original is false' do
-      it 'preserves original archive' do
+      before do
         extractor.extract delete_original: false
+      end
 
-        expect(File).to exist test_cbz
+      it 'preserves original archive' do
+        expect(File).to exist test_cbr
       end
     end
 
@@ -163,28 +152,11 @@ RSpec.describe ComicBook::CBZ::Extractor do
       end
     end
 
-    context 'when archive is empty' do
-      subject(:extractor) { described_class.new empty_cbz }
-
-      let(:empty_cbz) { File.join temp_dir, 'empty.cbz' }
-      let(:extracted_folder_path) { extractor.extract }
-
-      before do
-        load_fixture('cbz/empty.cbz').copy_to empty_cbz
-      end
-
-      it 'creates empty extraction folder' do
-        expect(File).to exist extracted_folder_path
-        expect(File).to be_directory extracted_folder_path
-        expect(Dir).to be_empty extracted_folder_path
-      end
-    end
-
     context 'when destination folder already exists' do
       let(:existing_destination) { File.join temp_dir, 'existing' }
-      let(:extracted_folder_path) { extractor.extract to: existing_destination }
-      let(:image_in_archive) { File.join existing_destination, 'simple', 'page1.jpg' }
+      let(:image_in_archive) { File.join existing_destination, 'page1.jpg' }
       let(:old_file) { File.join existing_destination, 'old_file.txt' }
+      let(:extracted_folder_path) { extractor.extract to: existing_destination }
 
       before do
         Dir.mkdir existing_destination

@@ -1,67 +1,48 @@
-require 'rubygems/package'
-require 'fileutils'
-
 class ComicBook
   class CBT < Adapter
     class Extractor
-      def initialize path
-        @path = File.expand_path path
+      def initialize archive_path
+        @archive_path = File.expand_path archive_path
       end
 
       def extract options = {}
-        extension = options.fetch :extension, :cb
-        delete_original = options.fetch :delete_original, false
+        extension          = options.fetch :extension, :cb
+        delete_original    = options.fetch :delete_original, false
         destination_folder = options[:to]
 
         destination = destination_folder || determine_extract_path(extension)
         create_destination_directory destination
-        extract_files destination, options
-        cleanup_original_archive if delete_original
+        extract_contents destination, options
+        cleanup_archive_file if delete_original
 
         destination
       end
 
       private
 
-      attr_reader :path
-
-      def determine_extract_path extension
-        base_name = File.basename path, '.*'
-        dir_name = File.dirname path
-        archive_name = base_name
-
-        if extension
-          extension_str = extension.to_s
-          extension_str = extension_str[1..] if extension_str.start_with?('.')
-          archive_name << ".#{extension_str}"
-        end
-
-        full_path = File.join dir_name, archive_name
-        File.expand_path full_path
-      end
+      attr_reader :archive_path
 
       def create_destination_directory destination
         FileUtils.mkdir_p destination
       end
 
-      def extract_files destination, options
-        File.open(path, 'rb') do |file|
-          Gem::Package::TarReader.new(file) do |tar|
-            tar.each do |entry|
-              next unless entry.file?
-              next unless options[:all] || image_file?(entry.full_name)
+      def determine_extract_path extension
+        base_name    = File.basename archive_path, '.*'
+        dir_name     = File.dirname  archive_path
+        archive_name = base_name
 
-              extract_entry entry, destination
-            end
-          end
-        end
+        archive_name << ".#{extension}" if extension
+
+        full_path = File.join dir_name, archive_name
+        File.expand_path full_path
       end
 
-      def extract_entry entry, destination
-        output_path = File.join destination, entry.full_name
-        create_parent_directory output_path
+      def image_file? filename
+        ComicBook::IMAGE_EXTENSIONS.include? File.extname(filename.downcase)
+      end
 
-        File.binwrite(output_path, entry.read)
+      def cleanup_archive_file
+        File.delete archive_path
       end
 
       def create_parent_directory file_path
@@ -69,12 +50,28 @@ class ComicBook
         FileUtils.mkdir_p parent_dir
       end
 
-      def image_file? filename
-        ComicBook::IMAGE_EXTENSIONS.include? File.extname(filename.downcase)
+      def extract_contents destination, options
+        File.open(archive_path, 'rb') do |file|
+          Gem::Package::TarReader.new(file) do |tar|
+            extract_files destination, options, tar
+          end
+        end
       end
 
-      def cleanup_original_archive
-        FileUtils.rm path
+      def extract_files destination, options, tar
+        tar.each do |entry|
+          next unless entry.file?
+          next if options[:images_only] && !image_file?(entry.full_name)
+
+          extract_single_file entry, destination
+        end
+      end
+
+      def extract_single_file entry, destination
+        file_path = File.join destination, entry.full_name
+        create_parent_directory file_path
+
+        File.binwrite file_path, entry.read
       end
     end
   end

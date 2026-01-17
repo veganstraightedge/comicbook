@@ -10,7 +10,7 @@ class ComicBook
         delete_original = options.fetch :delete_original, false
 
         output_path = options[:to] || determine_output_path(extension)
-        create_7z_archive output_path
+        create_archive output_path
         cleanup_source_folder if delete_original
 
         output_path
@@ -27,11 +27,11 @@ class ComicBook
         File.expand_path File.join(dir_name, "#{base_name}.#{extension}")
       end
 
-      def create_7z_archive output_path
+      def create_archive output_path
         File.open(output_path, 'wb') do |file|
-          SevenZipRuby::Writer.open(file) do |szw|
+          SevenZipRuby::Writer.open(file) do |writer|
             find_image_files.each do |image_file|
-              add_file_to_7z szw, image_file
+              add_file writer, image_file
             end
           end
         end
@@ -42,12 +42,12 @@ class ComicBook
         Dir.glob(pattern, File::FNM_CASEFOLD).sort
       end
 
-      def add_file_to_7z szw, file
+      def add_file writer, file
         file_path     = Pathname.new file
         source_path   = Pathname.new source_folder
         relative_path = file_path.relative_path_from source_path
 
-        szw.add_file file, as: relative_path.to_s
+        writer.add_file file, as: relative_path.to_s
       end
 
       def cleanup_source_folder

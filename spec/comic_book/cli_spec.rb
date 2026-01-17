@@ -106,6 +106,34 @@ RSpec.describe ComicBook::CLI do
           expect(ComicBook).to have_received(:extract).with cbz_file, {}
         end
       end
+
+      context 'with --images-only option' do
+        before do
+          allow(ComicBook).to receive(:extract).with cbz_file, { images_only: true }
+        end
+
+        it 'extracts only image files' do
+          expect { cli.start ['extract', cbz_file, '--images-only'] }
+            .to output(/Extracted #{Regexp.escape(cbz_file)}/)
+            .to_stdout
+
+          expect(ComicBook).to have_received(:extract).with cbz_file, { images_only: true }
+        end
+      end
+
+      context 'with --delete-original option' do
+        before do
+          allow(ComicBook).to receive(:extract).with cbz_file, { delete_original: true }
+        end
+
+        it 'deletes source archive after extraction' do
+          expect { cli.start ['extract', cbz_file, '--delete-original'] }
+            .to output(/Extracted #{Regexp.escape(cbz_file)}/)
+            .to_stdout
+
+          expect(ComicBook).to have_received(:extract).with cbz_file, { delete_original: true }
+        end
+      end
     end
 
     context 'with missing source file' do
@@ -140,21 +168,6 @@ RSpec.describe ComicBook::CLI do
     end
 
     context 'with unsupported formats' do
-      context 'with CBR files' do
-        let(:cbr_file) { File.join temp_dir, 'test.cbr' }
-
-        before do
-          FileUtils.touch cbr_file
-        end
-
-        it 'shows error' do
-          expect { cli.start ['extract', cbr_file] }
-            .to raise_error(SystemExit)
-            .and output(/Error: Unsupported format: .cbr/)
-            .to_stdout
-        end
-      end
-
       context 'with CBA files' do
         let(:cba_file) { File.join temp_dir, 'test.cba' }
 
@@ -183,7 +196,7 @@ RSpec.describe ComicBook::CLI do
 
       before do
         allow(ComicBook).to receive(:new).with(test_folder).and_return comic_book
-        allow(comic_book).to receive(:archive).with(no_args)
+        allow(comic_book).to receive(:archive).with({})
       end
 
       it 'archives folder' do
@@ -197,7 +210,7 @@ RSpec.describe ComicBook::CLI do
 
         before do
           allow(ComicBook).to receive(:new).with(test_folder).and_return comic_book
-          allow(comic_book).to receive(:archive).with(to: to_path)
+          allow(comic_book).to receive(:archive).with({ to: to_path })
         end
 
         it 'archives folder to specified path' do
@@ -210,13 +223,28 @@ RSpec.describe ComicBook::CLI do
       context 'with --from option' do
         before do
           allow(ComicBook).to receive(:new).with(test_folder).and_return comic_book
-          allow(comic_book).to receive(:archive).with(no_args)
+          allow(comic_book).to receive(:archive).with({})
         end
 
         it 'archives folder with --from option' do
           expect { cli.start ['archive', '--from', test_folder] }
             .to output(/Archived #{Regexp.escape(test_folder)}/)
             .to_stdout
+        end
+      end
+
+      context 'with --delete-original option' do
+        before do
+          allow(ComicBook).to receive(:new).with(test_folder).and_return comic_book
+          allow(comic_book).to receive(:archive).with({ delete_original: true })
+        end
+
+        it 'deletes source folder after archiving' do
+          expect { cli.start ['archive', test_folder, '--delete-original'] }
+            .to output(/Archived #{Regexp.escape(test_folder)}/)
+            .to_stdout
+
+          expect(comic_book).to have_received(:archive).with({ delete_original: true })
         end
       end
     end
@@ -264,6 +292,41 @@ RSpec.describe ComicBook::CLI do
           .to raise_error(SystemExit)
           .and output(/Error: Destination already exists/)
           .to_stdout
+      end
+    end
+
+    context 'with unsupported output formats' do
+      context 'with CBR output' do
+        let(:cbr_path) { File.join temp_dir, 'output.cbr' }
+
+        it 'shows error explaining RAR is proprietary' do
+          expect { cli.start ['archive', test_folder, '--to', cbr_path] }
+            .to raise_error(SystemExit)
+            .and output(/Error: Cannot archive to CBR format \(RAR is proprietary\)/)
+            .to_stdout
+        end
+      end
+
+      context 'with CBA output' do
+        let(:cba_path) { File.join temp_dir, 'output.cba' }
+
+        it 'shows error explaining ACE is not supported' do
+          expect { cli.start ['archive', test_folder, '--to', cba_path] }
+            .to raise_error(SystemExit)
+            .and output(/Error: Cannot archive to CBA format \(ACE is not supported\)/)
+            .to_stdout
+        end
+      end
+
+      context 'with unknown format' do
+        let(:unknown_path) { File.join temp_dir, 'output.xyz' }
+
+        it 'shows unsupported format error' do
+          expect { cli.start ['archive', test_folder, '--to', unknown_path] }
+            .to raise_error(SystemExit)
+            .and output(/Error: Unsupported archive format: .xyz/)
+            .to_stdout
+        end
       end
     end
   end

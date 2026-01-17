@@ -7,14 +7,15 @@ A Ruby library and CLI tool for managing comic books archives.
 
 **`archive`** — to create a `.cb*` file (default: `.cbz`).
 
-Currently supported formats, `archive` and `extract`:
+Currently supported formats for `archive` and `extract`:
 - CB7 — [7zip](https://en.wikipedia.org/wiki/7-Zip)
 - CBT — [Tar](https://en.wikipedia.org/wiki/Tar_(computing))
 - CBZ — [Zip](https://en.wikipedia.org/wiki/ZIP_(file_format))
 
-Planned formats , only `extract`:
+Currently supported formats for `extract` only:
+- **CBR** — [RAR](https://en.wikipedia.org/wiki/WinRAR) is proprietary without an open source implementation license. Extracting support is provided using vendored [`unar`](https://theunarchiver.com/command-line) binaries because a large number of comic books are archived in .cbr/.rar format. No support for creating `.cbr` files will ever be added until RAR is open source (or reverse engineered).
 
-- **CBR** — [RAR](https://en.wikipedia.org/wiki/WinRAR) is proprietary without an open source implementation license. People use WinRAR (Windows-only) to create .rar files. Or `unrar` on Linux/macOS to open .rar files. Extracting support is provided because a large number of comic books are archived in .cbr/.rar format, primarily by Windows users. No support for creating `.cbr` files will ever be added until RAR is opensource (or reverse engineered).
+Planned formats for `extract` only:
 - **CBA** — [ACE](https://en.wikipedia.org/wiki/WinAce) is both proprietary and very old/outdated/unsupported. ACE extracting support is provided for historical posterity and completeness.
 
 ## Installation
@@ -33,23 +34,50 @@ gem install comicbook
 
 ## Usage
 
-In Ruby, you can use the `ComicBook` class to `extract` comic books archives from various formats. You `archive` a folder of images to create a comic book archive.
+### CLI
 
-### Extracting
+```sh
+# Extract a comic book archive
+comicbook extract path/to/archive.cbz
+
+# Extract to a specific destination
+comicbook extract path/to/archive.cbz --to path/to/output
+
+# Extract only image files (exclude metadata like ComicInfo.xml)
+comicbook extract path/to/archive.cbz --images-only
+
+# Create a comic book archive from a folder
+comicbook archive path/to/folder
+
+# Create archive at a specific destination
+comicbook archive path/to/folder --to path/to/output.cbz
+
+# Show help
+comicbook --help
+```
+
+### Ruby API
 
 ```ruby
+# Extract a comic book archive (extracts all files by default)
 ComicBook.extract 'path/to/archive.cbz'
+
+# Extract to a specific destination
+ComicBook.extract 'path/to/archive.cbz', to: 'path/to/output'
+
+# Extract only image files (exclude metadata like ComicInfo.xml)
+ComicBook.extract 'path/to/archive.cbz', images_only: true
+
+# Create a comic book archive from a folder (creates .cbz by default)
+ComicBook.new('path/to/folder').archive
+
+# Create archive at a specific destination
+ComicBook.new('path/to/folder').archive to: 'path/to/output.cbz'
+
+# Get pages from an archive
+comic = ComicBook.new 'path/to/archive.cbz'
+comic.pages  # => [#<ComicBook::Page>, ...]
 ```
-### Archiving
-
-```ruby
-ComicBook.archive 'path/to/archive'
-```
-
-## Requirements
-
-- [`unar`](https://theunarchiver.com/command-line)
-   on macOS, you can install it using Homebrew: `brew install unar`
 
 ## Development
 
