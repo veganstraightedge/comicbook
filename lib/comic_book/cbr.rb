@@ -17,7 +17,7 @@ class ComicBook
     private
 
     def collect_pages_from_rar
-      entries = CLIHelpers.unrar_list path
+      entries = CLIHelpers.lsar_list path
 
       entries
         .select { |entry| image_file?(entry) }

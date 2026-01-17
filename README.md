@@ -13,7 +13,7 @@ Currently supported formats for `archive` and `extract`:
 - CBZ — [Zip](https://en.wikipedia.org/wiki/ZIP_(file_format))
 
 Currently supported formats for `extract` only:
-- **CBR** — [RAR](https://en.wikipedia.org/wiki/WinRAR) is proprietary without an open source implementation license. People use WinRAR (Windows-only) to create .rar files. Or `unrar` on Linux/macOS to open .rar files. Extracting support is provided because a large number of comic books are archived in .cbr/.rar format, primarily by Windows users. No support for creating `.cbr` files will ever be added until RAR is opensource (or reverse engineered).
+- **CBR** — [RAR](https://en.wikipedia.org/wiki/WinRAR) is proprietary without an open source implementation license. Extracting support is provided using vendored [`unar`](https://theunarchiver.com/command-line) binaries because a large number of comic books are archived in .cbr/.rar format. No support for creating `.cbr` files will ever be added until RAR is open source (or reverse engineered).
 
 Planned formats for `extract` only:
 - **CBA** — [ACE](https://en.wikipedia.org/wiki/WinAce) is both proprietary and very old/outdated/unsupported. ACE extracting support is provided for historical posterity and completeness.
@@ -78,11 +78,6 @@ ComicBook.new('path/to/folder').archive to: 'path/to/output.cbz'
 comic = ComicBook.new 'path/to/archive.cbz'
 comic.pages  # => [#<ComicBook::Page>, ...]
 ```
-
-## Requirements
-
-- [`unar`](https://theunarchiver.com/command-line)
-   on macOS, you can install it using Homebrew: `brew install unar`
 
 ## Development
 
