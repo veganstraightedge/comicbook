@@ -5,15 +5,16 @@ class ComicBook
   class CLIHelpers
     class << self
       def binary_path name
-        case Ruby::PLATFORM
+        case RUBY_PLATFORM
         when /darwin/
           File.expand_path "../vendor/macos/#{name}", __FILE__
         when /linux/
-          check_linux_dependency! name and name
+          check_linux_dependency! name
+          name
         when /mingw/
           File.expand_path "../vendor/windows/#{name}", __FILE__
         else
-          raise "Unsupported platform: #{Ruby::PLATFORM}"
+          raise "Unsupported platform: #{RUBY_PLATFORM}"
         end
       end
 
