@@ -1,6 +1,8 @@
 require_relative 'comic_book/version'
 require_relative 'comic_book/page'
+require_relative 'comic_book/cb'
 require_relative 'comic_book/cb7'
+require_relative 'comic_book/cba'
 require_relative 'comic_book/cbr'
 require_relative 'comic_book/cbt'
 require_relative 'comic_book/cbz'
@@ -40,13 +42,23 @@ class ComicBook
   end
 
   def archive options = {}
-    raise Error, 'Cannot archive a file' unless type == :folder
+    raise Error, 'Cannot archive a file' unless %i[folder cb].include?(type)
 
-    CBZ.new(path).archive options
+    output_format = options[:to] ? File.extname(options[:to]).downcase : '.cbz'
+
+    case output_format
+    when '.cb'  then CB.new(path).archive options
+    when '.cb7' then CB7.new(path).archive options
+    when '.cbt' then CBT.new(path).archive options
+    when '.cbz' then CBZ.new(path).archive options
+    else
+      raise Error, "Unsupported archive format: #{output_format}"
+    end
   end
 
   def extract options = {}
     raise Error, 'Cannot extract a folder' if type == :folder
+    raise Error, '.cb folders are already extracted (they are uncompressed folders)' if type == :cb
 
     adapter.extract options
   end
@@ -55,7 +67,7 @@ class ComicBook
 
   def determine_type path
     if File.directory? path
-      :folder
+      File.extname(path).downcase == '.cb' ? :cb : :folder
     elsif File.file? path
       extension = File.extname(path).downcase
 
@@ -93,8 +105,9 @@ class ComicBook
 
   def adapter
     case type
+    when :cb  then CB.new path
     when :cb7 then CB7.new path
-    # when :cba then CBA.new path
+    when :cba then CBA.new path
     when :cbr then CBR.new path
     when :cbt then CBT.new path
     when :cbz then CBZ.new path

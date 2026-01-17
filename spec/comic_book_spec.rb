@@ -149,8 +149,8 @@ RSpec.describe ComicBook do
     end
 
     context 'when loading a .cb folder' do
-      it 'detects folders' do
-        expect(type).to eq :folder
+      it 'detects .cb folders' do
+        expect(type).to eq :cb
       end
     end
   end
