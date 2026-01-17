@@ -2,8 +2,8 @@ require 'optparse'
 
 class ComicBook
   class CLI
-    EXTRACT_FORMATS     = %w[.cb7 .cbr .cbt .cbz].freeze
-    ARCHIVE_FORMATS     = %w[.cb7 .cbt .cbz].freeze
+    EXTRACT_FORMATS     = %w[.cb .cb7 .cbr .cbt .cbz].freeze
+    ARCHIVE_FORMATS     = %w[.cb .cb7 .cbt .cbz].freeze
     UNSUPPORTED_FORMATS = %w[.cba].freeze
 
     def self.start argv
@@ -36,7 +36,7 @@ class ComicBook
 
     def show_help
       puts <<~HELP
-        ComicBook CLI for .cb7, .cbt, .cbz, .cbr files
+        ComicBook CLI for .cb, .cb7, .cbt, .cbz, .cbr files
 
         Usage:
           comicbook extract <file> [options]
@@ -44,8 +44,8 @@ class ComicBook
           comicbook -h, --help
 
         Commands:
-          extract  Extract comic book archive
-          archive  Create comic book archive (excluding .cbr)
+          extract  Extract comic book archive (.cb7, .cbr, .cbt, .cbz, .cb)
+          archive  Create comic book archive (.cb7, .cbt, .cbz, .cb)
 
         Extract Options:
           --from            Source file path (optional, first arg is default)
@@ -55,7 +55,7 @@ class ComicBook
 
         Archive Options:
           --from            Source folder path (optional, first arg is default)
-          --to              Destination path
+          --to              Destination path (extension determines format, default .cbz)
           --delete-original Delete source folder after archiving
 
         General Options:
@@ -127,6 +127,11 @@ class ComicBook
 
       # formats
       ext = File.extname(from_path).downcase
+
+      if ext == '.cb' && File.directory?(from_path)
+        raise ComicBook::Error, '.cb folders are already extracted (they are uncompressed folders)'
+      end
+
       raise ComicBook::Error, "Unsupported format: #{ext} (not yet implemented)" unless EXTRACT_FORMATS.include?(ext)
 
       nil
