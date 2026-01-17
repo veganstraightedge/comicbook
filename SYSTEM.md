@@ -230,6 +230,6 @@ ComicBook::Error < StandardError
 The adapter pattern makes it easy to add new formats or extend existing ones without modifying core functionality.
 
 ## Version Information
-- **Current Version**: 0.1.0
-- **Ruby Requirement**: >= 3.4.7
+- **Current Version**: 0.2.0
+- **Ruby Requirement**: >= 4.0.0
 - **License**: MIT
