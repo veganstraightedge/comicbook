@@ -12,18 +12,14 @@ class ComicBook
       Extractor.new(path).extract options
     end
 
-    def pages = collect_pages_from_rar
+    def pages
+      CLIHelpers.lsar_list(path)
+                .select { image_file? it }
+                .map    { create_page_from_entry it }
+                .sort_by(&:name)
+    end
 
     private
-
-    def collect_pages_from_rar
-      entries = CLIHelpers.lsar_list path
-
-      entries
-        .select { |entry| image_file?(entry) }
-        .map { |entry| create_page_from_entry(entry) }
-        .sort_by(&:name)
-    end
 
     def create_page_from_entry entry
       basename = File.basename entry
@@ -32,7 +28,7 @@ class ComicBook
     end
 
     def image_file? filename
-      extension = File.extname(filename.downcase)
+      extension = File.extname filename.downcase
 
       ComicBook::IMAGE_EXTENSIONS.include? extension
     end

@@ -13,34 +13,32 @@ class ComicBook
       Extractor.new(path).extract options
     end
 
-    def pages = collect_pages_from_7z
-
-    private
-
-    def collect_pages_from_7z
-      pages = []
+    def pages
+      entries = []
 
       File.open(path, 'rb') do |file|
-        SevenZipRuby::Reader.open(file) do |seven_zip_reader|
-          seven_zip_reader.entries.each do |entry|
-            next unless entry.file? && image_file?(entry.path)
-
-            pages << create_page_from_entry(entry)
+        SevenZipRuby::Reader.open(file) do |reader|
+          reader.entries.each do |entry|
+            entries << entry.path if entry.file?
           end
         end
       end
 
-      pages.sort_by(&:name)
+      entries.select { image_file? it }
+             .map    { create_page_from_entry it }
+             .sort_by(&:name)
     end
 
-    def create_page_from_entry entry
-      basename = File.basename(entry.path)
+    private
 
-      ComicBook::Page.new entry.path, basename
+    def create_page_from_entry entry
+      basename = File.basename entry
+
+      ComicBook::Page.new entry, basename
     end
 
     def image_file? filename
-      extension = File.extname(filename.downcase)
+      extension = File.extname filename.downcase
 
       ComicBook::IMAGE_EXTENSIONS.include? extension
     end

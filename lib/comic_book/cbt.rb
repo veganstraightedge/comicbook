@@ -13,30 +13,28 @@ class ComicBook
       Extractor.new(path).extract options
     end
 
-    def pages = collect_pages_from_tar
-
-    private
-
-    def collect_pages_from_tar
-      pages = []
+    def pages
+      entries = []
 
       File.open(path, 'rb') do |file|
-        Gem::Package::TarReader.new(file) do |tar|
-          tar.each do |entry|
-            next unless entry.file? && image_file?(entry.full_name)
-
-            pages << create_page_from_entry(entry)
+        Gem::Package::TarReader.new(file) do |reader|
+          reader.each do |entry|
+            entries << entry.full_name if entry.file?
           end
         end
       end
 
-      pages.sort_by &:name
+      entries.select { image_file? it }
+             .map    { create_page_from_entry it }
+             .sort_by(&:name)
     end
 
-    def create_page_from_entry entry
-      basename = File.basename entry.full_name
+    private
 
-      ComicBook::Page.new entry.full_name, basename
+    def create_page_from_entry entry
+      basename = File.basename entry
+
+      ComicBook::Page.new entry, basename
     end
 
     def image_file? filename
