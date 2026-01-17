@@ -8,8 +8,7 @@ class ComicBook
         when /darwin/  then 'macos'
         when /linux/   then 'linux'
         when /mingw/   then 'windows'
-        else
-          raise "Unsupported platform: #{RUBY_PLATFORM}"
+        else raise "Unsupported platform: #{RUBY_PLATFORM}"
         end
       end
 
