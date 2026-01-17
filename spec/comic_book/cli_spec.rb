@@ -106,6 +106,20 @@ RSpec.describe ComicBook::CLI do
           expect(ComicBook).to have_received(:extract).with cbz_file, {}
         end
       end
+
+      context 'with --images-only option' do
+        before do
+          allow(ComicBook).to receive(:extract).with cbz_file, { images_only: true }
+        end
+
+        it 'extracts only image files' do
+          expect { cli.start ['extract', cbz_file, '--images-only'] }
+            .to output(/Extracted #{Regexp.escape(cbz_file)}/)
+            .to_stdout
+
+          expect(ComicBook).to have_received(:extract).with cbz_file, { images_only: true }
+        end
+      end
     end
 
     context 'with missing source file' do
@@ -140,21 +154,6 @@ RSpec.describe ComicBook::CLI do
     end
 
     context 'with unsupported formats' do
-      context 'with CBR files' do
-        let(:cbr_file) { File.join temp_dir, 'test.cbr' }
-
-        before do
-          FileUtils.touch cbr_file
-        end
-
-        it 'shows error' do
-          expect { cli.start ['extract', cbr_file] }
-            .to raise_error(SystemExit)
-            .and output(/Error: Unsupported format: .cbr/)
-            .to_stdout
-        end
-      end
-
       context 'with CBA files' do
         let(:cba_file) { File.join temp_dir, 'test.cba' }
 

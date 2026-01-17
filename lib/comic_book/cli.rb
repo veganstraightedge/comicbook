@@ -2,8 +2,8 @@ require 'optparse'
 
 class ComicBook
   class CLI
-    SUPPORTED_FORMATS   = %w[.cb7 .cbt .cbz].freeze
-    UNSUPPORTED_FORMATS = %w[.cbr .cba].freeze
+    SUPPORTED_FORMATS   = %w[.cb7 .cbr .cbt .cbz].freeze
+    UNSUPPORTED_FORMATS = %w[.cba].freeze
 
     def self.start argv
       new.start Array(argv)
@@ -37,35 +37,47 @@ class ComicBook
         ComicBook CLI
 
         Usage:
-          comicbook extract <file> [--to <path>]
-          comicbook archive <folder> [--to <path>]
+          comicbook extract <file> [options]
+          comicbook archive <folder> [options]
           comicbook -h, --help
 
         Commands:
           extract     Extract comic book archive
           archive     Create comic book archive
 
-        Options:
-          --from      Source path (optional, first arg is default)
-          --to        Destination path
-          --help, -h  Show this help
+        Extract Options:
+          --from         Source file path (optional, first arg is default)
+          --to           Destination path
+          --images-only  Extract only image files (exclude metadata, text, etc.)
+
+        Archive Options:
+          --from         Source folder path (optional, first arg is default)
+          --to           Destination path
+
+        General Options:
+          --help, -h     Show this help
       HELP
     end
 
     def extract argv
-      from_path = nil
-      to_path   = nil
+      from_path   = nil
+      to_path     = nil
+      images_only = false
 
       parser = OptionParser.new do |opts|
-        opts.on('--from PATH', 'Source file path') { from_path = it }
-        opts.on('--to PATH',   'Destination path') { to_path   = it }
+        opts.on('--from PATH',   'Source file path')       { from_path   = it }
+        opts.on('--to PATH',     'Destination path')       { to_path     = it }
+        opts.on('--images-only', 'Extract only images')    { images_only = true }
       end
 
       remaining = parser.parse argv
       from_path ||= remaining.first
 
       validate_extract_args! from_path, to_path
-      ComicBook.extract from_path, { to: to_path }.compact
+
+      options = { to: to_path, images_only: images_only }.compact
+      options.delete(:images_only) unless images_only
+      ComicBook.extract from_path, options
 
       puts "Extracted #{from_path}#{" to #{to_path}" if to_path}"
     end
