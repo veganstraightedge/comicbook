@@ -64,10 +64,10 @@ class ComicBook
         archive_entries = CLIHelpers.lsar_list archive_path
 
         archive_entries.each do |entry|
-          next if image_file?(entry)
+          next if image_file? entry
 
           file_path = File.join(destination, entry)
-          FileUtils.rm_f(file_path)
+          FileUtils.rm_f file_path
         end
       end
     end
