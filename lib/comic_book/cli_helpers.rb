@@ -26,7 +26,7 @@ class ComicBook
       def lsar_list archive_path
         bin_path = binary_path 'lsar'
 
-        output, status = Open3.capture2e bin_path, archive_path
+        output, status = Open3.capture2e(bin_path, archive_path)
 
         raise Error, "lsar failed: #{output}" unless status.success?
 
@@ -36,11 +36,13 @@ class ComicBook
       def unar_extract archive_path, destination
         bin_path = binary_path 'unar'
 
-        output, status = Open3.capture2e bin_path,
-                                         '-o', destination,
-                                         '-f',
-                                         '-D',
-                                         archive_path
+        output, status = Open3.capture2e(
+          bin_path,
+          '-o', destination,
+          '-f',
+          '-D',
+          archive_path
+        )
 
         raise Error, "unar extraction failed: #{output}" unless status.success?
 
