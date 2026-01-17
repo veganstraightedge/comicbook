@@ -12,7 +12,7 @@ class ComicBook
 
         destination = destination_folder || determine_extract_path(extension)
         create_destination_directory destination
-        extract_contents destination
+        extract_contents destination, options
         cleanup_archive_file if delete_original
 
         destination
@@ -50,10 +50,10 @@ class ComicBook
         FileUtils.mkdir_p parent_dir
       end
 
-      def extract_contents destination
+      def extract_contents destination, options
         FileUtils.mkdir_p destination
         CLIHelpers.unrar_extract archive_path, destination
-        delete_extracted_non_images destination
+        delete_extracted_non_images destination unless options[:all]
       end
 
       def delete_extracted_non_images destination

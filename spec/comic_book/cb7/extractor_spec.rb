@@ -115,6 +115,16 @@ RSpec.describe ComicBook::CB7::Extractor do
         expect(File).not_to exist text_file_in_archive
         expect(File).not_to exist json_file_in_archive
       end
+
+      context 'when all option is true' do
+        let(:extracted_folder_path) { extractor.extract all: true }
+
+        it 'extracts all files including non-images' do
+          expect(File).to exist image_in_archive
+          expect(File).to exist text_file_in_archive
+          expect(File).to exist json_file_in_archive
+        end
+      end
     end
 
     context 'when delete_original is true' do

@@ -12,7 +12,7 @@ class ComicBook
 
         destination = destination_folder || determine_extract_path(extension)
         create_destination_directory destination
-        extract_contents destination
+        extract_contents destination, options
         cleanup_archive_file if delete_original
 
         destination
@@ -50,19 +50,19 @@ class ComicBook
         FileUtils.mkdir_p parent_dir
       end
 
-      def extract_contents destination
+      def extract_contents destination, options
         FileUtils.mkdir_p destination
 
         Dir.chdir(File.dirname(destination)) do
           destination_basename = File.basename destination
-          extract_files destination_basename
+          extract_files destination_basename, options
         end
       end
 
-      def extract_files destination_basename
+      def extract_files destination_basename, options
         Zip::File.open(archive_path) do |zipfile|
           zipfile.each do |entry|
-            next unless image_file?(entry.name)
+            next unless options[:all] || image_file?(entry.name)
 
             extract_single_file entry, destination_basename
           end

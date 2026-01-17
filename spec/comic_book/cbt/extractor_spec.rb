@@ -99,15 +99,25 @@ RSpec.describe ComicBook::CBT::Extractor do
 
     context 'with non-images in the archive' do
       let(:test_cbt) { File.join temp_dir, 'mixed.cbt' }
+      let(:image_in_archive) { File.join extracted_folder_path, 'page1.jpg' }
+      let(:text_file_in_archive) { File.join extracted_folder_path, 'readme.txt' }
 
       before do
         load_fixture('cbt/mixed.cbt').copy_to test_cbt
       end
 
       it 'ignores non-image files' do
-        text_file = File.join extracted_folder_path, 'readme.txt'
+        expect(File).to exist image_in_archive
+        expect(File).not_to exist text_file_in_archive
+      end
 
-        expect(File).not_to exist text_file
+      context 'when all option is true' do
+        let(:extracted_folder_path) { extractor.extract all: true }
+
+        it 'extracts all files including non-images' do
+          expect(File).to exist image_in_archive
+          expect(File).to exist text_file_in_archive
+        end
       end
     end
 

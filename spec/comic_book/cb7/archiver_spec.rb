@@ -156,7 +156,6 @@ RSpec.describe ComicBook::CB7::Archiver do
 
     context 'with mixed fixture' do
       let(:source_folder) { File.join temp_dir, 'mixed' }
-      let(:expected_cb7) { load_fixture('cb7/mixed.cb7').path }
 
       before do
         load_fixture('originals/mixed/page1.jpg').copy_to File.join(source_folder, 'page1.jpg')
@@ -164,7 +163,7 @@ RSpec.describe ComicBook::CB7::Archiver do
         load_fixture('originals/mixed/data.json').copy_to File.join(source_folder, 'data.json')
       end
 
-      it 'creates archive matching mixed.cb7 fixture' do
+      it 'creates archive with only image files' do
         output_path = archiver.archive
 
         created_entries = []
@@ -174,14 +173,7 @@ RSpec.describe ComicBook::CB7::Archiver do
           end
         end
 
-        expected_entries = []
-        File.open(expected_cb7, 'rb') do |file|
-          SevenZipRuby::Reader.open(file) do |seven_zip_reader|
-            expected_entries = seven_zip_reader.entries.map(&:path).sort
-          end
-        end
-
-        expect(created_entries).to eq expected_entries
+        expect(created_entries).to eq ['page1.jpg']
       end
 
       it 'only includes image files' do
