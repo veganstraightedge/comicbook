@@ -46,6 +46,11 @@ ComicBook.extract 'path/to/archive.cbz'
 ComicBook.archive 'path/to/archive'
 ```
 
+## Requirements
+
+- [`unar`](https://theunarchiver.com/command-line)
+   on macOS, you can install it using Homebrew: `brew install unar`
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
