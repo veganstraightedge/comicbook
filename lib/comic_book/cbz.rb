@@ -13,21 +13,19 @@ class ComicBook
       Extractor.new(path).extract options
     end
 
-    def pages = collect_pages
-
-    private
-
-    def collect_pages
+    def pages
       entries = []
 
       Zip::File.open(path) do |zipfile|
         zipfile.each { |entry| entries << entry.name }
       end
 
-      entries.select { |entry| image_file?(entry) }
-             .map { |entry| create_page_from_entry(entry) }
+      entries.select { image_file? it }
+             .map    { create_page_from_entry it }
              .sort_by(&:name)
     end
+
+    private
 
     def create_page_from_entry entry
       basename = File.basename entry
