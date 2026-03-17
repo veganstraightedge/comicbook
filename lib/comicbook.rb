@@ -12,6 +12,8 @@ require_relative 'comic_book/cli_helpers'
 class ComicBook
   class Error < StandardError; end
 
+  Info = ComicInfo::Issue
+
   IMAGE_EXTENSIONS   = %w[.jpg .jpeg .png .gif .bmp .webp].freeze
   IMAGE_GLOB_PATTERN = '*.{jpg,jpeg,png,gif,bmp,webp}'.freeze
 

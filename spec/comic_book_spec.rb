@@ -320,7 +320,7 @@ RSpec.describe ComicBook do
       end
 
       it 'returns a ComicInfo object' do
-        expect(cb.info).to be_a ComicInfo::Issue
+        expect(cb.info).to be_a ComicBook::Info
       end
 
       it 'has correct title' do
@@ -354,7 +354,7 @@ RSpec.describe ComicBook do
       end
 
       it 'returns a ComicInfo object' do
-        expect(cb.info).to be_a ComicInfo::Issue
+        expect(cb.info).to be_a ComicBook::Info
         expect(cb.info.title).to eq 'The Amazing Spider-Man'
       end
     end

@@ -134,7 +134,7 @@ RSpec.describe ComicBook::CB7 do
       end
 
       it 'returns a ComicInfo object' do
-        expect(adapter.info).to be_a ComicInfo::Issue
+        expect(adapter.info).to be_a ComicBook::Info
       end
 
       it 'has correct title' do
