@@ -192,12 +192,12 @@ class ComicBook
     def format_info data, output_format
       data = data.compact
 
-      case output_format
-      when 'json'    then format_json(data)
-      when 'yaml'    then format_yaml(data)
-      when 'terse'   then format_terse(data)
-      when 'verbose' then format_verbose(data)
-      end
+      {
+        'json'    => format_json(data),
+        'yaml'    => format_yaml(data),
+        'terse'   => format_terse(data),
+        'verbose' => format_verbose(data)
+      }[output_format]
     end
 
     def format_json data
