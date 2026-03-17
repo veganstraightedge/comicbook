@@ -195,8 +195,8 @@ class ComicBook
       case output_format
       when 'json'    then format_json(data)
       when 'yaml'    then format_yaml(data)
-      when 'terse'   then format_terse(clean_for_display(data))
-      when 'verbose' then format_verbose(clean_for_display(data))
+      when 'terse'   then format_terse(data)
+      when 'verbose' then format_verbose(data)
       end
     end
 
@@ -213,16 +213,14 @@ class ComicBook
     end
 
     def format_terse data
-      data.map { |key, value| "#{key}=#{value}" }.join(' | ')
+      clean_for_display(data).map { |key, value| "#{key}=#{value}" }.join(' | ')
     end
 
     def format_verbose data
+      data = clean_for_display(data)
       max_key_length = data.keys.map { it.to_s.length }.max || 0
 
-      data.map do |key, value|
-        label = key.to_s.ljust max_key_length
-        "#{label}  #{value}"
-      end.join("\n")
+      data.map { |key, value| "#{key.to_s.ljust max_key_length}  #{value}" }.join("\n")
     end
 
     def validate_extract_args! from_path, to_path
