@@ -2,6 +2,7 @@ PATH
   remote: .
   specs:
     comicbook (0.2.0)
+      ruby-vips (>= 2.3)
       rubyzip (>= 3.2.2)
       seven-zip (~> 1.4)
 
@@ -12,6 +13,7 @@ GEM
     date (3.5.1)
     diff-lcs (1.6.2)
     erb (6.0.1)
+    ffi (1.17.3-arm64-darwin)
     io-console (0.8.2)
     irb (1.16.0)
       pp (>= 0.6.0)
@@ -20,6 +22,7 @@ GEM
     json (2.18.0)
     language_server-protocol (3.17.0.5)
     lint_roller (1.1.0)
+    logger (1.7.0)
     parallel (1.27.0)
     parser (3.3.10.1)
       ast (~> 2.4.1)
@@ -81,6 +84,9 @@ GEM
       lint_roller (~> 1.1)
       rubocop (~> 1.81)
     ruby-progressbar (1.13.0)
+    ruby-vips (2.3.0)
+      ffi (~> 1.12)
+      logger
     rubyzip (3.2.2)
     seven-zip (1.4.2)
     stringio (3.2.0)
@@ -91,7 +97,6 @@ GEM
 
 PLATFORMS
   arm64-darwin-25
-  x86_64-linux
 
 DEPENDENCIES
   comicbook!

@@ -136,6 +136,23 @@ RSpec.describe ComicBook::CLI do
       end
     end
 
+    context 'with PDF file' do
+      let(:pdf_file) { File.join temp_dir, 'test.pdf' }
+
+      before do
+        load_fixture('pdf/simple.pdf').copy_to pdf_file
+        allow(ComicBook).to receive(:extract).with pdf_file, {}
+      end
+
+      it 'extracts pdf file' do
+        expect { cli.start ['extract', pdf_file] }
+          .to output(/Extracted #{Regexp.escape(pdf_file)}/)
+          .to_stdout
+
+        expect(ComicBook).to have_received(:extract).with pdf_file, {}
+      end
+    end
+
     context 'with missing source file' do
       it 'shows error for nonexistent file' do
         expect { cli.start ['extract', 'nonexistent.cbz'] }
