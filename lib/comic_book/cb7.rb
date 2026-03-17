@@ -20,7 +20,7 @@ class ComicBook
       File.open(path, 'rb') do |file|
         SevenZipRuby::Reader.open(file) do |reader|
           entry = reader.entries.find { it.path == 'ComicInfo.xml' }
-          xml = reader.extract_data(entry.index) if entry
+          xml   = reader.extract_data(entry.index) if entry
         end
       end
 
