@@ -125,6 +125,40 @@ RSpec.describe ComicBook::CBT do
     end
   end
 
+  describe '#info' do
+    context 'with ComicInfo.xml in the archive' do
+      subject(:adapter) { described_class.new test_cbt }
+
+      let(:test_cbt) { File.join temp_dir, 'with_comicinfo.cbt' }
+
+      before do
+        load_fixture('cbt/with_comicinfo.cbt').copy_to test_cbt
+      end
+
+      it 'returns a ComicInfo object' do
+        expect(adapter.info).to be_a ComicInfo::Issue
+      end
+
+      it 'has correct title' do
+        expect(adapter.info.title).to eq 'The Amazing Spider-Man'
+      end
+    end
+
+    context 'without ComicInfo.xml in the archive' do
+      subject(:adapter) { described_class.new test_cbt }
+
+      let(:test_cbt) { File.join temp_dir, 'simple.cbt' }
+
+      before do
+        load_fixture('cbt/simple.cbt').copy_to test_cbt
+      end
+
+      it 'returns nil' do
+        expect(adapter.info).to be_nil
+      end
+    end
+  end
+
   describe '#pages' do
     subject(:adapter) { described_class.new test_cbt }
 
