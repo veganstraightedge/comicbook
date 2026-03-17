@@ -21,7 +21,7 @@ class ComicBook
       def check_linux_dependency! name
         return if system("which #{name} > /dev/null 2>&1")
 
-        raise Error, "#{name} is not installed. Install it with: sudo apt-get install unar"
+        raise Error, "#{name} is not installed. Install with: sudo apt-get install unar (Ubuntu/Debian)"
       end
 
       def lsar_list archive_path

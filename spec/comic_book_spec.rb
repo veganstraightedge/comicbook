@@ -136,6 +136,14 @@ RSpec.describe ComicBook do
         expect(type).to eq :cba
       end
     end
+
+    context 'when loading a .pdf' do
+      let(:file_ext) { '.pdf' }
+
+      it 'detects .pdf files' do
+        expect(type).to eq :pdf
+      end
+    end
   end
 
   describe 'folder detection' do

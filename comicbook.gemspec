@@ -50,6 +50,7 @@ Gem::Specification.new do |spec|
   spec.bindir        = 'exe'
 
   # Runtime dependencies
+  spec.add_dependency 'ruby-vips', '>= 2.3'
   spec.add_dependency 'rubyzip', '>= 3.2.2'
   spec.add_dependency 'seven-zip', '~> 1.4'
 end

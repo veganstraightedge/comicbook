@@ -6,6 +6,7 @@ require_relative 'comic_book/cba'
 require_relative 'comic_book/cbr'
 require_relative 'comic_book/cbt'
 require_relative 'comic_book/cbz'
+require_relative 'comic_book/pdf'
 require_relative 'comic_book/cli_helpers'
 
 class ComicBook
@@ -77,6 +78,7 @@ class ComicBook
       when '.cbt' then :cbt
       when '.cbr' then :cbr
       when '.cba' then :cba
+      when '.pdf' then :pdf
       else
         raise Error, "Unsupported file type: #{File.extname(path)}"
       end
@@ -111,6 +113,7 @@ class ComicBook
     when :cbr then CBR.new path
     when :cbt then CBT.new path
     when :cbz then CBZ.new path
+    when :pdf then PDF.new path
     else
       raise Error, "No adapter available for type: #{type}"
     end

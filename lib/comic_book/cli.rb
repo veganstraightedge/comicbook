@@ -2,7 +2,7 @@ require 'optparse'
 
 class ComicBook
   class CLI
-    EXTRACT_FORMATS     = %w[.cb .cb7 .cbr .cbt .cbz].freeze
+    EXTRACT_FORMATS     = %w[.cb .cb7 .cbr .cbt .cbz .pdf].freeze
     ARCHIVE_FORMATS     = %w[.cb .cb7 .cbt .cbz].freeze
     UNSUPPORTED_FORMATS = %w[.cba].freeze
 
@@ -36,7 +36,7 @@ class ComicBook
 
     def show_help
       puts <<~HELP
-        ComicBook CLI for .cb, .cb7, .cbt, .cbz, .cbr files
+        ComicBook CLI for .cb, .cb7, .cbt, .cbz, .cbr, .pdf files
 
         Usage:
           comicbook extract <file> [options]
@@ -44,7 +44,7 @@ class ComicBook
           comicbook -h, --help
 
         Commands:
-          extract  Extract comic book archive (.cb7, .cbr, .cbt, .cbz, .cb)
+          extract  Extract comic book archive (.cb7, .cbr, .cbt, .cbz, .cb, .pdf)
           archive  Create comic book archive (.cb7, .cbt, .cbz, .cb)
 
         Extract Options:
