@@ -1,6 +1,13 @@
 ## [Unreleased]
 
-## [0.2.0] - 2025-01-17
+### Added
+
+- PDF to comic book conversion (PDF → .cb → .cbz/.cb7/.cbt)
+- PDF adapter with extract and pages support using libvips
+- `ruby-vips` gem dependency (lazy-loaded, only required for PDF features)
+- Install `libvips-dev` in CI workflow
+
+## [0.2.0] - 2025-11-17
 
 ### Added
 
