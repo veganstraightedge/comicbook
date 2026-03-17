@@ -181,9 +181,9 @@ class ComicBook
 
     def filter_fields data, only_fields, except_fields
       if only_fields
-        data.select { |key, _| only_fields.include? key.to_s }
+        data.slice(*only_fields.map(&:to_sym))
       elsif except_fields
-        data.reject { |key, _| except_fields.include? key.to_s }
+        data.except(*except_fields.map(&:to_sym))
       else
         data
       end

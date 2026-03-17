@@ -19,7 +19,7 @@ class ComicBook
 
       Zip::File.open(path) do |zipfile|
         entry = zipfile.find_entry('ComicInfo.xml')
-        xml = entry&.get_input_stream&.read
+        xml   = entry&.get_input_stream&.read
       end
 
       return nil unless xml
