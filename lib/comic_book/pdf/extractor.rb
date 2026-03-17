@@ -1,5 +1,3 @@
-require 'vips'
-
 class ComicBook
   class PDF < Adapter
     class Extractor
@@ -39,6 +37,7 @@ class ComicBook
       end
 
       def page_count
+        require 'vips'
         image = Vips::Image.new_from_file pdf_path
         image.get 'n-pages'
       rescue Vips::Error
@@ -55,6 +54,7 @@ class ComicBook
       end
 
       def render_page destination, page_number
+        require 'vips'
         image     = Vips::Image.new_from_file pdf_path, page: page_number
         file_name = format('page_%03d.jpg', page_number + 1)
         file_path = File.join destination, file_name

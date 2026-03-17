@@ -1,4 +1,3 @@
-require 'vips'
 require_relative 'adapter'
 require_relative 'pdf/extractor'
 
@@ -9,10 +8,12 @@ class ComicBook
     end
 
     def extract options = {}
+      require_vips!
       Extractor.new(path).extract options
     end
 
     def pages
+      require_vips!
       image = Vips::Image.new_from_file path
       count = image.get 'n-pages'
 
@@ -23,6 +24,14 @@ class ComicBook
       end
     rescue Vips::Error
       []
+    end
+
+    private
+
+    def require_vips!
+      require 'vips'
+    rescue LoadError
+      raise ComicBook::Error, 'PDF support requires libvips. Install with: brew install vips (macOS) or apt install libvips-dev (Linux)'
     end
   end
 end
