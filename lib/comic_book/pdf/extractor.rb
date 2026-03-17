@@ -40,7 +40,9 @@ class ComicBook
         require 'vips'
         image = Vips::Image.new_from_file pdf_path
         image.get 'n-pages'
-      rescue Vips::Error
+      rescue StandardError => e
+        raise unless e.class.name == 'Vips::Error' # rubocop:disable Style/ClassEqualityComparison
+
         0
       end
 

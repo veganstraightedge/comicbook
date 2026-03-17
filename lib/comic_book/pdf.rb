@@ -22,7 +22,9 @@ class ComicBook
 
         ComicBook::Page.new name, name
       end
-    rescue Vips::Error
+    rescue StandardError => e
+      raise unless e.class.name == 'Vips::Error' # rubocop:disable Style/ClassEqualityComparison
+
       []
     end
 
@@ -31,7 +33,9 @@ class ComicBook
     def require_vips!
       require 'vips'
     rescue LoadError
-      raise ComicBook::Error, 'PDF support requires libvips. Install with: brew install vips (macOS) or apt install libvips-dev (Linux)'
+      raise ComicBook::Error,
+            'PDF support requires libvips. ' \
+            'Install with: brew install vips (macOS) or apt install libvips-dev (Linux)'
     end
   end
 end
