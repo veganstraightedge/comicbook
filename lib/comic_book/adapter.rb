@@ -19,6 +19,10 @@ class ComicBook
       raise NotImplementedError, "#{self.class} must implement #pages"
     end
 
+    def info
+      raise NotImplementedError, "#{self.class} must implement #info"
+    end
+
     private
 
     attr_reader :path

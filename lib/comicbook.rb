@@ -42,6 +42,12 @@ class ComicBook
     end
   end
 
+  def info
+    return CB.new(path).info if type == :folder
+
+    adapter.info
+  end
+
   def archive options = {}
     raise Error, 'Cannot archive a file' unless %i[folder cb].include?(type)
 

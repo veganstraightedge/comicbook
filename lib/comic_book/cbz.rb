@@ -1,4 +1,5 @@
 require 'zip'
+require 'comicinfo'
 require_relative 'adapter'
 require_relative 'cbz/archiver'
 require_relative 'cbz/extractor'
@@ -11,6 +12,19 @@ class ComicBook
 
     def extract options = {}
       Extractor.new(path).extract options
+    end
+
+    def info
+      xml = nil
+
+      Zip::File.open(path) do |zipfile|
+        entry = zipfile.find_entry('ComicInfo.xml')
+        xml = entry&.get_input_stream&.read
+      end
+
+      return nil unless xml
+
+      ComicInfo.load xml
     end
 
     def pages

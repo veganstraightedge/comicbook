@@ -1,3 +1,4 @@
+require 'comicinfo'
 require_relative 'adapter'
 require_relative 'cb/archiver'
 require_relative 'cb/extractor'
@@ -6,6 +7,13 @@ class ComicBook
   class CB < Adapter
     def archive options = {}
       Archiver.new(path).archive options
+    end
+
+    def info
+      xml_path = File.join path, 'ComicInfo.xml'
+      return nil unless File.exist? xml_path
+
+      ComicInfo.load xml_path
     end
 
     def extract _options = {}

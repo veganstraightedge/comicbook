@@ -6,6 +6,9 @@
 - PDF adapter with extract and pages support using libvips
 - `ruby-vips` gem dependency (lazy-loaded, only required for PDF features)
 - Install `libvips-dev` in CI workflow
+- `.info` method to read ComicInfo.xml metadata from archives and folders
+- `comicinfo` gem dependency for ComicInfo.xml parsing
+- `comicbook info` CLI subcommand with `--format` (verbose, terse, json, yaml), `--only`, and `--except` options
 
 ## [0.2.0] - 2025-11-17
 
