@@ -1,6 +1,8 @@
 class ComicBook
   class PDF < Adapter
     class Extractor
+      DEFAULT_DPI = 300
+
       def initialize pdf_path
         @pdf_path = File.expand_path pdf_path
       end
@@ -8,6 +10,7 @@ class ComicBook
       def extract options = {}
         extension       = options.fetch :extension, :cb
         delete_original = options.fetch :delete_original, false
+        @dpi            = options.fetch :dpi, DEFAULT_DPI
 
         destination = options[:to] || determine_extract_path(extension)
         create_destination_directory destination
@@ -19,7 +22,7 @@ class ComicBook
 
       private
 
-      attr_reader :pdf_path
+      attr_reader :pdf_path, :dpi
 
       def determine_extract_path extension
         base_name = File.basename pdf_path, '.*'
@@ -57,7 +60,7 @@ class ComicBook
 
       def render_page destination, page_number
         require 'vips'
-        image     = Vips::Image.new_from_file pdf_path, page: page_number
+        image     = Vips::Image.new_from_file pdf_path, page: page_number, dpi: dpi
         file_name = format('page_%03d.jpg', page_number + 1)
         file_path = File.join destination, file_name
 

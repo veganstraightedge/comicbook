@@ -1,4 +1,5 @@
 require 'rubygems/package'
+require 'comicinfo'
 require_relative 'adapter'
 require_relative 'cbt/archiver'
 require_relative 'cbt/extractor'
@@ -11,6 +12,25 @@ class ComicBook
 
     def extract options = {}
       Extractor.new(path).extract options
+    end
+
+    def info
+      xml = nil
+
+      File.open(path, 'rb') do |file|
+        Gem::Package::TarReader.new(file) do |reader|
+          reader.each do |entry|
+            next unless entry.full_name == 'ComicInfo.xml'
+
+            xml = entry.read
+            break
+          end
+        end
+      end
+
+      return nil unless xml
+
+      ComicInfo.load xml
     end
 
     def pages

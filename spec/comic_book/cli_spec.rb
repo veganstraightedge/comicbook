@@ -39,6 +39,16 @@ RSpec.describe ComicBook::CLI do
       end
     end
 
+    context 'with version flags' do
+      it 'shows version for -v' do
+        expect { cli.start('-v') }.to output("#{ComicBook::VERSION}\n").to_stdout
+      end
+
+      it 'shows version for --version' do
+        expect { cli.start('--version') }.to output("#{ComicBook::VERSION}\n").to_stdout
+      end
+    end
+
     context 'with unknown command' do
       it 'shows error and help' do
         expect { cli.start 'unknown' }
@@ -344,6 +354,114 @@ RSpec.describe ComicBook::CLI do
             .and output(/Error: Unsupported archive format: .xyz/)
             .to_stdout
         end
+      end
+    end
+  end
+
+  describe 'info command' do
+    let(:info_cbz) { File.join temp_dir, 'with_comicinfo.cbz' }
+
+    before do
+      load_fixture('cbz/with_comicinfo.cbz').copy_to info_cbz
+    end
+
+    context 'with default verbose format' do
+      it 'shows comic info' do
+        expect { cli.start ['info', info_cbz] }
+          .to output(/title.*The Amazing Spider-Man/m)
+          .to_stdout
+      end
+    end
+
+    context 'with --format terse' do
+      it 'shows single line output' do
+        expect { cli.start ['info', info_cbz, '--format', 'terse'] }
+          .to output(/title=The Amazing Spider-Man/)
+          .to_stdout
+      end
+    end
+
+    context 'with --format json' do
+      it 'shows JSON output' do
+        expect { cli.start ['info', info_cbz, '--format', 'json'] }
+          .to output(/"title":"The Amazing Spider-Man"/)
+          .to_stdout
+      end
+    end
+
+    context 'with --format yaml' do
+      it 'shows YAML output' do
+        expect { cli.start ['info', info_cbz, '--format', 'yaml'] }
+          .to output(/title: The Amazing Spider-Man/)
+          .to_stdout
+      end
+    end
+
+    context 'with --only filter' do
+      it 'shows only specified fields' do
+        expect { cli.start ['info', info_cbz, '--only', 'title,publisher'] }
+          .to output(/title.*The Amazing Spider-Man.*publisher.*Marvel Comics/m)
+          .to_stdout
+      end
+    end
+
+    context 'with --except filter' do
+      it 'excludes specified fields' do
+        expect { cli.start ['info', info_cbz, '--except', 'title'] }
+          .to output(/publisher.*Marvel Comics/m)
+          .to_stdout
+
+        expect { cli.start ['info', info_cbz, '--except', 'title'] }
+          .not_to output(/^title\s/)
+          .to_stdout
+      end
+    end
+
+    context 'with --from option' do
+      it 'reads from specified path' do
+        expect { cli.start ['info', '--from', info_cbz] }
+          .to output(/title.*The Amazing Spider-Man/m)
+          .to_stdout
+      end
+    end
+
+    context 'with invalid format' do
+      it 'shows error' do
+        expect { cli.start ['info', info_cbz, '--format', 'invalid'] }
+          .to raise_error(SystemExit)
+          .and output(/Error: Invalid format: invalid/)
+          .to_stdout
+      end
+    end
+
+    context 'with missing source file' do
+      it 'shows error' do
+        expect { cli.start ['info', 'nonexistent.cbz'] }
+          .to raise_error(SystemExit)
+          .and output(/Error: Source file not found/)
+          .to_stdout
+      end
+
+      it 'shows error for no source file' do
+        expect { cli.start 'info' }
+          .to raise_error(SystemExit)
+          .and output(/Error: Source file required/)
+          .to_stdout
+      end
+    end
+
+    context 'with archive without ComicInfo.xml' do
+      let(:no_info_cbz) { File.join temp_dir, 'simple.cbz' }
+
+      before do
+        load_fixture('cbz/simple.cbz').copy_to no_info_cbz
+      end
+
+      it 'shows error' do
+        expect { cli.start ['info', no_info_cbz] }
+          .to raise_error(SystemExit)
+          .and output(/Error: No ComicInfo.xml found/)
+          .to_stdout
       end
     end
   end

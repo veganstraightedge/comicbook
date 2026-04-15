@@ -1,10 +1,24 @@
 require 'optparse'
+require 'json'
+require 'yaml'
 
 class ComicBook
   class CLI
     EXTRACT_FORMATS     = %w[.cb .cb7 .cbr .cbt .cbz .pdf].freeze
     ARCHIVE_FORMATS     = %w[.cb .cb7 .cbt .cbz].freeze
+    INFO_FORMATS        = %w[.cb .cb7 .cbr .cbt .cbz].freeze
     UNSUPPORTED_FORMATS = %w[.cba].freeze
+
+    # Fields that duplicate others in a less useful form
+    REDUNDANT_FIELDS = %i[
+      genre genres_raw_data
+      characters_raw_data
+      teams_raw_data
+      locations_raw_data
+      story_arc story_arcs_raw_data
+      story_arc_number story_arc_numbers_raw_data
+      web_urls
+    ].freeze
 
     def self.start argv
       new.start Array(argv)
@@ -12,6 +26,11 @@ class ComicBook
 
     def start argv
       argv = Array argv
+
+      if argv.include?('-v') || argv.include?('--version')
+        puts ComicBook::VERSION
+        return
+      end
 
       if argv.empty? || argv.include?('-h') || argv.include?('--help')
         show_help
@@ -22,6 +41,7 @@ class ComicBook
 
       when 'extract' then extract(argv)
       when 'archive' then archive(argv)
+      when 'info'    then info(argv)
       else
         puts "Unknown command: #{command}"
         show_help
@@ -37,15 +57,18 @@ class ComicBook
     def show_help
       puts <<~HELP
         ComicBook CLI for .cb, .cb7, .cbt, .cbz, .cbr, .pdf files
+        Version #{ComicBook::VERSION}
 
         Usage:
           comicbook extract <file> [options]
           comicbook archive <folder> [options]
-          comicbook -h, --help
+          comicbook info <file> [options]
+          comicbook --help
 
         Commands:
           extract  Extract comic book archive (.cb7, .cbr, .cbt, .cbz, .cb, .pdf)
           archive  Create comic book archive (.cb7, .cbt, .cbz, .cb)
+          info     Show ComicInfo.xml metadata (.cb7, .cbr, .cbt, .cbz, .cb)
 
         Extract Options:
           --from            Source file path (optional, first arg is default)
@@ -58,8 +81,15 @@ class ComicBook
           --to              Destination path (extension determines format, default .cbz)
           --delete-original Delete source folder after archiving
 
+        Info Options:
+          --from            Source file path (optional, first arg is default)
+          --format FORMAT   Output format: verbose (default), terse, json, yaml
+          --only FIELDS     Only show these fields (comma-separated)
+          --except FIELDS   Show all fields except these (comma-separated)
+
         General Options:
-          --help, -h     Show this help
+          --help, -h        Show this help
+          --version, -v     Show version
       HELP
     end
 
@@ -116,6 +146,88 @@ class ComicBook
       cb.archive options
 
       puts "Archived #{from_path}#{" to #{to_path}" if to_path}"
+    end
+
+    def info argv
+      from_path     = nil
+      output_format = 'verbose'
+      only_fields   = nil
+      except_fields = nil
+
+      parser = OptionParser.new do |opts|
+        opts.on('--from PATH',     'Source file path')     { from_path     = it }
+        opts.on('--format FORMAT', 'Output format')        { output_format = it }
+        opts.on('--only FIELDS',   'Only these fields')    { only_fields   = it.split(',').map(&:strip) }
+        opts.on('--except FIELDS', 'Exclude these fields') { except_fields = it.split(',').map(&:strip) }
+      end
+
+      remaining = parser.parse argv
+      from_path ||= remaining.first
+
+      validate_info_args! from_path, output_format
+
+      comic_info = ComicBook.new(from_path).info
+
+      raise ComicBook::Error, "No ComicInfo.xml found in #{from_path}" unless comic_info
+
+      data = comic_info.to_h
+      data = filter_fields data, only_fields, except_fields
+
+      puts format_info(data, output_format)
+    end
+
+    def validate_info_args! from_path, output_format
+      raise ComicBook::Error, 'Source file required' unless from_path
+      raise ComicBook::Error, "Source file not found: #{from_path}" unless File.exist?(from_path)
+
+      valid_formats = %w[verbose terse json yaml]
+      return if valid_formats.include? output_format
+
+      raise ComicBook::Error, "Invalid format: #{output_format} (valid: #{valid_formats.join(', ')})"
+    end
+
+    def filter_fields data, only_fields, except_fields
+      if only_fields
+        data.slice(*only_fields.map(&:to_sym))
+      elsif except_fields
+        data.except(*except_fields.map(&:to_sym))
+      else
+        data
+      end
+    end
+
+    def format_info data, output_format
+      data = data.compact
+
+      {
+        'json'    => format_json(data),
+        'yaml'    => format_yaml(data),
+        'terse'   => format_terse(data),
+        'verbose' => format_verbose(data)
+      }[output_format]
+    end
+
+    def format_json data
+      JSON.generate(data.transform_keys(&:to_s))
+    end
+
+    def format_yaml data
+      data.transform_keys(&:to_s).to_yaml.delete_prefix("---\n")
+    end
+
+    def clean_for_display data
+      data.except(*REDUNDANT_FIELDS)
+    end
+
+    def format_terse data
+      clean_for_display(data).map { |key, value| "#{key}=#{value}" }.join(' | ')
+    end
+
+    def format_verbose data
+      data = clean_for_display(data)
+      max_key_length = data.keys.map { it.to_s.length }.max || 0
+
+      data.map { |key, value| "#{key.to_s.ljust max_key_length}  #{value}" }.join("\n")
     end
 
     def validate_extract_args! from_path, to_path

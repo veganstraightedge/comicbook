@@ -12,6 +12,8 @@ require_relative 'comic_book/cli_helpers'
 class ComicBook
   class Error < StandardError; end
 
+  Info = ComicInfo::Issue
+
   IMAGE_EXTENSIONS   = %w[.jpg .jpeg .png .gif .bmp .webp].freeze
   IMAGE_GLOB_PATTERN = '*.{jpg,jpeg,png,gif,bmp,webp}'.freeze
 
@@ -40,6 +42,12 @@ class ComicBook
     when :folder then folder_pages
     else adapter.pages
     end
+  end
+
+  def info
+    return CB.new(path).info if type == :folder
+
+    adapter.info
   end
 
   def archive options = {}

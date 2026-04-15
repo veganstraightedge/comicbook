@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-# Specify your gem's dependencies in comicinfo.gemspec
+# Specify your gem's dependencies in comicbook.gemspec
 gemspec
 
 gem 'irb'

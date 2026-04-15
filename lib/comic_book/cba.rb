@@ -10,6 +10,10 @@ class ComicBook
       raise Error, 'CBA extraction not yet implemented'
     end
 
+    def info
+      raise Error, 'CBA info not yet implemented'
+    end
+
     def pages
       raise Error, 'CBA page listing not yet implemented'
     end

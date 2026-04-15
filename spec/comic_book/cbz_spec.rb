@@ -117,6 +117,40 @@ RSpec.describe ComicBook::CBZ do
     end
   end
 
+  describe '#info' do
+    context 'with ComicInfo.xml in the archive' do
+      subject(:adapter) { described_class.new test_cbz }
+
+      let(:test_cbz) { File.join temp_dir, 'with_comicinfo.cbz' }
+
+      before do
+        load_fixture('cbz/with_comicinfo.cbz').copy_to test_cbz
+      end
+
+      it 'returns a ComicInfo object' do
+        expect(adapter.info).to be_a ComicBook::Info
+      end
+
+      it 'has correct title' do
+        expect(adapter.info.title).to eq 'The Amazing Spider-Man'
+      end
+    end
+
+    context 'without ComicInfo.xml in the archive' do
+      subject(:adapter) { described_class.new test_cbz }
+
+      let(:test_cbz) { File.join temp_dir, 'simple.cbz' }
+
+      before do
+        load_fixture('cbz/simple.cbz').copy_to test_cbz
+      end
+
+      it 'returns nil' do
+        expect(adapter.info).to be_nil
+      end
+    end
+  end
+
   describe '#pages' do
     subject(:adapter) { described_class.new test_cbz }
 

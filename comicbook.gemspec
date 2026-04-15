@@ -49,7 +49,14 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
   spec.bindir        = 'exe'
 
+  spec.post_install_message = <<~MESSAGE
+    PDF support requires libvips:
+      macOS:  brew install vips
+      Linux:  sudo apt install libvips-dev
+  MESSAGE
+
   # Runtime dependencies
+  spec.add_dependency 'comicinfo', '>= 2.0'
   spec.add_dependency 'ruby-vips', '>= 2.3'
   spec.add_dependency 'rubyzip', '>= 3.2.2'
   spec.add_dependency 'seven-zip', '~> 1.4'

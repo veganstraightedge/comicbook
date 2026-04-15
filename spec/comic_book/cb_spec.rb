@@ -91,6 +91,42 @@ RSpec.describe ComicBook::CB do
     end
   end
 
+  describe '#info' do
+    context 'with ComicInfo.xml in the folder' do
+      subject(:adapter) { described_class.new test_cb }
+
+      let(:test_cb) { File.join temp_dir, 'with_comicinfo.cb' }
+
+      before do
+        FileUtils.mkdir_p test_cb
+        load_fixture('_design-files/cb_with_comicinfo_xml/ComicInfo.xml')
+          .copy_to File.join(test_cb, 'ComicInfo.xml')
+      end
+
+      it 'returns a ComicInfo object' do
+        expect(adapter.info).to be_a ComicBook::Info
+      end
+
+      it 'has correct title' do
+        expect(adapter.info.title).to eq 'The Amazing Spider-Man'
+      end
+    end
+
+    context 'without ComicInfo.xml in the folder' do
+      subject(:adapter) { described_class.new test_cb }
+
+      let(:test_cb) { File.join temp_dir, 'empty.cb' }
+
+      before do
+        FileUtils.mkdir_p test_cb
+      end
+
+      it 'returns nil' do
+        expect(adapter.info).to be_nil
+      end
+    end
+  end
+
   describe '#pages' do
     subject(:adapter) { described_class.new(cb_folder) }
 

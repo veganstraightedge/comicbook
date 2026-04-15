@@ -1,4 +1,5 @@
 require 'seven_zip_ruby'
+require 'comicinfo'
 require_relative 'adapter'
 require_relative 'cb7/archiver'
 require_relative 'cb7/extractor'
@@ -11,6 +12,21 @@ class ComicBook
 
     def extract options = {}
       Extractor.new(path).extract options
+    end
+
+    def info
+      xml = nil
+
+      File.open(path, 'rb') do |file|
+        SevenZipRuby::Reader.open(file) do |reader|
+          entry = reader.entries.find { it.path == 'ComicInfo.xml' }
+          xml   = reader.extract_data(entry.index) if entry
+        end
+      end
+
+      return nil unless xml
+
+      ComicInfo.load xml
     end
 
     def pages

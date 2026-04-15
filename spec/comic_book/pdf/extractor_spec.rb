@@ -142,6 +142,41 @@ RSpec.describe ComicBook::PDF::Extractor do
       end
     end
 
+    context 'with default DPI' do
+      let(:image_a) { File.join extracted_folder_path, 'page_001.jpg' }
+
+      it 'renders pages at 300 DPI' do
+        extracted_folder_path
+
+        image = Vips::Image.new_from_file image_a
+        expect(image.width).to be > 1000
+      end
+    end
+
+    context 'with custom dpi: 72' do
+      let(:extracted_folder_path) { extractor.extract dpi: 72 }
+      let(:image_a) { File.join extracted_folder_path, 'page_001.jpg' }
+
+      it 'renders pages at lower resolution' do
+        extracted_folder_path
+
+        image = Vips::Image.new_from_file image_a
+        expect(image.width).to be < 500
+      end
+    end
+
+    context 'with custom dpi: 600' do
+      let(:extracted_folder_path) { extractor.extract dpi: 600 }
+      let(:image_a) { File.join extracted_folder_path, 'page_001.jpg' }
+
+      it 'renders pages at higher resolution' do
+        extracted_folder_path
+
+        image = Vips::Image.new_from_file image_a
+        expect(image.width).to be > 3000
+      end
+    end
+
     context 'when destination folder already exists' do
       let(:existing_destination) { File.join temp_dir, 'existing' }
       let(:image_in_folder) { File.join existing_destination, 'page_001.jpg' }

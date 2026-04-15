@@ -7,6 +7,8 @@ A Ruby library and CLI tool for managing comic books archives.
 
 **`archive`** — to create a `.cb*` file (default: `.cbz`).
 
+**`info`** — to read ComicInfo.xml metadata from a `.cb*` file.
+
 Currently supported formats for `archive` and `extract`:
 - CB7 — [7zip](https://en.wikipedia.org/wiki/7-Zip)
 - CBT — [Tar](https://en.wikipedia.org/wiki/Tar_(computing))
@@ -14,6 +16,7 @@ Currently supported formats for `archive` and `extract`:
 
 Currently supported formats for `extract` only:
 - **CBR** — [RAR](https://en.wikipedia.org/wiki/WinRAR) is proprietary without an open source implementation license. Extracting support is provided using vendored [`unar`](https://theunarchiver.com/command-line) binaries because a large number of comic books are archived in .cbr/.rar format. No support for creating `.cbr` files will ever be added until RAR is open source (or reverse engineered).
+- **PDF** — Extract PDF pages as images using [libvips](https://www.libvips.org/). Requires libvips installed on the system.
 
 Planned formats for `extract` only:
 - **CBA** — [ACE](https://en.wikipedia.org/wiki/WinAce) is both proprietary and very old/outdated/unsupported. ACE extracting support is provided for historical posterity and completeness.
@@ -52,6 +55,20 @@ comicbook archive path/to/folder
 # Create archive at a specific destination
 comicbook archive path/to/folder --to path/to/output.cbz
 
+# Show ComicInfo.xml metadata
+comicbook info path/to/archive.cbz
+
+# Show info in different formats
+comicbook info path/to/archive.cbz --format json
+comicbook info path/to/archive.cbz --format yaml
+comicbook info path/to/archive.cbz --format terse
+
+# Show only specific fields
+comicbook info path/to/archive.cbz --only title,writer,publisher
+
+# Show all fields except specific ones
+comicbook info path/to/archive.cbz --except summary,review
+
 # Show help
 comicbook --help
 ```
@@ -77,9 +94,22 @@ ComicBook.new('path/to/folder').archive to: 'path/to/output.cbz'
 # Get pages from an archive
 comic = ComicBook.new 'path/to/archive.cbz'
 comic.pages  # => [#<ComicBook::Page>, ...]
+
+# Read ComicInfo.xml metadata
+comic = ComicBook.new 'path/to/archive.cbz'
+comic.info        # => #<ComicInfo::Issue> or nil
+comic.info.title  # => "The Amazing Spider-Man"
+comic.info.writer # => "Dan Slott, Christos Gage"
 ```
 
 ## Development
+
+PDF support requires [libvips](https://www.libvips.org/). Install it with `brew bundle` (uses the included `Brewfile`) or manually:
+
+```sh
+brew install vips             # macOS
+sudo apt install libvips-dev  # Linux
+```
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
 

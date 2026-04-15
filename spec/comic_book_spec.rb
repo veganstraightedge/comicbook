@@ -309,6 +309,71 @@ RSpec.describe ComicBook do
     end
   end
 
+  describe '#info' do
+    context 'with a CBZ containing ComicInfo.xml' do
+      subject(:cb) { described_class.new test_file }
+
+      let(:test_file) { File.join temp_dir, 'with_comicinfo.cbz' }
+
+      before do
+        load_fixture('cbz/with_comicinfo.cbz').copy_to test_file
+      end
+
+      it 'returns a ComicInfo object' do
+        expect(cb.info).to be_a ComicBook::Info
+      end
+
+      it 'has correct title' do
+        expect(cb.info.title).to eq 'The Amazing Spider-Man'
+      end
+    end
+
+    context 'with a CBZ without ComicInfo.xml' do
+      subject(:cb) { described_class.new test_file }
+
+      let(:test_file) { File.join temp_dir, 'simple.cbz' }
+
+      before do
+        load_fixture('cbz/simple.cbz').copy_to test_file
+      end
+
+      it 'returns nil' do
+        expect(cb.info).to be_nil
+      end
+    end
+
+    context 'with a folder containing ComicInfo.xml' do
+      subject(:cb) { described_class.new test_folder }
+
+      let(:test_folder) { File.join temp_dir, 'comic_folder' }
+
+      before do
+        FileUtils.mkdir_p test_folder
+        load_fixture('_design-files/cb_with_comicinfo_xml/ComicInfo.xml')
+          .copy_to File.join(test_folder, 'ComicInfo.xml')
+      end
+
+      it 'returns a ComicInfo object' do
+        expect(cb.info).to be_a ComicBook::Info
+        expect(cb.info.title).to eq 'The Amazing Spider-Man'
+      end
+    end
+
+    context 'with a folder without ComicInfo.xml' do
+      subject(:cb) { described_class.new test_folder }
+
+      let(:test_folder) { File.join temp_dir, 'empty_folder' }
+
+      before do
+        FileUtils.mkdir_p test_folder
+      end
+
+      it 'returns nil' do
+        expect(cb.info).to be_nil
+      end
+    end
+  end
+
   describe '.extract' do
     let(:source_folder) { File.join temp_dir, 'source' }
     let(:test_cbz) do
