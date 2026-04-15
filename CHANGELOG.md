@@ -1,15 +1,18 @@
 ## [Unreleased]
 
+## [0.3.0] - 2026-04-14
+
 ### Added
 
-- PDF to comic book conversion (PDF → .cb → .cbz/.cb7/.cbt)
+- PDF to comic book conversion (PDF → .cb → .cbz/.cb7/.cbt) with configurable DPI (default 300)
 - PDF adapter with extract and pages support using libvips
 - `ruby-vips` gem dependency (lazy-loaded, only required for PDF features)
-- Install `libvips-dev` in CI workflow
 - `ComicBook#info` method to read ComicInfo.xml metadata from archives and folders
 - `comicinfo` gem dependency for ComicInfo.xml parsing
 - `ComicBook::Info` alias for `ComicInfo::Issue`
 - `comicbook info` CLI subcommand with `--format` (verbose, terse, json, yaml), `--only`, and `--except` options
+- `--version`/`-v` CLI flag
+- Install `libvips-dev` in CI workflow
 
 ## [0.2.0] - 2025-11-17
 
