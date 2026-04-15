@@ -27,6 +27,11 @@ class ComicBook
     def start argv
       argv = Array argv
 
+      if argv.include?('-v') || argv.include?('--version')
+        puts ComicBook::VERSION
+        return
+      end
+
       if argv.empty? || argv.include?('-h') || argv.include?('--help')
         show_help
         return
@@ -52,12 +57,13 @@ class ComicBook
     def show_help
       puts <<~HELP
         ComicBook CLI for .cb, .cb7, .cbt, .cbz, .cbr, .pdf files
+        Version #{ComicBook::VERSION}
 
         Usage:
           comicbook extract <file> [options]
           comicbook archive <folder> [options]
           comicbook info <file> [options]
-          comicbook -h, --help
+          comicbook --help
 
         Commands:
           extract  Extract comic book archive (.cb7, .cbr, .cbt, .cbz, .cb, .pdf)
@@ -82,7 +88,8 @@ class ComicBook
           --except FIELDS   Show all fields except these (comma-separated)
 
         General Options:
-          --help, -h     Show this help
+          --help, -h        Show this help
+          --version, -v     Show version
       HELP
     end
 

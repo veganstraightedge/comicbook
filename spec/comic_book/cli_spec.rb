@@ -39,6 +39,16 @@ RSpec.describe ComicBook::CLI do
       end
     end
 
+    context 'with version flags' do
+      it 'shows version for -v' do
+        expect { cli.start('-v') }.to output("#{ComicBook::VERSION}\n").to_stdout
+      end
+
+      it 'shows version for --version' do
+        expect { cli.start('--version') }.to output("#{ComicBook::VERSION}\n").to_stdout
+      end
+    end
+
     context 'with unknown command' do
       it 'shows error and help' do
         expect { cli.start 'unknown' }
