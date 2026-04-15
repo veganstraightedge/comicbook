@@ -1,1 +1,1 @@
-brew "vips"
+brew 'vips'
