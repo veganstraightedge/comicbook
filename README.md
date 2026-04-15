@@ -49,6 +49,9 @@ comicbook extract path/to/archive.cbz --to path/to/output
 # Extract only image files (exclude metadata like ComicInfo.xml)
 comicbook extract path/to/archive.cbz --images-only
 
+# Extract PDF at custom DPI (default: 300)
+comicbook extract path/to/comic.pdf --dpi 600
+
 # Create a comic book archive from a folder
 comicbook archive path/to/folder
 

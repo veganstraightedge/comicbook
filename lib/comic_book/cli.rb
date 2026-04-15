@@ -73,6 +73,7 @@ class ComicBook
         Extract Options:
           --from            Source file path (optional, first arg is default)
           --to              Destination path
+          --dpi DPI         PDF render resolution (default: 300)
           --images-only     Extract only image files (exclude metadata, text, etc.)
           --delete-original Delete source archive after extraction
 
@@ -96,12 +97,14 @@ class ComicBook
     def extract argv
       from_path       = nil
       to_path         = nil
+      dpi             = nil
       images_only     = false
       delete_original = false
 
       parser = OptionParser.new do |opts|
         opts.on('--from PATH',       'Source file path')            { from_path       = it }
         opts.on('--to PATH',         'Destination path')            { to_path         = it }
+        opts.on('--dpi DPI',         Integer, 'PDF render DPI')     { dpi             = it }
         opts.on('--images-only',     'Extract only images')         { images_only     = true }
         opts.on('--delete-original', 'Delete source after extract') { delete_original = true }
       end
@@ -115,6 +118,7 @@ class ComicBook
 
       options.delete(:images_only)     unless images_only
       options.delete(:delete_original) unless delete_original
+      options[:dpi] = dpi if dpi
 
       ComicBook.extract from_path, options
 

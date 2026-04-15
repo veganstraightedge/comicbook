@@ -11,6 +11,7 @@
 - `comicinfo` gem dependency for ComicInfo.xml parsing
 - `ComicBook::Info` alias for `ComicInfo::Issue`
 - `comicbook info` CLI subcommand with `--format` (verbose, terse, json, yaml), `--only`, and `--except` options
+- `--dpi` CLI option for PDF extraction
 - `--version`/`-v` CLI flag
 - Install `libvips-dev` in CI workflow
 

@@ -161,6 +161,20 @@ RSpec.describe ComicBook::CLI do
 
         expect(ComicBook).to have_received(:extract).with pdf_file, {}
       end
+
+      context 'with --dpi option' do
+        before do
+          allow(ComicBook).to receive(:extract).with pdf_file, { dpi: 600 }
+        end
+
+        it 'passes dpi to extract' do
+          expect { cli.start ['extract', pdf_file, '--dpi', '600'] }
+            .to output(/Extracted #{Regexp.escape(pdf_file)}/)
+            .to_stdout
+
+          expect(ComicBook).to have_received(:extract).with pdf_file, { dpi: 600 }
+        end
+      end
     end
 
     context 'with missing source file' do
