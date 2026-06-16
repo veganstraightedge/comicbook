@@ -231,5 +231,5 @@ The adapter pattern makes it easy to add new formats or extend existing ones wit
 
 ## Version Information
 - **Current Version**: 0.2.0
-- **Ruby Requirement**: >= 4.0.0
+- **Ruby Requirement**: >= 4.0.5
 - **License**: MIT
