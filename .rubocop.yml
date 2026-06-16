@@ -40,16 +40,16 @@ Style/MethodDefParentheses:
   EnforcedStyle: require_no_parentheses
 
 Metrics/AbcSize:
-  Max: 65
+  Max: 26
 
 Metrics/ClassLength:
-  Max: 240
+  Max: 205
 
 Metrics/CyclomaticComplexity:
-  Max: 11
+  Max: 10
 
 Metrics/MethodLength:
-  Max: 51
+  Max: 31
 
 Metrics/PerceivedComplexity:
   Max: 11

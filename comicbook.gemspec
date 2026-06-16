@@ -15,7 +15,7 @@ Gem::Specification.new do |spec|
   spec.homepage = 'https://github.com/veganstraightedge/comicbook'
   spec.license  = 'MIT'
 
-  spec.required_ruby_version = '>= 4.0.0'
+  spec.required_ruby_version = '>= 4.0.5'
 
   spec.metadata['allowed_push_host'] = 'https://rubygems.org'
   spec.metadata['homepage_uri']      = spec.homepage
@@ -58,6 +58,6 @@ Gem::Specification.new do |spec|
   # Runtime dependencies
   spec.add_dependency 'comicinfo', '>= 2.0'
   spec.add_dependency 'ruby-vips', '>= 2.3'
-  spec.add_dependency 'rubyzip', '>= 3.2.2'
+  spec.add_dependency 'rubyzip', '>= 3.4.0'
   spec.add_dependency 'seven-zip', '~> 1.4'
 end

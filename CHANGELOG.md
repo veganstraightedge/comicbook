@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+### Changed
+
+- Bump Ruby version from 4.0.2 to 4.0.5 (`.ruby-version`, `required_ruby_version`, CI matrix)
+
 ## [0.3.0] - 2026-04-14
 
 ### Added
