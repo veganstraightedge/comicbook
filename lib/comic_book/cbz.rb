@@ -14,6 +14,16 @@ class ComicBook
       Extractor.new(path).extract options
     end
 
+    def entries
+      names = []
+
+      Zip::File.open(path) do |zipfile|
+        zipfile.each { |entry| names << entry.name if entry.file? }
+      end
+
+      names.map { ComicBook::Entry.new it }
+    end
+
     def info
       xml = nil
 
@@ -25,16 +35,6 @@ class ComicBook
       return nil unless xml
 
       ComicInfo.load xml
-    end
-
-    def entries
-      names = []
-
-      Zip::File.open(path) do |zipfile|
-        zipfile.each { |entry| names << entry.name if entry.file? }
-      end
-
-      names.map { ComicBook::Entry.new it }
     end
   end
 end

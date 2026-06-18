@@ -9,13 +9,6 @@ class ComicBook
       Archiver.new(path).archive options
     end
 
-    def info
-      xml_path = File.join path, 'ComicInfo.xml'
-      return nil unless File.exist? xml_path
-
-      ComicInfo.load xml_path
-    end
-
     def extract _options = {}
       Extractor.new(path).extract
     end
@@ -26,6 +19,13 @@ class ComicBook
         relative = Pathname.new(file).relative_path_from(Pathname.new(path)).to_s
         ComicBook::Entry.new relative
       end
+    end
+
+    def info
+      xml_path = File.join path, 'ComicInfo.xml'
+      return nil unless File.exist? xml_path
+
+      ComicInfo.load xml_path
     end
   end
 end

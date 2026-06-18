@@ -1,10 +1,10 @@
 class ComicBook
   class Page
-    attr_reader :path, :name
+    attr_reader :name, :path
 
     def initialize path, name
-      @path = path
       @name = name
+      @path = path
     end
   end
 end

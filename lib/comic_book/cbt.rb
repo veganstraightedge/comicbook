@@ -14,6 +14,20 @@ class ComicBook
       Extractor.new(path).extract options
     end
 
+    def entries
+      names = []
+
+      File.open(path, 'rb') do |file|
+        Gem::Package::TarReader.new(file) do |reader|
+          reader.each do |entry|
+            names << entry.full_name if entry.file?
+          end
+        end
+      end
+
+      names.map { ComicBook::Entry.new it }
+    end
+
     def info
       xml = nil
 
@@ -31,20 +45,6 @@ class ComicBook
       return nil unless xml
 
       ComicInfo.load xml
-    end
-
-    def entries
-      names = []
-
-      File.open(path, 'rb') do |file|
-        Gem::Package::TarReader.new(file) do |reader|
-          reader.each do |entry|
-            names << entry.full_name if entry.file?
-          end
-        end
-      end
-
-      names.map { ComicBook::Entry.new it }
     end
   end
 end

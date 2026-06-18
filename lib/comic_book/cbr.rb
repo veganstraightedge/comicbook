@@ -13,6 +13,10 @@ class ComicBook
       Extractor.new(path).extract options
     end
 
+    def entries
+      CLIHelpers.lsar_list(path).map { ComicBook::Entry.new it }
+    end
+
     def info
       entries = CLIHelpers.lsar_list path
       return nil unless entries.include? 'ComicInfo.xml'
@@ -24,10 +28,6 @@ class ComicBook
 
         ComicInfo.load xml_path
       end
-    end
-
-    def entries
-      CLIHelpers.lsar_list(path).map { ComicBook::Entry.new it }
     end
   end
 end

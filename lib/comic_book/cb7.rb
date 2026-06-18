@@ -14,6 +14,20 @@ class ComicBook
       Extractor.new(path).extract options
     end
 
+    def entries
+      names = []
+
+      File.open(path, 'rb') do |file|
+        SevenZipRuby::Reader.open(file) do |reader|
+          reader.entries.each do |entry|
+            names << entry.path if entry.file?
+          end
+        end
+      end
+
+      names.map { ComicBook::Entry.new it }
+    end
+
     def info
       xml = nil
 
@@ -27,20 +41,6 @@ class ComicBook
       return nil unless xml
 
       ComicInfo.load xml
-    end
-
-    def entries
-      names = []
-
-      File.open(path, 'rb') do |file|
-        SevenZipRuby::Reader.open(file) do |reader|
-          reader.entries.each do |entry|
-            names << entry.path if entry.file?
-          end
-        end
-      end
-
-      names.map { ComicBook::Entry.new it }
     end
   end
 end
