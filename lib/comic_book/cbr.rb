@@ -26,8 +26,6 @@ class ComicBook
       end
     end
 
-    # Every member of the RAR archive, as Entries. RAR is read-only, so an
-    # entry's path is the name lsar reports for it.
     def entries
       CLIHelpers.lsar_list(path).map { ComicBook::Entry.new it }
     end
