@@ -10,15 +10,18 @@ A Ruby library and CLI tool for managing comic books archives.
 **`info`** — to read ComicInfo.xml metadata from a `.cb*` file.
 
 Currently supported formats for `archive` and `extract`:
+
 - CB7 — [7zip](https://en.wikipedia.org/wiki/7-Zip)
-- CBT — [Tar](https://en.wikipedia.org/wiki/Tar_(computing))
-- CBZ — [Zip](https://en.wikipedia.org/wiki/ZIP_(file_format))
+- CBT — [Tar](<https://en.wikipedia.org/wiki/Tar_(computing)>)
+- CBZ — [Zip](<https://en.wikipedia.org/wiki/ZIP_(file_format)>)
 
 Currently supported formats for `extract` only:
+
 - **CBR** — [RAR](https://en.wikipedia.org/wiki/WinRAR) is proprietary without an open source implementation license. Extracting support is provided using vendored [`unar`](https://theunarchiver.com/command-line) binaries because a large number of comic books are archived in .cbr/.rar format. No support for creating `.cbr` files will ever be added until RAR is open source (or reverse engineered).
 - **PDF** — Extract PDF pages as images using [libvips](https://www.libvips.org/). Requires libvips installed on the system.
 
 Planned formats for `extract` only:
+
 - **CBA** — [ACE](https://en.wikipedia.org/wiki/WinAce) is both proprietary and very old/outdated/unsupported. ACE extracting support is provided for historical posterity and completeness.
 
 ## Installation

@@ -207,10 +207,10 @@ RSpec.describe ComicBook do
     let(:folder) { File.join temp_dir, 'with_info' }
 
     before do
-      load_fixture('originals/with_info/page1.jpg').copy_to     File.join(folder, 'page1.jpg')
-      load_fixture('originals/with_info/ComicInfo.xml').copy_to File.join(folder, 'ComicInfo.xml')
+      load_fixture('originals/with_info/page1.jpg').copy_to      File.join(folder, 'page1.jpg')
+      load_fixture('originals/with_info/ComicInfo.xml').copy_to  File.join(folder, 'ComicInfo.xml')
       load_fixture('originals/with_info/MetronInfo.xml').copy_to File.join(folder, 'MetronInfo.xml')
-      load_fixture('originals/with_info/notes.txt').copy_to File.join(folder, 'notes.txt')
+      load_fixture('originals/with_info/notes.txt').copy_to      File.join(folder, 'notes.txt')
     end
 
     def basenames type
