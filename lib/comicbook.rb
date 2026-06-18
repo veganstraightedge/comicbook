@@ -42,9 +42,9 @@ class ComicBook
   end
 
   # Pages are the image files, in path order, wrapped as Page objects.
-  # PDF renders synthetic pages; CBR (shell-listed) and CBA (stub) stay custom.
+  # PDF renders synthetic pages and CBA is a stub, so both stay custom.
   def pages
-    return adapter.pages if %i[cba cbr pdf].include?(type)
+    return adapter.pages if %i[cba pdf].include?(type)
 
     files(type: :images).map { Page.new it.path, it.name }
   end

@@ -218,6 +218,21 @@ RSpec.describe ComicBook do
       end
     end
 
+    context 'with a CBR archive' do
+      subject(:pages) { described_class.new(test_file).pages }
+
+      let(:test_file) { File.join temp_dir, 'simple.cbr' }
+
+      before do
+        load_fixture('cbr/simple.cbr').copy_to test_file
+      end
+
+      it 'derives image pages with archive-entry paths' do
+        expect(pages.map(&:name)).to eq %w[page1.jpg page2.png page3.gif]
+        expect(pages.first.path).to eq 'page1.jpg'
+      end
+    end
+
     context 'with a .cb folder' do
       subject(:pages) { described_class.new(folder).pages }
 
