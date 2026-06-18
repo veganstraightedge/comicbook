@@ -90,11 +90,11 @@ class ComicBook
       extension = File.extname(path).downcase
 
       case extension
-      when '.cbz' then :cbz
       when '.cb7' then :cb7
-      when '.cbt' then :cbt
-      when '.cbr' then :cbr
       when '.cba' then :cba
+      when '.cbr' then :cbr
+      when '.cbt' then :cbt
+      when '.cbz' then :cbz
       when '.pdf' then :pdf
       else
         raise Error, "Unsupported file type: #{File.extname(path)}"
@@ -122,13 +122,13 @@ class ComicBook
 
   def adapter
     case type
-    when :cb, :folder then CB.new path
     when :cb7 then CB7.new path
     when :cba then CBA.new path
     when :cbr then CBR.new path
     when :cbt then CBT.new path
     when :cbz then CBZ.new path
     when :pdf then PDF.new path
+    when :cb, :folder then CB.new path
     else
       raise Error, "No adapter available for type: #{type}"
     end
