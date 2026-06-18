@@ -187,7 +187,56 @@ RSpec.describe ComicBook do
       end
     end
 
-    context 'with an archive file' do
+    context 'with a CBZ archive' do
+      subject(:pages) { described_class.new(test_file).pages }
+
+      let(:test_file) { File.join temp_dir, 'simple.cbz' }
+
+      before do
+        load_fixture('cbz/simple.cbz').copy_to test_file
+      end
+
+      it 'derives image pages, in order, with archive-entry paths' do
+        expect(pages).to be_all ComicBook::Page
+        expect(pages.map(&:name)).to eq %w[page1.jpg page2.png page3.gif]
+        expect(pages.first.path).to eq 'simple/page1.jpg'
+      end
+    end
+
+    context 'with a CB7 archive' do
+      subject(:pages) { described_class.new(test_file).pages }
+
+      let(:test_file) { File.join temp_dir, 'simple.cb7' }
+
+      before do
+        load_fixture('cb7/simple.cb7').copy_to test_file
+      end
+
+      it 'derives image pages with archive-entry paths' do
+        expect(pages.map(&:name)).to eq %w[page1.jpg page2.png page3.gif]
+        expect(pages.first.path).to eq 'page1.jpg'
+      end
+    end
+
+    context 'with a .cb folder' do
+      subject(:pages) { described_class.new(folder).pages }
+
+      let(:folder) { File.join temp_dir, 'test.cb' }
+
+      before do
+        load_fixture('originals/simple/page1.jpg').copy_to File.join(folder, 'page1.jpg')
+        load_fixture('originals/nested/subfolder/nested.jpg').copy_to File.join(folder, 'subfolder', 'nested.jpg')
+      end
+
+      it 'derives image pages with folder-relative paths' do
+        nested = pages.find { it.name == 'nested.jpg' }
+
+        expect(pages).to be_all ComicBook::Page
+        expect(nested.path).to eq 'subfolder/nested.jpg'
+      end
+    end
+
+    context 'with an invalid archive file' do
       subject(:pages) { cb.pages }
 
       let(:cb) { described_class.new test_file }

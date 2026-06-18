@@ -33,34 +33,18 @@ class ComicBook
       ComicInfo.load xml
     end
 
-    def pages
-      entries = []
+    def entries
+      names = []
 
       File.open(path, 'rb') do |file|
         Gem::Package::TarReader.new(file) do |reader|
           reader.each do |entry|
-            entries << entry.full_name if entry.file?
+            names << entry.full_name if entry.file?
           end
         end
       end
 
-      entries.select { image_file? it }
-             .map    { create_page_from_entry it }
-             .sort_by(&:name)
-    end
-
-    private
-
-    def create_page_from_entry entry
-      basename = File.basename entry
-
-      ComicBook::Page.new entry, basename
-    end
-
-    def image_file? filename
-      extension = File.extname filename.downcase
-
-      ComicBook::IMAGE_EXTENSIONS.include? extension
+      names.map { ComicBook::Entry.new it }
     end
   end
 end

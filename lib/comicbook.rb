@@ -41,11 +41,12 @@ class ComicBook
     new(path).extract options
   end
 
+  # Pages are the image files, in path order, wrapped as Page objects.
+  # PDF renders synthetic pages; CBR (shell-listed) and CBA (stub) stay custom.
   def pages
-    case type
-    when :folder then folder_pages
-    else adapter.pages
-    end
+    return adapter.pages if %i[cba cbr pdf].include?(type)
+
+    files(type: :images).map { Page.new it.path, it.name }
   end
 
   def info
@@ -109,18 +110,6 @@ class ComicBook
     return if File.exist? path
 
     raise Error, "Path does not exist: #{path}"
-  end
-
-  def folder_pages
-    pattern     = IMAGE_GLOB_PATTERN
-    search_path = File.join @path, '**', pattern
-    image_files = Dir.glob search_path, File::FNM_CASEFOLD
-
-    image_files.sort.map do |file|
-      basename = File.basename file
-
-      Page.new file, basename
-    end
   end
 
   # A plain folder has no format adapter, so list it through CB.

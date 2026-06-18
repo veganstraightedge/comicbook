@@ -20,19 +20,6 @@ class ComicBook
       Extractor.new(path).extract
     end
 
-    def pages
-      pattern     = ComicBook::IMAGE_GLOB_PATTERN
-      search_path = File.join path, '**', pattern
-      image_files = Dir.glob search_path, File::FNM_CASEFOLD
-
-      image_files.sort.map do |file|
-        relative_path = Pathname.new(file).relative_path_from(Pathname.new(path)).to_s
-        basename      = File.basename file
-
-        ComicBook::Page.new relative_path, basename
-      end
-    end
-
     # Every file in the folder, as Entries with folder-relative paths.
     def entries
       Dir.glob(File.join(path, '**', '*')).reject { File.directory? it }.map do |file|

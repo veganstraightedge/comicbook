@@ -159,7 +159,7 @@ RSpec.describe ComicBook::CBT do
     end
   end
 
-  describe '#pages' do
+  describe '#entries' do
     subject(:adapter) { described_class.new test_cbt }
 
     let(:test_cbt) { File.join temp_dir, 'simple.cbt' }
@@ -168,26 +168,18 @@ RSpec.describe ComicBook::CBT do
       load_fixture('cbt/simple.cbt').copy_to test_cbt
     end
 
-    it 'returns array of Page objects' do
-      pages = adapter.pages
+    it 'returns Entry objects for every member' do
+      entries = adapter.entries
 
-      expect(pages).to be_an Array
-      expect(pages).to be_all ComicBook::Page
+      expect(entries).to be_an Array
+      expect(entries).to be_all ComicBook::Entry
     end
 
-    it 'sorts pages alphabetically by name' do
-      pages = adapter.pages
-      names = pages.map(&:name)
+    it 'sets a string path and name for each entry' do
+      entry = adapter.entries.first
 
-      expect(names).to eq names.sort
-    end
-
-    it 'sets correct path and name for each page' do
-      pages = adapter.pages
-      page = pages.first
-
-      expect(page.path).to be_a String
-      expect(page.name).to be_a String
+      expect(entry.path).to be_a String
+      expect(entry.name).to be_a String
     end
 
     context 'with non-image files in the archive' do
@@ -197,12 +189,11 @@ RSpec.describe ComicBook::CBT do
         load_fixture('cbt/mixed.cbt').copy_to test_cbt
       end
 
-      it 'only includes image files' do
-        pages = adapter.pages
-        names = pages.map(&:name)
+      it 'includes non-image files too' do
+        names = adapter.entries.map(&:name)
 
         expect(names).to include('page1.jpg')
-        expect(names).not_to include('readme.txt')
+        expect(names).to include('readme.txt')
       end
     end
   end
