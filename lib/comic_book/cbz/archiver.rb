@@ -11,7 +11,9 @@ class ComicBook
         contents        = options.fetch :contents, :all
 
         output_path = options[:to] || determine_output_path(extension)
-        create_archive output_path, ComicBook.new(source_folder).files(type: contents)
+        entries     = ComicBook.new(source_folder).files(type: contents)
+
+        create_archive output_path, entries
         cleanup_source_folder if delete_original
 
         output_path
