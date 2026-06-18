@@ -1,9 +1,11 @@
 class ComicBook
-  # A single member of a comic book: an image, an info file (ComicInfo.xml / MetronInfo.xml),
-  # or anything else.
+  # A single member of a comic book: an image, an info file
+  # (ComicInfo.xml / MetronInfo.xml), or anything else.
   #
-  # `path` locates it within the comic — a relative path in a folder, an entry name in an
-  # archive — and `name` is its basename.
+  # `path` locates it within the comic:
+  #    a relative path in a folder,
+  #    or an entry name in an archive
+  # `name` is its basename.
   class Entry
     attr_reader :path, :name
 
