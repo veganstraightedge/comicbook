@@ -41,7 +41,6 @@ class ComicBook
     new(path).extract options
   end
 
-
   def archive options = {}
     raise Error, 'Cannot archive a file' unless %i[folder cb].include?(type)
 
