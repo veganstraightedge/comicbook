@@ -41,23 +41,6 @@ class ComicBook
     new(path).extract options
   end
 
-  # Pages are the image files, in path order, wrapped as Page objects.
-  # PDF renders synthetic pages and CBA is a stub, so both stay custom.
-  def pages
-    return adapter.pages if %i[cba pdf].include?(type)
-
-    files(type: :images).map { Page.new it.path, it.name }
-  end
-
-  def info = adapter.info
-
-  # The files in this comic, filtered by `type`:
-  #   :all (default),
-  #   :images,
-  #   :images_and_info (images + ComicInfo.xml / MetronInfo.xml)
-  def files type: :all
-    filter_files adapter.entries, by: type
-  end
 
   def archive options = {}
     raise Error, 'Cannot archive a file' unless %i[folder cb].include?(type)
@@ -81,7 +64,39 @@ class ComicBook
     adapter.extract options
   end
 
+  def info = adapter.info
+
+  # The files in this comicbook, filtered by type:
+  #   :all (default),
+  #   :images,
+  #   :images_and_info (images + ComicInfo.xml / MetronInfo.xml)
+  def files type: :all
+    filter_files adapter.entries, by: type
+  end
+
+  # Pages are the image files, in path order, wrapped as Page objects.
+  # PDF renders synthetic pages and CBA is a stub, so both stay custom.
+  def pages
+    return adapter.pages if %i[cba pdf].include?(type)
+
+    files(type: :images).map { Page.new it.path, it.name }
+  end
+
   private
+
+  def adapter
+    case type
+    when :cb7 then CB7.new path
+    when :cba then CBA.new path
+    when :cbr then CBR.new path
+    when :cbt then CBT.new path
+    when :cbz then CBZ.new path
+    when :pdf then PDF.new path
+    when :cb, :folder then CB.new path
+    else
+      raise Error, "No adapter available for type: #{type}"
+    end
+  end
 
   def determine_type path
     if File.directory? path
@@ -104,33 +119,22 @@ class ComicBook
     end
   end
 
-  def validate_path!
-    return if File.exist? path
-
-    raise Error, "Path does not exist: #{path}"
-  end
-
   def filter_files entries, by:
     case by
     when :all             then entries
-    when :images          then entries.select(&:image?)
-    when :images_and_info then entries.select { it.image? || it.info? }
+    when :images          then images
+    when :images_and_info then images_and_info
     else
       raise Error, "Unknown files type: #{by.inspect} (expected :all, :images, or :images_and_info)"
     end.sort_by(&:path)
   end
 
-  def adapter
-    case type
-    when :cb7 then CB7.new path
-    when :cba then CBA.new path
-    when :cbr then CBR.new path
-    when :cbt then CBT.new path
-    when :cbz then CBZ.new path
-    when :pdf then PDF.new path
-    when :cb, :folder then CB.new path
-    else
-      raise Error, "No adapter available for type: #{type}"
-    end
+  def images          = adapter.images
+  def images_and_info = adapter.images_and_info
+
+  def validate_path!
+    return if File.exist? path
+
+    raise Error, "Path does not exist: #{path}"
   end
 end

@@ -27,6 +27,9 @@ class ComicBook
       raise NotImplementedError, "#{self.class} must implement #info"
     end
 
+    def images = entries.select(&:image?)
+    def images_and_info = entries.select { it.image? || it.info? }
+
     private
 
     attr_reader :path
