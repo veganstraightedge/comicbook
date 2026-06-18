@@ -8,9 +8,10 @@ class ComicBook
       def archive options = {}
         extension       = options.fetch :extension, :cbz
         delete_original = options.fetch :delete_original, false
+        contents        = options.fetch :contents, :all
 
         output_path = options[:to] || determine_output_path(extension)
-        create_archive output_path
+        create_archive output_path, contents
         cleanup_source_folder if delete_original
 
         output_path
@@ -27,17 +28,12 @@ class ComicBook
         File.expand_path File.join(dir_name, "#{base_name}.#{extension}")
       end
 
-      def create_archive output_path
+      def create_archive output_path, contents
         Zip::File.open(output_path, create: true) do |writer|
-          find_image_files.each do |file|
+          ComicBook::ArchiveContents.files(source_folder, contents).each do |file|
             add_file writer, file
           end
         end
-      end
-
-      def find_image_files
-        pattern = File.join(source_folder, '**', ComicBook::IMAGE_GLOB_PATTERN)
-        Dir.glob(pattern, File::FNM_CASEFOLD).sort
       end
 
       def add_file writer, file

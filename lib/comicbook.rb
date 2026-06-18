@@ -8,6 +8,7 @@ require_relative 'comic_book/cbt'
 require_relative 'comic_book/cbz'
 require_relative 'comic_book/pdf'
 require_relative 'comic_book/cli_helpers'
+require_relative 'comic_book/archive_contents'
 
 class ComicBook
   class Error < StandardError; end
@@ -16,6 +17,9 @@ class ComicBook
 
   IMAGE_EXTENSIONS   = %w[.jpg .jpeg .png .gif .bmp .webp].freeze
   IMAGE_GLOB_PATTERN = '*.{jpg,jpeg,png,gif,bmp,webp}'.freeze
+
+  # Metadata sidecar files included by the `:images_and_info` archive mode.
+  INFO_FILENAMES = %w[ComicInfo.xml MetronInfo.xml].freeze
 
   attr_reader :path, :type
 

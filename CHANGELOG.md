@@ -1,7 +1,13 @@
 ## [Unreleased]
 
+## [0.4.0] - 2026-06-17
+
 ### Changed
 
+- **`#archive` now includes every file in the source folder by default** (was images-only). A new
+  `contents:` option selects what to archive: `:all` (default), `:images_only` (the previous
+  behavior), or `:images_and_info` (images plus `ComicInfo.xml` / `MetronInfo.xml`). Applies to
+  `.cbz` / `.cbt` / `.cb7`; `.cb` already keeps the whole folder. Adds `ComicBook::ArchiveContents`.
 - Bump Ruby version from 4.0.2 to 4.0.5 (`.ruby-version`, `required_ruby_version`, CI matrix)
 
 ## [0.3.0] - 2026-04-14

@@ -160,7 +160,7 @@ RSpec.describe ComicBook::CBT::Archiver do
         load_fixture('originals/mixed/readme.txt').copy_to File.join(source_folder, 'readme.txt')
       end
 
-      it 'creates archive with only image files' do
+      it 'includes every file by default' do
         archiver = described_class.new source_folder
         output_path = archiver.archive
 
@@ -171,12 +171,12 @@ RSpec.describe ComicBook::CBT::Archiver do
           end
         end
 
-        expect(created_entries).to eq ['page1.jpg']
+        expect(created_entries.sort).to eq %w[page1.jpg readme.txt]
       end
 
-      it 'only includes image files' do
+      it 'includes only image files with contents: :images_only' do
         archiver = described_class.new source_folder
-        output_path = archiver.archive
+        output_path = archiver.archive contents: :images_only
 
         File.open(output_path, 'rb') do |file|
           Gem::Package::TarReader.new(file) do |tar|
@@ -226,20 +226,21 @@ RSpec.describe ComicBook::CBT::Archiver do
         load_fixture('originals/text_only/readme.txt').copy_to File.join(source_folder, 'readme.txt')
       end
 
-      it 'creates archive matching text_only.cbt fixture' do
+      it 'includes the non-image files by default' do
         archiver = described_class.new source_folder
         output_path = archiver.archive
 
         File.open(output_path, 'rb') do |file|
           Gem::Package::TarReader.new(file) do |tar|
-            expect(tar.count).to eq 0
+            entries = tar.map { it.full_name if it.file? }.compact
+            expect(entries).to eq ['readme.txt']
           end
         end
       end
 
-      it 'creates an empty archive when only non-image files exist' do
+      it 'creates an empty archive with contents: :images_only' do
         archiver = described_class.new source_folder
-        output_path = archiver.archive
+        output_path = archiver.archive contents: :images_only
 
         File.open(output_path, 'rb') do |file|
           Gem::Package::TarReader.new(file) do |tar|

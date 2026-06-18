@@ -149,25 +149,22 @@ RSpec.describe ComicBook::CBZ::Archiver do
         load_fixture('originals/mixed/data.json').copy_to File.join(source_folder, 'data.json')
       end
 
-      it 'creates archive with only image files' do
+      it 'includes every file by default' do
         archiver = described_class.new source_folder
         output_path = archiver.archive
 
-        created_entries = []
         Zip::File.open(output_path) do |zipfile|
-          created_entries = zipfile.map(&:name).sort
+          expect(zipfile.map(&:name).sort).to eq %w[data.json page1.jpg readme.txt]
         end
-
-        expect(created_entries).to eq ['page1.jpg']
       end
 
-      it 'only includes image files' do
+      it 'includes only image files with contents: :images_only' do
         archiver = described_class.new source_folder
-        output_path = archiver.archive
+        output_path = archiver.archive contents: :images_only
 
         Zip::File.open(output_path) do |zipfile|
           entries = zipfile.map(&:name)
-          expect(entries).to include 'page1.jpg'
+          expect(entries).to eq ['page1.jpg']
           expect(entries).not_to include 'readme.txt', 'data.json'
         end
       end
@@ -199,13 +196,42 @@ RSpec.describe ComicBook::CBZ::Archiver do
         load_fixture('originals/text_only/config.json').copy_to File.join(source_folder, 'config.json')
       end
 
-      it 'creates empty archive from text-only folder' do
+      it 'includes the non-image files by default' do
         archiver = described_class.new source_folder
         output_path = archiver.archive
+
+        Zip::File.open(output_path) do |zipfile|
+          expect(zipfile.map(&:name).sort).to eq %w[config.json readme.txt]
+        end
+      end
+
+      it 'creates an empty archive with contents: :images_only' do
+        archiver = described_class.new source_folder
+        output_path = archiver.archive contents: :images_only
 
         expect(File).to exist output_path
         Zip::File.open(output_path) do |zipfile|
           expect(zipfile.entries).to be_empty
+        end
+      end
+    end
+
+    context 'with info fixture' do
+      let(:source_folder) { File.join temp_dir, 'with_info' }
+
+      before do
+        load_fixture('originals/with_info/page1.jpg').copy_to     File.join(source_folder, 'page1.jpg')
+        load_fixture('originals/with_info/ComicInfo.xml').copy_to File.join(source_folder, 'ComicInfo.xml')
+        load_fixture('originals/with_info/MetronInfo.xml').copy_to File.join(source_folder, 'MetronInfo.xml')
+        load_fixture('originals/with_info/notes.txt').copy_to File.join(source_folder, 'notes.txt')
+      end
+
+      it 'includes images and info files with contents: :images_and_info' do
+        archiver = described_class.new source_folder
+        output_path = archiver.archive contents: :images_and_info
+
+        Zip::File.open(output_path) do |zipfile|
+          expect(zipfile.map(&:name).sort).to eq %w[ComicInfo.xml MetronInfo.xml page1.jpg]
         end
       end
     end
