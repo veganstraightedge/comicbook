@@ -1,28 +1,30 @@
 # ComicBook
 
-⚠️ Under construction. ⚠️
 A Ruby library and CLI tool for managing comic books archives.
 
-**`extract`** — to open a `.cb*` file.
+- `extract`: to open a `.cb*` file
+- `archive`: to create a `.cb*` file
+- `info`: to read `ComicInfo.xml` metadata from a `.cb*` file
+- `pages`: to list page image files in a `.cb*` file
 
-**`archive`** — to create a `.cb*` file (default: `.cbz`).
+---
 
-**`info`** — to read ComicInfo.xml metadata from a `.cb*` file.
+Support for `archive` and `extract` :
 
-Currently supported formats for `archive` and `extract`:
+- `CB`: a folder of images, an optional `ComicInfo.xml` metadata file
+- `CB7`: [7zip](https://en.wikipedia.org/wiki/7-Zip)
+- `CBT`: [Tar](<https://en.wikipedia.org/wiki/Tar_(computing)>)
+- `CBZ`: [Zip](<https://en.wikipedia.org/wiki/ZIP_(file_format)>) **default**
 
-- CB7 — [7zip](https://en.wikipedia.org/wiki/7-Zip)
-- CBT — [Tar](<https://en.wikipedia.org/wiki/Tar_(computing)>)
-- CBZ — [Zip](<https://en.wikipedia.org/wiki/ZIP_(file_format)>)
+Suppor for only `extract`:
 
-Currently supported formats for `extract` only:
-
-- **CBR** — [RAR](https://en.wikipedia.org/wiki/WinRAR) is proprietary without an open source implementation license. Extracting support is provided using vendored [`unar`](https://theunarchiver.com/command-line) binaries because a large number of comic books are archived in .cbr/.rar format. No support for creating `.cbr` files will ever be added until RAR is open source (or reverse engineered).
-- **PDF** — Extract PDF pages as images using [libvips](https://www.libvips.org/). Requires libvips installed on the system.
-
-Planned formats for `extract` only:
-
-- **CBA** — [ACE](https://en.wikipedia.org/wiki/WinAce) is both proprietary and very old/outdated/unsupported. ACE extracting support is provided for historical posterity and completeness.
+- `CBR`: [RAR](https://en.wikipedia.org/wiki/WinRAR) is proprietary without an open source implementation license.
+  Extracting support because a large number of comic books are archived in .cbr/.rar format.
+  No support for creating `.cbr` files will ever be added unless `RAR` is open source (or reverse engineered).
+- `PDF`: Convert a PDF to a `.cb*` archive using [libvips](https://www.libvips.org) . Requires `libvips` installed on the system.
+- `CBA`: [ACE](https://en.wikipedia.org/wiki/WinAce) is both proprietary and very old/outdated/unsupported.
+  ACE extracting support is planned, to support historical posterity and completeness.
+  **NEEDED: actual `.cba` files** to test against (with and without `ComicInfo.xml`).
 
 ## Installation
 
@@ -117,9 +119,7 @@ brew install vips             # macOS
 sudo apt install libvips-dev  # Linux
 ```
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
-
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment. To install this gem onto your local machine, run `bundle exec rake install`.
 
 ## Contributing
 
