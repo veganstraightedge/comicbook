@@ -49,16 +49,14 @@ class ComicBook
     files(type: :images).map { Page.new it.path, it.name }
   end
 
-  def info
-    return CB.new(path).info if type == :folder
-
-    adapter.info
-  end
+  def info = adapter.info
 
   # The files in this comic, filtered by `type`:
-  #   :all (default), :images, or :images_and_info (images + ComicInfo.xml / MetronInfo.xml).
+  #   :all (default),
+  #   :images,
+  #   :images_and_info (images + ComicInfo.xml / MetronInfo.xml)
   def files type: :all
-    filter_files list_entries, by: type
+    filter_files adapter.entries, by: type
   end
 
   def archive options = {}
@@ -112,11 +110,6 @@ class ComicBook
     raise Error, "Path does not exist: #{path}"
   end
 
-  # A plain folder has no format adapter, so list it through CB.
-  def list_entries
-    type == :folder ? CB.new(path).entries : adapter.entries
-  end
-
   def filter_files entries, by:
     case by
     when :all             then entries
@@ -129,7 +122,7 @@ class ComicBook
 
   def adapter
     case type
-    when :cb  then CB.new path
+    when :cb, :folder then CB.new path
     when :cb7 then CB7.new path
     when :cba then CBA.new path
     when :cbr then CBR.new path

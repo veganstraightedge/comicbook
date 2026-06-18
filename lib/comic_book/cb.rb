@@ -20,7 +20,7 @@ class ComicBook
       Extractor.new(path).extract
     end
 
-    # Every file in the folder, as Entries with folder-relative paths.
+    # Every file in the folder, as Entries with folder-relative paths
     def entries
       Dir.glob(File.join(path, '**', '*')).reject { File.directory? it }.map do |file|
         relative = Pathname.new(file).relative_path_from(Pathname.new(path)).to_s
