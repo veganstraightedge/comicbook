@@ -17,6 +17,13 @@ class ComicBook
   IMAGE_EXTENSIONS   = %w[.jpg .jpeg .png .gif .bmp .webp].freeze
   IMAGE_GLOB_PATTERN = '*.{jpg,jpeg,png,gif,bmp,webp}'.freeze
 
+  # Metadata sidecar files (used by the :images_and_info file selection).
+  INFO_FILENAMES = %w[ComicInfo.xml MetronInfo.xml].freeze
+
+  # Stateless predicates over a file name or an archive-entry name.
+  def self.image?(name) = IMAGE_EXTENSIONS.include?(File.extname(name).downcase)
+  def self.info?(name)  = INFO_FILENAMES.include?(File.basename(name))
+
   attr_reader :path, :type
 
   def initialize path
@@ -48,6 +55,12 @@ class ComicBook
     return CB.new(path).info if type == :folder
 
     adapter.info
+  end
+
+  # The files in this comic, filtered by `type`:
+  #   :all (default), :images, or :images_and_info (images + ComicInfo.xml / MetronInfo.xml).
+  def files type: :all
+    filter_files list_entries, by: type
   end
 
   def archive options = {}
@@ -111,6 +124,21 @@ class ComicBook
 
       Page.new file, basename
     end
+  end
+
+  # A plain folder has no format adapter, so list it through CB.
+  def list_entries
+    type == :folder ? CB.new(path).entries : adapter.entries
+  end
+
+  def filter_files names, by:
+    case by
+    when :all             then names
+    when :images          then names.select { ComicBook.image? it }
+    when :images_and_info then names.select { ComicBook.image?(it) || ComicBook.info?(it) }
+    else
+      raise Error, "Unknown files type: #{by.inspect} (expected :all, :images, or :images_and_info)"
+    end.sort
   end
 
   def adapter

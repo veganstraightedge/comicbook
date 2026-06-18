@@ -32,5 +32,10 @@ class ComicBook
         ComicBook::Page.new relative_path, basename
       end
     end
+
+    # Every file in the folder, as absolute paths.
+    def entries
+      Dir.glob(File.join(path, '**', '*')).reject { File.directory? it }
+    end
   end
 end

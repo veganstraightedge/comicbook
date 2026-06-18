@@ -163,7 +163,7 @@ RSpec.describe ComicBook::CB7::Archiver do
         load_fixture('originals/mixed/data.json').copy_to File.join(source_folder, 'data.json')
       end
 
-      it 'creates archive with only image files' do
+      it 'includes every file by default' do
         output_path = archiver.archive
 
         created_entries = []
@@ -173,11 +173,11 @@ RSpec.describe ComicBook::CB7::Archiver do
           end
         end
 
-        expect(created_entries).to eq ['page1.jpg']
+        expect(created_entries).to eq %w[data.json page1.jpg readme.txt]
       end
 
-      it 'only includes image files' do
-        output_path = archiver.archive
+      it 'includes only image files with contents: :images' do
+        output_path = archiver.archive contents: :images
 
         File.open(output_path, 'rb') do |file|
           SevenZipRuby::Reader.open(file) do |seven_zip_reader|
@@ -192,6 +192,10 @@ RSpec.describe ComicBook::CB7::Archiver do
     context 'with empty fixture' do
       let(:source_folder) { File.join temp_dir, 'empty' }
       let(:expected_cb7) { load_fixture('cb7/empty.cb7').path }
+
+      before do
+        Dir.mkdir source_folder
+      end
 
       it 'creates archive matching empty.cb7 fixture' do
         output_path = archiver.archive
@@ -227,14 +231,13 @@ RSpec.describe ComicBook::CB7::Archiver do
 
     context 'with text_only fixture' do
       let(:source_folder) { File.join temp_dir, 'text_only' }
-      let(:expected_cb7) { load_fixture('cb7/text_only.cb7').path }
 
       before do
         load_fixture('originals/text_only/readme.txt').copy_to File.join(source_folder, 'readme.txt')
         load_fixture('originals/text_only/config.json').copy_to File.join(source_folder, 'config.json')
       end
 
-      it 'creates archive matching text_only.cb7 fixture' do
+      it 'includes the non-image files by default' do
         output_path = archiver.archive
 
         created_entries = []
@@ -244,18 +247,11 @@ RSpec.describe ComicBook::CB7::Archiver do
           end
         end
 
-        expected_entries = []
-        File.open(expected_cb7, 'rb') do |file|
-          SevenZipRuby::Reader.open(file) do |seven_zip_reader|
-            expected_entries = seven_zip_reader.entries.map(&:path).sort
-          end
-        end
-
-        expect(created_entries).to eq expected_entries
+        expect(created_entries).to eq %w[config.json readme.txt]
       end
 
-      it 'creates an empty archive when only non-image files exist' do
-        output_path = archiver.archive
+      it 'creates an empty archive with contents: :images' do
+        output_path = archiver.archive contents: :images
 
         expect(File).to exist output_path
         File.open(output_path, 'rb') do |file|

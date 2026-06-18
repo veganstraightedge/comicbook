@@ -203,6 +203,42 @@ RSpec.describe ComicBook do
     end
   end
 
+  describe '#files' do
+    let(:folder) { File.join temp_dir, 'with_info' }
+
+    before do
+      load_fixture('originals/with_info/page1.jpg').copy_to     File.join(folder, 'page1.jpg')
+      load_fixture('originals/with_info/ComicInfo.xml').copy_to File.join(folder, 'ComicInfo.xml')
+      load_fixture('originals/with_info/MetronInfo.xml').copy_to File.join(folder, 'MetronInfo.xml')
+      load_fixture('originals/with_info/notes.txt').copy_to File.join(folder, 'notes.txt')
+    end
+
+    def basenames type
+      described_class.new(folder).files(type:).map { File.basename it }
+    end
+
+    it 'returns every file with the default :all' do
+      expect(basenames(:all)).to eq %w[ComicInfo.xml MetronInfo.xml notes.txt page1.jpg]
+    end
+
+    it 'returns only images with :images' do
+      expect(basenames(:images)).to eq %w[page1.jpg]
+    end
+
+    it 'returns images and info with :images_and_info' do
+      expect(basenames(:images_and_info)).to eq %w[ComicInfo.xml MetronInfo.xml page1.jpg]
+    end
+
+    it 'defaults to :all' do
+      expect(described_class.new(folder).files.map { File.basename it }).to eq basenames(:all)
+    end
+
+    it 'raises on an unknown type' do
+      expect { described_class.new(folder).files type: :bogus }
+        .to raise_error described_class::Error, /Unknown files type/
+    end
+  end
+
   describe '#archive' do
     context 'with a folder' do
       subject(:cb) { described_class.new test_folder }

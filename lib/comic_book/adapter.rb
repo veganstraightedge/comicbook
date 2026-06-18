@@ -19,6 +19,10 @@ class ComicBook
       raise NotImplementedError, "#{self.class} must implement #pages"
     end
 
+    def entries
+      raise NotImplementedError, "#{self.class} must implement #entries"
+    end
+
     def info
       raise NotImplementedError, "#{self.class} must implement #info"
     end
