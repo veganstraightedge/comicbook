@@ -1,15 +1,13 @@
-## [Unreleased]
+## [0.4.0] - 2026-06-18
 
 ### Added
 
-- `ComicBook::Entry` domain model: a single member of a comic (image, info file, or other) that answers `#image?` and `#info?`
-- `ComicBook#files(type:)` returning `Entry` objects, filtered by `:all` (default), `:images`, or `:images_and_info` (images + ComicInfo.xml / MetronInfo.xml)
-- `contents:` option on archiving to choose which files to include (`:all`, `:images`, `:images_and_info`)
+- `contents:` option when archiving a folder — choose what goes into the archive: `:all` (default, every file), `:images` (images only), or `:images_and_info` (images plus `ComicInfo.xml` / `MetronInfo.xml`). Lets a comic be repackaged without dropping its metadata sidecars
+- `ComicBook#files(type:)` — list a comic's files, filtered the same three ways, as `ComicBook::Entry` objects that answer `#image?` and `#info?`
 
 ### Changed
 
-- `ComicBook#pages` now derives from `files(type: :images)` (PDF, CBR, and CBA keep their custom page listing)
-- Archive readers (CBZ, CBT, CB7, CB, CBR) expose `#entries` instead of a per-format `#pages`/image-filter
+- Pages are now ordered by full entry path; archives previously ordered by basename (affects nested archives only)
 - Bump Ruby version from 4.0.2 to 4.0.5 (`.ruby-version`, `required_ruby_version`, CI matrix)
 
 ## [0.3.0] - 2026-04-14
