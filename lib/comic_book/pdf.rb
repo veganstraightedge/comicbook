@@ -3,10 +3,6 @@ require_relative 'pdf/extractor'
 
 class ComicBook
   class PDF < Adapter
-    def info
-      nil
-    end
-
     def archive _options = {}
       raise Error, 'PDF archiving not supported (use extract to convert PDF pages to images)'
     end
@@ -15,6 +11,8 @@ class ComicBook
       require_vips!
       Extractor.new(path).extract options
     end
+
+    def info = nil
 
     def pages
       require_vips!

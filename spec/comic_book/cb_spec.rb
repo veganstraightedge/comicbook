@@ -127,7 +127,7 @@ RSpec.describe ComicBook::CB do
     end
   end
 
-  describe '#pages' do
+  describe '#entries' do
     subject(:adapter) { described_class.new(cb_folder) }
 
     let(:cb_folder) { File.join(temp_dir, 'test.cb') }
@@ -139,24 +139,17 @@ RSpec.describe ComicBook::CB do
       load_fixture('originals/simple/page3.gif').copy_to File.join(cb_folder, 'page3.gif')
     end
 
-    it 'returns array of Page objects' do
-      pages = adapter.pages
+    it 'returns Entry objects for every member' do
+      entries = adapter.entries
 
-      expect(pages).to be_all ComicBook::Page
-      expect(pages.length).to eq 3
+      expect(entries).to be_all ComicBook::Entry
+      expect(entries.map(&:name)).to contain_exactly 'page1.jpg', 'page2.png', 'page3.gif'
     end
 
-    it 'sorts pages alphabetically by name' do
-      pages = adapter.pages
+    it 'sets the path relative to the folder' do
+      entry = adapter.entries.find { it.name == 'page1.jpg' }
 
-      expect(pages.map(&:name)).to eq %w[page1.jpg page2.png page3.gif]
-    end
-
-    it 'sets correct path and name for each page' do
-      pages = adapter.pages
-
-      expect(pages.first.path).to eq 'page1.jpg'
-      expect(pages.first.name).to eq 'page1.jpg'
+      expect(entry.path).to eq 'page1.jpg'
     end
 
     context 'with nested files' do
@@ -165,11 +158,10 @@ RSpec.describe ComicBook::CB do
       end
 
       it 'includes nested files with relative paths' do
-        pages = adapter.pages
+        nested = adapter.entries.find { it.name == 'nested.jpg' }
 
-        nested_page = pages.find { it.name == 'nested.jpg' }
-        expect(nested_page).not_to be_nil
-        expect(nested_page.path).to eq 'subfolder/nested.jpg'
+        expect(nested).not_to be_nil
+        expect(nested.path).to eq 'subfolder/nested.jpg'
       end
     end
 
@@ -178,11 +170,11 @@ RSpec.describe ComicBook::CB do
         load_fixture('originals/mixed/readme.txt').copy_to File.join(cb_folder, 'readme.txt')
       end
 
-      it 'only includes image files' do
-        pages = adapter.pages
+      it 'includes non-image files too' do
+        names = adapter.entries.map(&:name)
 
-        expect(pages.length).to eq 3
-        expect(pages.map(&:name)).not_to include 'readme.txt'
+        expect(names).to include('readme.txt')
+        expect(names).to include('page1.jpg')
       end
     end
   end

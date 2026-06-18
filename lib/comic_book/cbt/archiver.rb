@@ -8,9 +8,12 @@ class ComicBook
       def archive options = {}
         extension       = options.fetch :extension, :cbt
         delete_original = options.fetch :delete_original, false
+        contents        = options.fetch :contents, :all
 
         output_path = options[:to] || determine_output_path(extension)
-        create_archive output_path
+        entries     = ComicBook.new(source_folder).files(type: contents)
+
+        create_archive output_path, entries
         cleanup_source_folder if delete_original
 
         output_path
@@ -27,31 +30,19 @@ class ComicBook
         File.expand_path File.join(dir_name, "#{base_name}.#{extension}")
       end
 
-      def create_archive output_path
+      def create_archive output_path, entries
         File.open(output_path, 'wb') do |file|
           Gem::Package::TarWriter.new(file) do |writer|
-            find_image_files.each do |image_file|
-              add_file writer, image_file
-            end
+            entries.each { add_entry writer, it }
           end
         end
       end
 
-      def find_image_files
-        pattern = File.join(source_folder, '**', ComicBook::IMAGE_GLOB_PATTERN)
-        Dir.glob(pattern, File::FNM_CASEFOLD).sort
-      end
+      def add_entry writer, entry
+        absolute = File.join source_folder, entry.path
 
-      def add_file writer, file
-        file_path     = Pathname.new file
-        source_path   = Pathname.new source_folder
-        relative_path = file_path.relative_path_from source_path
-
-        stat = File.stat file
-        writer.add_file(relative_path.to_s, stat.mode) do |io|
-          File.open(file, 'rb') do |f|
-            io.write f.read
-          end
+        writer.add_file(entry.path, File.stat(absolute).mode) do |io|
+          io.write File.binread(absolute)
         end
       end
 

@@ -1,5 +1,6 @@
 require_relative 'comic_book/version'
 require_relative 'comic_book/page'
+require_relative 'comic_book/entry'
 require_relative 'comic_book/cb'
 require_relative 'comic_book/cb7'
 require_relative 'comic_book/cba'
@@ -16,6 +17,9 @@ class ComicBook
 
   IMAGE_EXTENSIONS   = %w[.jpg .jpeg .png .gif .bmp .webp].freeze
   IMAGE_GLOB_PATTERN = '*.{jpg,jpeg,png,gif,bmp,webp}'.freeze
+
+  # Metadata sidecar files (used by the :images_and_info file selection).
+  INFO_FILENAMES = %w[ComicInfo.xml MetronInfo.xml].freeze
 
   attr_reader :path, :type
 
@@ -35,19 +39,6 @@ class ComicBook
 
   def self.extract path, options = {}
     new(path).extract options
-  end
-
-  def pages
-    case type
-    when :folder then folder_pages
-    else adapter.pages
-    end
-  end
-
-  def info
-    return CB.new(path).info if type == :folder
-
-    adapter.info
   end
 
   def archive options = {}
@@ -72,7 +63,39 @@ class ComicBook
     adapter.extract options
   end
 
+  def info = adapter.info
+
+  # The files in this comicbook, filtered by type:
+  #   :all (default),
+  #   :images,
+  #   :images_and_info (images + ComicInfo.xml / MetronInfo.xml)
+  def files type: :all
+    filter_files adapter.entries, by: type
+  end
+
+  # Pages are the image files, in path order, wrapped as Page objects.
+  # PDF renders synthetic pages and CBA is a stub, so both stay custom.
+  def pages
+    return adapter.pages if %i[cba pdf].include?(type)
+
+    files(type: :images).map { Page.new it.path, it.name }
+  end
+
   private
+
+  def adapter
+    case type
+    when :cb7 then CB7.new path
+    when :cba then CBA.new path
+    when :cbr then CBR.new path
+    when :cbt then CBT.new path
+    when :cbz then CBZ.new path
+    when :pdf then PDF.new path
+    when :cb, :folder then CB.new path
+    else
+      raise Error, "No adapter available for type: #{type}"
+    end
+  end
 
   def determine_type path
     if File.directory? path
@@ -81,11 +104,11 @@ class ComicBook
       extension = File.extname(path).downcase
 
       case extension
-      when '.cbz' then :cbz
       when '.cb7' then :cb7
-      when '.cbt' then :cbt
-      when '.cbr' then :cbr
       when '.cba' then :cba
+      when '.cbr' then :cbr
+      when '.cbt' then :cbt
+      when '.cbz' then :cbz
       when '.pdf' then :pdf
       else
         raise Error, "Unsupported file type: #{File.extname(path)}"
@@ -95,35 +118,22 @@ class ComicBook
     end
   end
 
+  def filter_files entries, by:
+    case by
+    when :all             then entries
+    when :images          then images
+    when :images_and_info then images_and_info
+    else
+      raise Error, "Unknown files type: #{by.inspect} (expected :all, :images, or :images_and_info)"
+    end.sort_by(&:path)
+  end
+
+  def images          = adapter.images
+  def images_and_info = adapter.images_and_info
+
   def validate_path!
     return if File.exist? path
 
     raise Error, "Path does not exist: #{path}"
-  end
-
-  def folder_pages
-    pattern     = IMAGE_GLOB_PATTERN
-    search_path = File.join @path, '**', pattern
-    image_files = Dir.glob search_path, File::FNM_CASEFOLD
-
-    image_files.sort.map do |file|
-      basename = File.basename file
-
-      Page.new file, basename
-    end
-  end
-
-  def adapter
-    case type
-    when :cb  then CB.new path
-    when :cb7 then CB7.new path
-    when :cba then CBA.new path
-    when :cbr then CBR.new path
-    when :cbt then CBT.new path
-    when :cbz then CBZ.new path
-    when :pdf then PDF.new path
-    else
-      raise Error, "No adapter available for type: #{type}"
-    end
   end
 end

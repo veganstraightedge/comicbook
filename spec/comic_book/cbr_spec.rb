@@ -123,7 +123,7 @@ RSpec.describe ComicBook::CBR do
     end
   end
 
-  describe '#pages' do
+  describe '#entries' do
     subject(:adapter) { described_class.new(test_cbr) }
 
     let(:test_cbr) { File.join(temp_dir, 'simple.cbr') }
@@ -132,24 +132,17 @@ RSpec.describe ComicBook::CBR do
       load_fixture('cbr/simple.cbr').copy_to(test_cbr)
     end
 
-    it 'returns array of Page objects' do
-      pages = adapter.pages
+    it 'returns Entry objects for every member' do
+      entries = adapter.entries
 
-      expect(pages).to be_all ComicBook::Page
-      expect(pages.length).to eq 3
+      expect(entries).to be_all ComicBook::Entry
+      expect(entries.map(&:name)).to contain_exactly 'page1.jpg', 'page2.png', 'page3.gif'
     end
 
-    it 'sorts pages alphabetically by name' do
-      pages = adapter.pages
+    it 'sets the path to the archive entry name' do
+      entry = adapter.entries.find { it.name == 'page1.jpg' }
 
-      expect(pages.map(&:name)).to eq %w[page1.jpg page2.png page3.gif]
-    end
-
-    it 'sets correct path and name for each page' do
-      pages = adapter.pages
-
-      expect(pages.first.path).to eq 'page1.jpg'
-      expect(pages.first.name).to eq 'page1.jpg'
+      expect(entry.path).to eq 'page1.jpg'
     end
 
     context 'with non-image files in the archive' do
@@ -161,11 +154,11 @@ RSpec.describe ComicBook::CBR do
         load_fixture('cbr/mixed.cbr').copy_to(mixed_cbr)
       end
 
-      it 'only includes image files' do
-        pages = adapter.pages
+      it 'includes non-image files too' do
+        names = adapter.entries.map(&:name)
 
-        expect(pages.length).to eq 1
-        expect(pages.first.name).to eq 'page1.jpg'
+        expect(names).to include('page1.jpg')
+        expect(names).to include('readme.txt')
       end
     end
   end

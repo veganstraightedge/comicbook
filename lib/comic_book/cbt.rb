@@ -14,6 +14,20 @@ class ComicBook
       Extractor.new(path).extract options
     end
 
+    def entries
+      names = []
+
+      File.open(path, 'rb') do |file|
+        Gem::Package::TarReader.new(file) do |reader|
+          reader.each do |entry|
+            names << entry.full_name if entry.file?
+          end
+        end
+      end
+
+      names.map { ComicBook::Entry.new it }
+    end
+
     def info
       xml = nil
 
@@ -31,36 +45,6 @@ class ComicBook
       return nil unless xml
 
       ComicInfo.load xml
-    end
-
-    def pages
-      entries = []
-
-      File.open(path, 'rb') do |file|
-        Gem::Package::TarReader.new(file) do |reader|
-          reader.each do |entry|
-            entries << entry.full_name if entry.file?
-          end
-        end
-      end
-
-      entries.select { image_file? it }
-             .map    { create_page_from_entry it }
-             .sort_by(&:name)
-    end
-
-    private
-
-    def create_page_from_entry entry
-      basename = File.basename entry
-
-      ComicBook::Page.new entry, basename
-    end
-
-    def image_file? filename
-      extension = File.extname filename.downcase
-
-      ComicBook::IMAGE_EXTENSIONS.include? extension
     end
   end
 end
