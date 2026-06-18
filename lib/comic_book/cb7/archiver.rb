@@ -28,20 +28,16 @@ class ComicBook
         File.expand_path File.join(dir_name, "#{base_name}.#{extension}")
       end
 
-      def create_archive output_path, files
+      def create_archive output_path, entries
         File.open(output_path, 'wb') do |file|
           SevenZipRuby::Writer.open(file) do |writer|
-            files.each { add_file writer, it }
+            entries.each { add_entry writer, it }
           end
         end
       end
 
-      def add_file writer, file
-        file_path     = Pathname.new file
-        source_path   = Pathname.new source_folder
-        relative_path = file_path.relative_path_from source_path
-
-        writer.add_file file, as: relative_path.to_s
+      def add_entry writer, entry
+        writer.add_file File.join(source_folder, entry.path), as: entry.path
       end
 
       def cleanup_source_folder

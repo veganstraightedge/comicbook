@@ -214,7 +214,7 @@ RSpec.describe ComicBook do
     end
 
     def basenames type
-      described_class.new(folder).files(type:).map { File.basename it }
+      described_class.new(folder).files(type:).map(&:name)
     end
 
     it 'returns every file with the default :all' do
@@ -230,7 +230,7 @@ RSpec.describe ComicBook do
     end
 
     it 'defaults to :all' do
-      expect(described_class.new(folder).files.map { File.basename it }).to eq basenames(:all)
+      expect(described_class.new(folder).files.map(&:name)).to eq basenames(:all)
     end
 
     it 'raises on an unknown type' do

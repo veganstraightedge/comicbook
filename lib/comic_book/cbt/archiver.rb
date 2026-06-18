@@ -28,24 +28,19 @@ class ComicBook
         File.expand_path File.join(dir_name, "#{base_name}.#{extension}")
       end
 
-      def create_archive output_path, files
+      def create_archive output_path, entries
         File.open(output_path, 'wb') do |file|
           Gem::Package::TarWriter.new(file) do |writer|
-            files.each { add_file writer, it }
+            entries.each { add_entry writer, it }
           end
         end
       end
 
-      def add_file writer, file
-        file_path     = Pathname.new file
-        source_path   = Pathname.new source_folder
-        relative_path = file_path.relative_path_from source_path
+      def add_entry writer, entry
+        absolute = File.join source_folder, entry.path
 
-        stat = File.stat file
-        writer.add_file(relative_path.to_s, stat.mode) do |io|
-          File.open(file, 'rb') do |f|
-            io.write f.read
-          end
+        writer.add_file(entry.path, File.stat(absolute).mode) do |io|
+          io.write File.binread(absolute)
         end
       end
 

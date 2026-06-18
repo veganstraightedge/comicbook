@@ -1,5 +1,6 @@
 require_relative 'comic_book/version'
 require_relative 'comic_book/page'
+require_relative 'comic_book/entry'
 require_relative 'comic_book/cb'
 require_relative 'comic_book/cb7'
 require_relative 'comic_book/cba'
@@ -19,10 +20,6 @@ class ComicBook
 
   # Metadata sidecar files (used by the :images_and_info file selection).
   INFO_FILENAMES = %w[ComicInfo.xml MetronInfo.xml].freeze
-
-  # Stateless predicates over a file name or an archive-entry name.
-  def self.image?(name) = IMAGE_EXTENSIONS.include?(File.extname(name).downcase)
-  def self.info?(name)  = INFO_FILENAMES.include?(File.basename(name))
 
   attr_reader :path, :type
 
@@ -131,14 +128,14 @@ class ComicBook
     type == :folder ? CB.new(path).entries : adapter.entries
   end
 
-  def filter_files names, by:
+  def filter_files entries, by:
     case by
-    when :all             then names
-    when :images          then names.select { ComicBook.image? it }
-    when :images_and_info then names.select { ComicBook.image?(it) || ComicBook.info?(it) }
+    when :all             then entries
+    when :images          then entries.select(&:image?)
+    when :images_and_info then entries.select { it.image? || it.info? }
     else
       raise Error, "Unknown files type: #{by.inspect} (expected :all, :images, or :images_and_info)"
-    end.sort
+    end.sort_by(&:path)
   end
 
   def adapter
