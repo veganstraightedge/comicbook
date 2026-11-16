@@ -12,10 +12,10 @@
 
 ### Adapter Pattern
 ```
-Format (e.g., CBR)
-├── cbr.rb - inherits from Adapter
-├── archiver.rb - creates archives
-└── extractor.rb - extracts archives
+Format (e.g., CBZ)
+├── cbz.rb - inherits from Adapter
+├── cbz/archiver.rb - creates archives (not for extract-only formats: CBR, PDF)
+└── cbz/extractor.rb - extracts archives
 ```
 
 ### TmpDir Testing
@@ -88,8 +88,9 @@ end
 
 ## Vendored Tools
 
-- Use `lib/comic_book/vendor/platform/tool`
-- Detect platform: macos/linux/windows
+- `lsar` / `unar` (for CBR) live in `lib/comic_book/vendor/<platform>/` for macos and windows
+- On linux they are not vendored: `ComicBook::CLIHelpers` expects them installed on the system
+- Run them through `ComicBook::CLIHelpers`, which detects the platform
 - Handle command errors gracefully
 - Parse output appropriately
 
@@ -105,6 +106,6 @@ end
 
 - All tests pass
 - RuboCop clean
-- Same patterns as CB7/CBT/CBZ
+- Same patterns as CB7/CBR/CBT/CBZ
 - No repo pollution
 - Documentation current

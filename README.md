@@ -5,7 +5,7 @@ A Ruby library and CLI tool for managing comic books archives.
 - `extract`: to open a `.cb*` file
 - `archive`: to create a `.cb*` file
 - `info`: to read `ComicInfo.xml` metadata from a `.cb*` file
-- `pages`: to list page image files in a `.cb*` file
+- `pages`: to list page image files in a `.cb*` file (Ruby API only)
 
 ---
 
@@ -16,12 +16,16 @@ Support for `archive` and `extract` :
 - `CBT`: [Tar](<https://en.wikipedia.org/wiki/Tar_(computing)>)
 - `CBZ`: [Zip](<https://en.wikipedia.org/wiki/ZIP_(file_format)>) **default**
 
-Suppor for only `extract`:
+Support for only `extract`:
 
 - `CBR`: [RAR](https://en.wikipedia.org/wiki/WinRAR) is proprietary without an open source implementation license.
+  Uses the `lsar` / `unar` tools: bundled for macOS and Windows, on Linux install the `unar` package.
   Extracting support because a large number of comic books are archived in .cbr/.rar format.
   No support for creating `.cbr` files will ever be added unless `RAR` is open source (or reverse engineered).
 - `PDF`: Convert a PDF to a `.cb*` archive using [libvips](https://www.libvips.org) . Requires `libvips` installed on the system.
+
+Not supported yet:
+
 - `CBA`: [ACE](https://en.wikipedia.org/wiki/WinAce) is both proprietary and very old/outdated/unsupported.
   ACE extracting support is planned, to support historical posterity and completeness.
   **NEEDED: actual `.cba` files** to test against (with and without `ComicInfo.xml`).
@@ -57,11 +61,14 @@ comicbook extract path/to/archive.cbz --images-only
 # Extract PDF at custom DPI (default: 300)
 comicbook extract path/to/comic.pdf --dpi 600
 
+# Delete the source after extracting (or archiving)
+comicbook extract path/to/archive.cbz --delete-original
+
 # Create a comic book archive from a folder
 comicbook archive path/to/folder
 
-# Create archive at a specific destination
-comicbook archive path/to/folder --to path/to/output.cbz
+# Create archive at a specific destination (the extension picks the format: .cbz, .cb7, .cbt, .cb)
+comicbook archive path/to/folder --to path/to/output.cb7
 
 # Show ComicInfo.xml metadata
 comicbook info path/to/archive.cbz
@@ -70,6 +77,7 @@ comicbook info path/to/archive.cbz
 comicbook info path/to/archive.cbz --format json
 comicbook info path/to/archive.cbz --format yaml
 comicbook info path/to/archive.cbz --format terse
+comicbook info path/to/archive.cbz --format verbose # default
 
 # Show only specific fields
 comicbook info path/to/archive.cbz --only title,writer,publisher
@@ -77,8 +85,9 @@ comicbook info path/to/archive.cbz --only title,writer,publisher
 # Show all fields except specific ones
 comicbook info path/to/archive.cbz --except summary,review
 
-# Show help
+# Show help or version
 comicbook --help
+comicbook --version
 ```
 
 ### Ruby API
@@ -96,12 +105,19 @@ ComicBook.extract 'path/to/archive.cbz', images_only: true
 # Create a comic book archive from a folder (creates .cbz by default)
 ComicBook.new('path/to/folder').archive
 
-# Create archive at a specific destination
+# Create archive at a specific destination (the extension picks the format)
 ComicBook.new('path/to/folder').archive to: 'path/to/output.cbz'
+
+# Choose what goes into the archive: :all (default), :images, or :images_and_info
+ComicBook.new('path/to/folder').archive contents: :images_and_info
 
 # Get pages from an archive
 comic = ComicBook.new 'path/to/archive.cbz'
 comic.pages  # => [#<ComicBook::Page>, ...]
+
+# List files in an archive: :all (default), :images, or :images_and_info
+comic.files                # => [#<ComicBook::Entry>, ...]
+comic.files type: :images  # => [#<ComicBook::Entry>, ...]
 
 # Read ComicInfo.xml metadata
 comic = ComicBook.new 'path/to/archive.cbz'
