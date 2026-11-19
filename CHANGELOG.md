@@ -6,10 +6,6 @@
 - Format support is public: `ComicBook::TYPES`, `ComicBook::READABLE_TYPES` (everything but `:cba`) and `ComicBook::WRITABLE_TYPES` (`:cb`, `:cb7`, `:cbt`, `:cbz`)
 - `ComicBook::DEFAULT_PAGE_FILENAME_TEMPLATE` (`page_{page:3}`)
 
-### Changed
-
-- Requires comicinfo 2.1 or later (was 2.0)
-
 ### Fixed
 
 - Mislabelled archives now open. A comic's type is told from the bytes the file starts with, so a RAR named `.cbz` (common in the wild) loads with `type == :cbr` and is read as one. ZIP, RAR, 7-Zip, TAR, PDF and ACE are recognized, by the new `ComicBook::Signature`. The extension still decides which files are comics at all (a `.zip` is refused as before) and is used when the contents are not recognized
@@ -17,6 +13,9 @@
 
 ### Changed
 
+- Requires comicinfo 2.1 or later (was 2.0)
+- CI runs on `ubuntu-24.04` instead of `ubuntu-latest`: on Ubuntu 26.04 the `seven-zip` gem crashed Ruby when reading an empty 7z
+- CI retries a stalled package download instead of hanging, and installs from Ubuntu's main archive: installing `unar` and `libvips-dev` was stalling on the runner's regional mirror
 - Bump Ruby version from 4.0.5 to 4.0.9 (`.ruby-version`, `required_ruby_version`, CI matrix)
 - Brought `README.md`, `SYSTEM.md`, `AGENT.md` and `TODO.md` up to date: CBR, PDF, `.cb` folders, the CLI, `files`, and `contents:` are documented as they work today; finished roadmap items are removed
 
