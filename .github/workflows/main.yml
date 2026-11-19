@@ -27,6 +27,10 @@ jobs:
         # and try it again, instead of hanging until the job is cancelled.
         timeout-minutes: 10
         run: |
+          # The runner's regional mirror (us-east-2.ec2.archive.ubuntu.com) keeps dropping
+          # downloads, so use the main archive wherever apt is pointed at a regional one.
+          sudo grep -rlE '[a-z0-9-]+\.ec2\.archive\.ubuntu\.com' /etc/apt \
+            | xargs -r sudo sed -i -E 's#[a-z0-9-]+\.ec2\.archive\.ubuntu\.com#archive.ubuntu.com#g'
           sudo apt-get update
           sudo apt-get install -y -o Acquire::Retries=5 -o Acquire::http::Timeout=30 unar libvips-dev
       - name: Set up Ruby
