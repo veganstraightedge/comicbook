@@ -1,5 +1,6 @@
 require_relative 'comic_book/version'
 require_relative 'comic_book/page'
+require_relative 'comic_book/page_arranger'
 require_relative 'comic_book/entry'
 require_relative 'comic_book/cb'
 require_relative 'comic_book/cb7'
@@ -21,6 +22,19 @@ class ComicBook
 
   # Metadata sidecar files (used by the :images_and_info file selection).
   INFO_FILENAMES = %w[ComicInfo.xml MetronInfo.xml].freeze
+
+  # Every kind of comic: a format's file extension, or :folder for a plain folder.
+  TYPES = %i[cb cb7 cba cbr cbt cbz folder pdf].freeze
+
+  # The types that can be opened: their pages listed, their metadata read.
+  # Everything but :cba, which is recognized but not implemented.
+  READABLE_TYPES = %i[cb cb7 cbr cbt cbz folder pdf].freeze
+
+  # The types #archive can produce. RAR and ACE are proprietary, and PDF is only read.
+  WRITABLE_TYPES = %i[cb cb7 cbt cbz].freeze
+
+  # How #arrange_pages names page files unless told otherwise: page_001, page_002, ...
+  DEFAULT_PAGE_FILENAME_TEMPLATE = 'page_{page:3}'.freeze
 
   attr_reader :path, :type
 
@@ -65,6 +79,35 @@ class ComicBook
   end
 
   def info = adapter.info
+
+  # Make this folder's page images exactly `sources`, in that order.
+  #
+  # Use it to reorder, delete, and add pages of an extracted comic before archiving it again:
+  #
+  #   comic = ComicBook.load 'Issue1.cb'
+  #   # Move the last of three pages to the front, drop the second, and add a new one.
+  #   comic.arrange_pages ['page3.jpg', 'page1.jpg', '/Users/me/Desktop/extra.png']
+  #
+  # Each source is an image file: a path relative to the folder for a page already in it,
+  # or an absolute path for a file anywhere (it is copied in). Afterwards:
+  #
+  # - The pages are named from `template` in the given order, keeping their extensions:
+  #   page_001, page_002, ... unless you pass another. ComicInfo::Issue#page_filename fills
+  #   the template in, so it can use {page} and the comic's details, such as
+  #   '{series}_{number:3}_{page:4}', and the names always sort in page order.
+  # - They are in the folder their pages were in before (the shared parent, if there were several).
+  # - Page images left out of `sources` are deleted. Files that are not images are left alone.
+  # - If the folder has a ComicInfo.xml, its <Page> entries and PageCount are updated to follow
+  #   the pages (see ComicInfo::Issue#rearranging_pages).
+  #
+  # Only a folder or .cb can be arranged; extract an archive first.
+  # Returns the comic's pages afterwards. Raises Error, changing nothing, for a source that is
+  # missing or is not an image.
+  def arrange_pages sources, template: DEFAULT_PAGE_FILENAME_TEMPLATE
+    raise Error, "Cannot arrange the pages of a #{type} file; extract it first" unless %i[folder cb].include?(type)
+
+    PageArranger.new(path).arrange sources, template:
+  end
 
   # The files in this comicbook, filtered by type:
   #   :all (default),

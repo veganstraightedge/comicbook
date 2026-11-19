@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ComicInfo>
+  <Title>Chapter Seven</Title>
+  <Series>Saga</Series>
+  <Number>7</Number>
+  <PageCount>3</PageCount>
+  <Pages>
+    <Page Image="0" Type="FrontCover" />
+    <Page Image="1" Type="Story" Bookmark="Chapter 1" />
+    <Page Image="2" Type="BackCover" />
+  </Pages>
+</ComicInfo>

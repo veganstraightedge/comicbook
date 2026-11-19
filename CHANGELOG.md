@@ -1,5 +1,15 @@
 ## [Unreleased]
 
+### Added
+
+- `ComicBook#arrange_pages(sources, template:)`: make a folder's page images exactly the given files, in order. Reorders, deletes, and adds pages of an extracted comic in one step: pages stay in the subfolder they were in, files that are not images are left alone, and a `ComicInfo.xml` in the folder has its `<Page>` entries and `PageCount` updated to match. Pages are named `page_001…` unless a `template:` such as `{series}_{number:3}_{page:4}` is given, which the comicinfo gem's `Issue#page_filename` fills in from the folder's `ComicInfo.xml`. `ComicBook::PageArranger` does the work
+- Format support is public: `ComicBook::TYPES`, `ComicBook::READABLE_TYPES` (everything but `:cba`) and `ComicBook::WRITABLE_TYPES` (`:cb`, `:cb7`, `:cbt`, `:cbz`)
+- `ComicBook::DEFAULT_PAGE_FILENAME_TEMPLATE` (`page_{page:3}`)
+
+### Changed
+
+- Requires comicinfo 2.1 or later (was 2.0)
+
 ### Fixed
 
 - Mislabelled archives now open. A comic's type is told from the bytes the file starts with, so a RAR named `.cbz` (common in the wild) loads with `type == :cbr` and is read as one. ZIP, RAR, 7-Zip, TAR, PDF and ACE are recognized, by the new `ComicBook::Signature`. The extension still decides which files are comics at all (a `.zip` is refused as before) and is used when the contents are not recognized

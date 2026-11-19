@@ -6,6 +6,7 @@ A Ruby library and CLI tool for managing comic books archives.
 - `archive`: to create a `.cb*` file
 - `info`: to read `ComicInfo.xml` metadata from a `.cb*` file
 - `pages`: to list page image files in a `.cb*` file (Ruby API only)
+- `arrange_pages`: to reorder, delete, and add pages of an extracted comic (Ruby API only)
 
 ---
 
@@ -123,6 +124,22 @@ comic.pages  # => [#<ComicBook::Page>, ...]
 # List files in an archive: :all (default), :images, or :images_and_info
 comic.files                # => [#<ComicBook::Entry>, ...]
 comic.files type: :images  # => [#<ComicBook::Entry>, ...]
+
+# Reorder, delete, and add pages of an extracted comic, then archive it again.
+# Each source is a page already in the folder (relative path) or any image file (absolute path).
+extracted = ComicBook.new 'path/to/extracted.cb'
+extracted.arrange_pages ['page3.jpg', 'page1.jpg', '/Users/me/Desktop/extra.png']
+extracted.archive to: 'path/to/output.cbz'
+
+# Pages are renumbered page_001... in the given order, page images left out are deleted,
+# and a ComicInfo.xml in the folder has its <Page> entries and PageCount updated to match.
+# Pass a template to name the page files another way. It can use {page} and the comic's
+# details, and the names always sort in page order. Write it in single quotes.
+extracted.arrange_pages sources, template: '{series}_{number:3}_{page:4}' # Saga_007_0001.jpg ...
+
+# Which formats can be opened, and which can be written
+ComicBook::READABLE_TYPES # => [:cb, :cb7, :cbr, :cbt, :cbz, :folder, :pdf]
+ComicBook::WRITABLE_TYPES # => [:cb, :cb7, :cbt, :cbz]
 
 # Read ComicInfo.xml metadata
 comic = ComicBook.new 'path/to/archive.cbz'
