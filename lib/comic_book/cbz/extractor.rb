@@ -63,6 +63,7 @@ class ComicBook
         Zip::File.open(archive_path) do |zipfile|
           zipfile.each do |entry|
             next if entry.directory?
+            next if ComicBook::Entry.new(entry.name).macos_metadata?
             next if options[:images_only] && !image_file?(entry.name)
 
             extract_single_file entry, destination_basename

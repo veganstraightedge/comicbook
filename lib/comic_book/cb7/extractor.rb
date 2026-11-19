@@ -63,6 +63,7 @@ class ComicBook
       def extract_files destination, options, seven_zip_reader
         seven_zip_reader.entries.each do |entry|
           next unless entry.file?
+          next if ComicBook::Entry.new(entry.path).macos_metadata?
           next if options[:images_only] && !image_file?(entry.path)
 
           extract_single_file entry, destination, seven_zip_reader

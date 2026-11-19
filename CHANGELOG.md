@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+### Fixed
+
+- macOS metadata is no longer part of a comic. Archives made on a Mac can carry AppleDouble members (`._page1.jpg`, written by `tar` beside a file with extended attributes) or a `__MACOSX` folder (where Finder's Compress puts the same data). They were listed as files, counted as pages because their names end in an image extension, and extracted. All formats now leave them out of `files`, `pages` and `extract`, and a folder's `__MACOSX` is left out when it is archived. `ComicBook::Entry#macos_metadata?` is the check
+
 ### Changed
 
 - Bump Ruby version from 4.0.5 to 4.0.9 (`.ruby-version`, `required_ruby_version`, CI matrix)

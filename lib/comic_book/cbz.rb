@@ -21,7 +21,7 @@ class ComicBook
         zipfile.each { |entry| names << entry.name if entry.file? }
       end
 
-      names.map { ComicBook::Entry.new it }
+      names.map { ComicBook::Entry.new it }.reject(&:macos_metadata?)
     end
 
     def info

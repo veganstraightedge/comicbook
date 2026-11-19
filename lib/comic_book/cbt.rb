@@ -25,7 +25,7 @@ class ComicBook
         end
       end
 
-      names.map { ComicBook::Entry.new it }
+      names.map { ComicBook::Entry.new it }.reject(&:macos_metadata?)
     end
 
     def info

@@ -16,5 +16,14 @@ class ComicBook
 
     def image? = ComicBook::IMAGE_EXTENSIONS.include?(File.extname(name).downcase)
     def info?  = ComicBook::INFO_FILENAMES.include?(name)
+
+    # True if macOS added this to an archive, so it is not part of the comic:
+    #    an AppleDouble member (`._page1.jpg`, which tar writes beside a file
+    #    that has extended attributes),
+    #    or anything in a `__MACOSX` folder (where Finder's Compress puts the same data).
+    # Such members are never listed, counted as pages, or extracted.
+    def macos_metadata?
+      path.split('/').any? { it == '__MACOSX' || it.start_with?('._') }
+    end
   end
 end
