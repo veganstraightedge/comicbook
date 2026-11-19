@@ -18,6 +18,7 @@ comicbook/
 │       ├── cli_helpers.rb       # Runs the lsar / unar tools
 │       ├── entry.rb             # One file inside a comic
 │       ├── page.rb              # Page representation
+│       ├── page_arranger.rb     # Reorders, deletes and adds a folder's pages
 │       ├── signature.rb         # A file's type, from the bytes it starts with
 │       ├── version.rb           # Version constant
 │       ├── cb.rb                # CB (folder) adapter
@@ -98,7 +99,7 @@ Each adapter delegates to an `Archiver` and an `Extractor` class that hold the f
   - Type detection: a folder is `:folder`, or `:cb` if its name ends in `.cb`; a file must have a comic extension, and is typed by its contents (`ComicBook::Signature`), falling back to the extension
   - Path validation
   - Delegation to the adapter
-  - `archive`, `extract`, `info`, `files(type:)`, `pages`
+  - `archive`, `extract`, `info`, `files(type:)`, `pages`, `arrange_pages(sources, template:)` (done by `ComicBook::PageArranger`)
 - `ComicBook::Info` is an alias of `ComicInfo::Issue`
 
 #### 2. ComicBook::Adapter (Base Class)
@@ -180,6 +181,12 @@ For a PDF, step 4 renders each page to an image at the `dpi` option's resolution
 IMAGE_EXTENSIONS   = %w[.jpg .jpeg .png .gif .bmp .webp].freeze
 IMAGE_GLOB_PATTERN = '*.{jpg,jpeg,png,gif,bmp,webp}'.freeze
 INFO_FILENAMES     = %w[ComicInfo.xml MetronInfo.xml].freeze
+
+TYPES          = %i[cb cb7 cba cbr cbt cbz folder pdf].freeze
+READABLE_TYPES = %i[cb cb7 cbr cbt cbz folder pdf].freeze
+WRITABLE_TYPES = %i[cb cb7 cbt cbz].freeze
+
+DEFAULT_PAGE_FILENAME_TEMPLATE = 'page_{page:3}'.freeze
 ```
 
 ### Options Support
@@ -200,7 +207,7 @@ Extract options:
 ## Dependencies
 
 ### Runtime Dependencies
-- **comicinfo** (>= 2.0): Reads `ComicInfo.xml`
+- **comicinfo** (>= 2.1): Reads and updates `ComicInfo.xml`, and fills in page file name templates
 - **rubyzip** (>= 3.4.0): ZIP file handling for CBZ format
 - **seven-zip** (~> 1.4): 7-Zip handling for CB7 format
 - **ruby-vips** (>= 2.3): PDF rendering; loaded only when a PDF is used, and needs libvips on the system
