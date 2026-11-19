@@ -1,5 +1,7 @@
 ## [Unreleased]
 
+## [0.5.0] - 2026-11-19
+
 ### Added
 
 - `ComicBook#arrange_pages(sources, template:)`: make a folder's page images exactly the given files, in order. Reorders, deletes, and adds pages of an extracted comic in one step: pages stay in the subfolder they were in, files that are not images are left alone, and a `ComicInfo.xml` in the folder has its `<Page>` entries and `PageCount` updated to match. Pages are named `page_001…` unless a `template:` such as `{series}_{number:3}_{page:4}` is given, which the comicinfo gem's `Issue#page_filename` fills in from the folder's `ComicInfo.xml`. `ComicBook::PageArranger` does the work
