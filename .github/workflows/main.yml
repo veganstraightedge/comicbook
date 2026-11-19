@@ -9,8 +9,8 @@ on:
 
 jobs:
   build:
-    # Pinned: on Ubuntu 26.04 (what ubuntu-latest became) the seven-zip gem crashes Ruby reading an
-    # empty 7z, and installing libvips-dev stalls.
+    # Pinned: on Ubuntu 26.04 (what ubuntu-latest became) the seven-zip gem crashed Ruby reading an
+    # empty 7z.
     runs-on: ubuntu-24.04
     name: Ruby ${{ matrix.ruby }}
     strategy:
@@ -23,7 +23,12 @@ jobs:
         with:
           persist-credentials: false
       - name: Install system dependencies
-        run: sudo apt-get update && sudo apt-get install -y unar libvips-dev
+        # The Ubuntu mirror sometimes stops answering mid-download. Give up on a stalled download
+        # and try it again, instead of hanging until the job is cancelled.
+        timeout-minutes: 10
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y -o Acquire::Retries=5 -o Acquire::http::Timeout=30 unar libvips-dev
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:

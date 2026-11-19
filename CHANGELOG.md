@@ -2,7 +2,8 @@
 
 ### Changed
 
-- CI runs on `ubuntu-24.04` instead of `ubuntu-latest`. On Ubuntu 26.04 the `seven-zip` gem crashes Ruby when reading an empty 7z, and installing `libvips-dev` stalls
+- CI runs on `ubuntu-24.04` instead of `ubuntu-latest`: on Ubuntu 26.04 the `seven-zip` gem crashed Ruby when reading an empty 7z
+- CI retries a stalled package download instead of hanging: installing `unar` and `libvips-dev` was stalling on an unresponsive Ubuntu mirror
 - Bump Ruby version from 4.0.5 to 4.0.9 (`.ruby-version`, `required_ruby_version`, CI matrix)
 - Brought `README.md`, `SYSTEM.md`, `AGENT.md` and `TODO.md` up to date: CBR, PDF, `.cb` folders, the CLI, `files`, and `contents:` are documented as they work today; finished roadmap items are removed
 
