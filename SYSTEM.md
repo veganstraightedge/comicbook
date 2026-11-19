@@ -18,6 +18,7 @@ comicbook/
 │       ├── cli_helpers.rb       # Runs the lsar / unar tools
 │       ├── entry.rb             # One file inside a comic
 │       ├── page.rb              # Page representation
+│       ├── signature.rb         # A file's type, from the bytes it starts with
 │       ├── version.rb           # Version constant
 │       ├── cb.rb                # CB (folder) adapter
 │       ├── cb/
@@ -94,7 +95,7 @@ Each adapter delegates to an `Archiver` and an `Extractor` class that hold the f
 - **Location**: `lib/comicbook.rb`
 - **Purpose**: Public API entry point and file type detection
 - **Responsibilities**:
-  - Type detection: a folder is `:folder`, or `:cb` if its name ends in `.cb`; a file is typed by its extension
+  - Type detection: a folder is `:folder`, or `:cb` if its name ends in `.cb`; a file must have a comic extension, and is typed by its contents (`ComicBook::Signature`), falling back to the extension
   - Path validation
   - Delegation to the adapter
   - `archive`, `extract`, `info`, `files(type:)`, `pages`
@@ -123,7 +124,7 @@ Each adapter delegates to an `Archiver` and an `Extractor` class that hold the f
 - **Location**: `lib/comic_book/entry.rb`
 - **Purpose**: One file inside a comic
 - **Attributes**: `path` (relative path in a folder, or entry name in an archive), `name` (basename)
-- **Predicates**: `image?`, `info?` (`ComicInfo.xml` or `MetronInfo.xml`)
+- **Predicates**: `image?`, `info?` (`ComicInfo.xml` or `MetronInfo.xml`), `macos_metadata?` (a `._` file or anything in `__MACOSX`; never listed or extracted)
 
 #### 5. ComicBook::Page
 - **Location**: `lib/comic_book/page.rb`
@@ -160,7 +161,7 @@ Each adapter delegates to an `Archiver` and an `Extractor` class that hold the f
 
 #### Archive Extraction Flow
 1. User calls `ComicBook.new(archive_path).extract`
-2. Main class detects file type by extension
+2. Main class detects file type from the file's contents, falling back to its extension
 3. Delegates to the adapter's Extractor
 4. Extracts every file (only images if `images_only` is set) to the destination folder
 5. Returns the path of the extracted folder

@@ -2,6 +2,7 @@
 
 ### Fixed
 
+- Mislabelled archives now open. A comic's type is told from the bytes the file starts with, so a RAR named `.cbz` (common in the wild) loads with `type == :cbr` and is read as one. ZIP, RAR, 7-Zip, TAR, PDF and ACE are recognized, by the new `ComicBook::Signature`. The extension still decides which files are comics at all (a `.zip` is refused as before) and is used when the contents are not recognized
 - macOS metadata is no longer part of a comic. Archives made on a Mac can carry AppleDouble members (`._page1.jpg`, written by `tar` beside a file with extended attributes) or a `__MACOSX` folder (where Finder's Compress puts the same data). They were listed as files, counted as pages because their names end in an image extension, and extracted. All formats now leave them out of `files`, `pages` and `extract`, and a folder's `__MACOSX` is left out when it is archived. `ComicBook::Entry#macos_metadata?` is the check
 
 ### Changed

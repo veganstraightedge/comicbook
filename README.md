@@ -24,6 +24,11 @@ Support for only `extract`:
   No support for creating `.cbr` files will ever be added unless `RAR` is open source (or reverse engineered).
 - `PDF`: Convert a PDF to a `.cb*` archive using [libvips](https://www.libvips.org) . Requires `libvips` installed on the system.
 
+A comic's type comes from what the file contains, not its name, so a mislabelled archive still opens: a RAR named `.cbz` is read as a CBR.
+The name still decides which files are comics at all (a `.zip` is refused).
+
+Files that macOS adds to archives it makes (`._page1.jpg`, a `__MACOSX` folder) are never listed, counted as pages, or extracted.
+
 Not supported yet:
 
 - `CBA`: [ACE](https://en.wikipedia.org/wiki/WinAce) is both proprietary and very old/outdated/unsupported.

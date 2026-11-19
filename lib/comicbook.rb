@@ -8,6 +8,7 @@ require_relative 'comic_book/cbr'
 require_relative 'comic_book/cbt'
 require_relative 'comic_book/cbz'
 require_relative 'comic_book/pdf'
+require_relative 'comic_book/signature'
 require_relative 'comic_book/cli_helpers'
 
 class ComicBook
@@ -101,20 +102,26 @@ class ComicBook
     if File.directory? path
       File.extname(path).downcase == '.cb' ? :cb : :folder
     elsif File.file? path
-      extension = File.extname(path).downcase
+      # The name says whether this is a comic at all.
+      # What kind it is comes from its contents, which are right more often than its name.
+      named = type_named File.extname(path)
 
-      case extension
-      when '.cb7' then :cb7
-      when '.cba' then :cba
-      when '.cbr' then :cbr
-      when '.cbt' then :cbt
-      when '.cbz' then :cbz
-      when '.pdf' then :pdf
-      else
-        raise Error, "Unsupported file type: #{File.extname(path)}"
-      end
+      Signature.new(path).type || named
     else
       raise Error, "Path does not exist: #{path}"
+    end
+  end
+
+  def type_named extension
+    case extension.downcase
+    when '.cb7' then :cb7
+    when '.cba' then :cba
+    when '.cbr' then :cbr
+    when '.cbt' then :cbt
+    when '.cbz' then :cbz
+    when '.pdf' then :pdf
+    else
+      raise Error, "Unsupported file type: #{extension}"
     end
   end
 
