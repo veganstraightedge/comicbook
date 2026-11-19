@@ -61,6 +61,7 @@ class ComicBook
       def extract_files destination, options, tar
         tar.each do |entry|
           next unless entry.file?
+          next if ComicBook::Entry.new(entry.full_name).macos_metadata?
           next if options[:images_only] && !image_file?(entry.full_name)
 
           extract_single_file entry, destination

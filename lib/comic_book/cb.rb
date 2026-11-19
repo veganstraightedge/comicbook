@@ -14,11 +14,16 @@ class ComicBook
     end
 
     # Every file in the folder, as Entries with folder-relative paths
+    # (hidden files and macOS metadata are left out)
     def entries
-      Dir.glob(File.join(path, '**', '*')).reject { File.directory? it }.map do |file|
+      files = Dir.glob(File.join(path, '**', '*')).reject { File.directory? it }
+
+      entries = files.map do |file|
         relative = Pathname.new(file).relative_path_from(Pathname.new(path)).to_s
         ComicBook::Entry.new relative
       end
+
+      entries.reject(&:macos_metadata?)
     end
 
     def info

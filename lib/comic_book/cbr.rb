@@ -14,7 +14,7 @@ class ComicBook
     end
 
     def entries
-      CLIHelpers.lsar_list(path).map { ComicBook::Entry.new it }
+      CLIHelpers.lsar_list(path).map { ComicBook::Entry.new it }.reject(&:macos_metadata?)
     end
 
     def info

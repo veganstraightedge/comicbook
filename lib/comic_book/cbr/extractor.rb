@@ -57,7 +57,19 @@ class ComicBook
 
       def extract_files destination, options
         CLIHelpers.unar_extract archive_path, destination
+        delete_macos_metadata destination
         delete_non_images destination if options[:images_only]
+      end
+
+      # unar extracts the whole archive, so what macOS added is removed afterwards.
+      def delete_macos_metadata destination
+        archive_entries = CLIHelpers.lsar_list archive_path
+
+        archive_entries.each do |entry|
+          next unless ComicBook::Entry.new(entry).macos_metadata?
+
+          FileUtils.rm_rf File.join(destination, entry)
+        end
       end
 
       def delete_non_images destination
