@@ -9,7 +9,9 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    # Pinned: on Ubuntu 26.04 (what ubuntu-latest became) the seven-zip gem crashes Ruby reading an
+    # empty 7z, and installing libvips-dev stalls.
+    runs-on: ubuntu-24.04
     name: Ruby ${{ matrix.ruby }}
     strategy:
       matrix:
